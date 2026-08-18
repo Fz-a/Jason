@@ -1,6 +1,6 @@
-/* Folio buddy v15 — snap in place, then form from ink (no fly-in). */
+/* Folio buddy v16 — snap in place, then form from ink (no fly-in). */
 (function () {
-	const BOOT_VER = 15;
+	const BOOT_VER = 16;
 	if (window.__folioBuddyBootVer === BOOT_VER) return;
 	try {
 		window.__folioBuddyDestroyLive?.();
@@ -244,18 +244,6 @@
 		const reduceMotion =
 			typeof matchMedia === "function" && matchMedia("(prefers-reduced-motion: reduce)").matches;
 		const playGenesis = !reduceMotion;
-		if (playGenesis) {
-			root.classList.add("is-forming");
-			root.classList.remove("is-formed");
-			window.setTimeout(() => {
-				root.classList.remove("is-forming");
-				root.classList.add("is-formed");
-				armIdle();
-			}, 3600);
-		} else {
-			root.classList.remove("is-forming");
-			root.classList.add("is-formed");
-		}
 
 		let actIdx = 1;
 		let idleWatch = 0;
@@ -309,27 +297,27 @@
 			return { x, y };
 		};
 
-		const placeFloat = (animate = false) => {
+		const dockBox = () => {
+			const dock = document.querySelector("[data-folio-buddy-dock]");
+			if (!dock) return null;
+			const r = dock.getBoundingClientRect();
+			if (r.width < 40 || r.height < 40) return null;
+			return r;
+		};
+
+		const placeFloat = () => {
 			docked = false;
 			root.classList.remove("is-docked", "is-home");
 			root.style.width = "";
 			root.style.height = "";
 			size = root.getBoundingClientRect().width || 92;
 			const pos = defaultFloatPos(size);
-			setPos(pos.x, pos.y, animate);
+			setPos(pos.x, pos.y, false);
 		};
 
-		const placeDock = (animate = false) => {
-			const dock = document.querySelector("[data-folio-buddy-dock]");
-			if (!dock) {
-				placeFloat(animate);
-				return;
-			}
-			const r = dock.getBoundingClientRect();
-			if (r.width < 40 || r.height < 40) {
-				placeFloat(animate);
-				return;
-			}
+		const placeDock = () => {
+			const r = dockBox();
+			if (!r) return false;
 			userFreed = false;
 			docked = true;
 			root.classList.add("is-docked", "is-home");
@@ -339,25 +327,70 @@
 			size = side;
 			const x = r.left + (r.width - side) / 2;
 			const y = r.top + (r.height - side) / 2;
-			setPos(x, y, animate);
+			setPos(x, y, false);
+			return true;
 		};
 
 		const syncPlace = (resetFree = false) => {
 			if (resetFree) userFreed = false;
 			const home = isHomeView();
-			const first = root.classList.contains("is-placing");
 			if (home) {
-				placeDock(!first);
+				if (!placeDock() && !root.classList.contains("is-placing")) placeFloat();
 				setChat(false);
 			} else if (resetFree || !userFreed) {
-				placeFloat(!first);
+				placeFloat();
 			} else {
 				const rect = root.getBoundingClientRect();
 				setPos(rect.left, rect.top, false);
 			}
+			avatar?.setAttribute("aria-label", home ? "墨趣伙伴，点击互动" : "墨趣伙伴，点击提问，可拖动");
+		};
+
+		const waitDock = (ms = 1200) =>
+			new Promise((resolve) => {
+				if (!isHomeView() || dockBox()) {
+					resolve();
+					return;
+				}
+				const start = performance.now();
+				const tick = () => {
+					if (dockBox() || performance.now() - start > ms) {
+						resolve();
+						return;
+					}
+					requestAnimationFrame(tick);
+				};
+				tick();
+			});
+
+		const startGenesis = () => {
+			if (!playGenesis) {
+				root.classList.remove("is-forming");
+				root.classList.add("is-formed");
+				armIdle();
+				return;
+			}
+			root.classList.remove("is-formed");
+			root.classList.add("is-forming");
+			root.querySelectorAll(".folio-buddy-seed").forEach((el) => {
+				el.style.animation = "none";
+				void el.offsetWidth;
+				el.style.animation = "";
+			});
+			window.setTimeout(() => {
+				root.classList.remove("is-forming");
+				root.classList.add("is-formed");
+				armIdle();
+			}, 3600);
+		};
+
+		const reveal = async () => {
+			if (isHomeView()) await waitDock();
+			syncPlace();
+			void root.offsetWidth;
+			startGenesis();
 			root.classList.remove("is-placing");
 			root.classList.add("is-placed");
-			avatar?.setAttribute("aria-label", home ? "墨趣伙伴，点击互动" : "墨趣伙伴，点击提问，可拖动");
 		};
 
 		const addBubble = (text, who) => {
@@ -502,8 +535,7 @@
 			}
 		});
 
-		syncPlace();
-		if (!playGenesis) armIdle();
+		void reveal();
 
 		live = {
 			bot,

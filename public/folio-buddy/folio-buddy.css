@@ -12,25 +12,21 @@
 	top: var(--fb-y);
 	transition:
 		width 380ms cubic-bezier(0.22, 1, 0.36, 1),
-		height 380ms cubic-bezier(0.22, 1, 0.36, 1),
-		left 420ms cubic-bezier(0.22, 1, 0.36, 1),
-		top 420ms cubic-bezier(0.22, 1, 0.36, 1);
+		height 380ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 #folio-buddy-root.is-dragging,
 #folio-buddy-root.is-placing,
 #folio-buddy-root.is-forming {
 	transition: none;
+}
+
+#folio-buddy-root.is-dragging {
 	cursor: grabbing;
 }
 
 #folio-buddy-root.is-placing {
 	visibility: hidden;
-	cursor: default;
-}
-
-#folio-buddy-root.is-forming {
-	cursor: default;
 }
 
 #folio-buddy-root.is-home {
