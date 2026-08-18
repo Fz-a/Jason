@@ -1,6 +1,6 @@
-/* Folio buddy v12 — defer mount so the folio paints first. */
+/* Folio buddy v13 — mount immediately; shape order circle → triangle → drop. */
 (function () {
-	const BOOT_VER = 12;
+	const BOOT_VER = 13;
 	if (window.__folioBuddyBootVer === BOOT_VER) return;
 	try {
 		window.__folioBuddyDestroyLive?.();
@@ -23,7 +23,7 @@
 	];
 
 	const IDLE_MS = 6800;
-	const SHAPES = ["blob", "pebble", "blob", "pebble", "squircle"];
+	const SHAPES = ["blob", "wedge", "teardrop", "pebble", "squircle", "hex", "tablet"];
 	const MOODS = ["idle", "listening", "happy", "proud", "shy", "happy", "idle", "listening"];
 
 	/** @type {any} */
@@ -35,29 +35,8 @@
 	/** @type {{ role: string, content: string }[]} */
 	let history = [];
 
-	function loadScript(src) {
-		return new Promise((resolve, reject) => {
-			if (window.GrokCharacter && window.__folioBuddyEngineVer === BOOT_VER) {
-				resolve();
-				return;
-			}
-			const existing = document.querySelector(`script[data-folio-buddy="${src}"]`);
-			if (existing && window.__folioBuddyEngineVer === BOOT_VER) {
-				setTimeout(resolve, 30);
-				return;
-			}
-			const el = document.createElement("script");
-			el.src = `${src}?v=${BOOT_VER}`;
-			el.async = false;
-			el.dataset.folioBuddy = src;
-			el.onload = () => resolve();
-			el.onerror = reject;
-			document.head.appendChild(el);
-		});
-	}
-
 	function ensureCss() {
-		if (document.querySelector('link[data-folio-buddy-css]')) return;
+		if (document.querySelector("link[data-folio-buddy-css]")) return;
 		const link = document.createElement("link");
 		link.rel = "stylesheet";
 		link.href = `/folio-buddy/folio-buddy.css?v=${BOOT_VER}`;
@@ -65,7 +44,7 @@
 		document.head.appendChild(link);
 	}
 
-	async function ensureScripts() {
+	function ensureScripts() {
 		const needFresh = window.__folioBuddyEngineVer !== BOOT_VER;
 		if (needFresh) {
 			window.GrokCharacter = undefined;
@@ -77,9 +56,29 @@
 			window.GROK_FX = undefined;
 			document.querySelectorAll("script[data-folio-buddy]").forEach((el) => el.remove());
 		}
-		if (window.GrokCharacter) return;
-		for (const src of SCRIPTS) await loadScript(src);
-		window.__folioBuddyEngineVer = BOOT_VER;
+		if (window.GrokCharacter) return Promise.resolve();
+		return new Promise((resolve, reject) => {
+			let left = SCRIPTS.length;
+			let failed = false;
+			for (const src of SCRIPTS) {
+				const el = document.createElement("script");
+				el.src = `${src}?v=${BOOT_VER}`;
+				el.async = false;
+				el.dataset.folioBuddy = src;
+				el.onload = () => {
+					left -= 1;
+					if (left === 0 && !failed) {
+						window.__folioBuddyEngineVer = BOOT_VER;
+						resolve();
+					}
+				};
+				el.onerror = () => {
+					failed = true;
+					reject(new Error(`Failed to load ${src}`));
+				};
+				document.head.appendChild(el);
+			}
+		});
 	}
 
 	async function loadKb() {
@@ -236,7 +235,7 @@
 		bot.setColor("black", "light");
 		bot.setState("idle", { resetEyes: true, soft: true });
 
-		let actIdx = 0;
+		let actIdx = 1;
 		let idleWatch = 0;
 		/** @type {number[]} */
 		let timers = [];
@@ -265,15 +264,13 @@
 			const mood = MOODS[i % MOODS.length];
 			clearIdle();
 			clearTimers();
-			const changeShape = i % 2 === 1;
-			if (changeShape) bot.setShape(shape, { silent: true });
+			bot.setShape(shape, { silent: true });
 			timers.push(
-				window.setTimeout(
-					() => bot.setState(mood, { resetEyes: false, soft: true }),
-					changeShape ? 280 : 0,
-				),
+				window.setTimeout(() => {
+					bot.setState(mood, { resetEyes: false, soft: true });
+				}, 160),
 			);
-			timers.push(window.setTimeout(() => armIdle(), 2000));
+			timers.push(window.setTimeout(() => armIdle(), 2200));
 		};
 
 		const setPos = (x, y, animate) => {
@@ -503,9 +500,15 @@
 		};
 	}
 
+	function onView() {
+		mount().catch(console.error);
+	}
+
+	ensureCss();
+	const scriptsReady = ensureScripts();
+
 	async function mount() {
-		ensureCss();
-		await ensureScripts();
+		await scriptsReady;
 		const root = createShell();
 		if (live?.root === root && root.querySelector("svg[data-folio-buddy-svg]")) {
 			live.syncPlace?.(true);
@@ -514,17 +517,6 @@
 		destroyLive();
 		bindCompanion(root);
 		loadKb();
-	}
-
-	function onView() {
-		const run = () => {
-			mount().catch(console.error);
-		};
-		if (typeof requestIdleCallback === "function") {
-			requestIdleCallback(run, { timeout: 800 });
-		} else {
-			window.setTimeout(run, 180);
-		}
 	}
 
 	if (document.readyState === "loading") {
