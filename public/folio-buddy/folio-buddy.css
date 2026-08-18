@@ -428,18 +428,6 @@
 	pointer-events: none;
 }
 
-.folio-buddy-dock-hint {
-	position: absolute;
-	left: 50%;
-	bottom: 0.85rem;
-	transform: translateX(-50%);
-	font-size: 0.68rem;
-	letter-spacing: 0.12em;
-	color: rgb(42 38 32 / 0.38);
-	pointer-events: none;
-	white-space: nowrap;
-}
-
 @media (max-width: 720px) {
 	#folio-buddy-root {
 		width: 4.6rem;
