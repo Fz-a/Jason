@@ -3,22 +3,12 @@ import FolioHeader from "@/components/pages/portfolio/FolioHeader.astro";
 import ContactInk from "@/components/pages/portfolio/ContactInk.svelte";
 import HeroInk from "@/components/pages/portfolio/HeroInk.svelte";
 import InkPetals from "@/components/pages/portfolio/InkPetals.svelte";
-import PortraitGreet from "@/components/pages/portfolio/PortraitGreet.svelte";
+import BianzhongPlayer from "@/components/pages/portfolio/BianzhongPlayer.svelte";
 import { portfolioConfig, profileConfig } from "@/config";
 import { url } from "@/utils/url-utils";
 
-const {
-	brand,
-	brandAccent,
-	headline,
-	sections,
-	portrait,
-	contactHref,
-	contactTitle,
-} = portfolioConfig;
+const { headline, sections, contactHref, contactTitle } = portfolioConfig;
 
-const portraitSrc = portrait ? url(portrait) : "";
-const displayName = [brand, brandAccent].filter(Boolean).join(" ");
 const mailto =
 	profileConfig.links.find((l) => l.url.startsWith("mailto:"))?.url ?? "";
 
@@ -39,7 +29,7 @@ const sectionNav = sections.map((section) => ({
 	<div class="folio-grid">
 		<HeroInk client:idle text={headline} />
 
-		<PortraitGreet client:load src={portraitSrc} name={displayName} />
+		<BianzhongPlayer client:load />
 
 		<aside
 			class="folio-tile folio-projects-wrap"
@@ -137,7 +127,6 @@ const sectionNav = sections.map((section) => ({
 				}
 
 				if (current) current.classList.add("is-under");
-				// Force reflow so enter transition always runs
 				void next.offsetWidth;
 				next.classList.add("is-active");
 

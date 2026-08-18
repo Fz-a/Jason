@@ -1,6 +1,6 @@
-/* Folio buddy v20 — no triangle; keep eyes inside sharp silhouettes. */
+/* Folio buddy v21 — dock snaps to centered mark. */
 (function () {
-	const BOOT_VER = 20;
+	const BOOT_VER = 21;
 	if (window.__folioBuddyBootVer === BOOT_VER) return;
 	try {
 		window.__folioBuddyDestroyLive?.();
@@ -301,7 +301,8 @@
 		const dockBox = () => {
 			const dock = document.querySelector("[data-folio-buddy-dock]");
 			if (!dock) return null;
-			const r = dock.getBoundingClientRect();
+			const mark = dock.querySelector(".folio-buddy-dock-mark");
+			const r = (mark || dock).getBoundingClientRect();
 			if (r.width < 40 || r.height < 40) return null;
 			return r;
 		};
@@ -322,7 +323,7 @@
 			userFreed = false;
 			docked = true;
 			root.classList.add("is-docked", "is-home");
-			const side = Math.min(r.width, r.height) * 0.72;
+			const side = Math.min(r.width, r.height) * 0.88;
 			root.style.width = `${side}px`;
 			root.style.height = `${side}px`;
 			size = side;
