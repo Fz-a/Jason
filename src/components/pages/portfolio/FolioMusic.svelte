@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onDestroy, onMount } from "svelte";
+	import { isFav, loadFavs, toggleFav } from "@/utils/folio-music-favs";
 
 	type Track = {
 		name?: string;
@@ -38,6 +39,7 @@
 	let loading = $state(true);
 	let errorMsg = $state("");
 	let query = $state("");
+	let favKeys = $state<string[]>([]);
 
 	let api: MusicApi | null = null;
 	let unsubs: Array<() => void> = [];
@@ -84,6 +86,7 @@
 	}
 
 	onMount(() => {
+		favKeys = loadFavs();
 		api = (window as unknown as { __fireflyMusic?: MusicApi }).__fireflyMusic ?? null;
 		if (!api) {
 			loading = false;
@@ -125,6 +128,11 @@
 	function selectTrack(i: number) {
 		api?.playTrackByIndex(i);
 	}
+
+	function starTrack(e: MouseEvent, t: Track) {
+		e.stopPropagation();
+		favKeys = toggleFav(t);
+	}
 </script>
 
 <section class="folio-music folio-music--library" aria-label="Music library">
@@ -154,10 +162,10 @@
 					</p>
 				{:else}
 					<strong class="folio-music-banner-title">歌单库</strong>
-					<p class="folio-music-banner-meta">点选曲目后，回首页敲编钟控制播放</p>
+					<p class="folio-music-banner-meta">点选曲目后，回首页抚琴控制播放</p>
 				{/if}
 			</div>
-			<a class="folio-music-to-bells" href={homeHref}>回首页敲钟</a>
+			<a class="folio-music-to-bells" href={homeHref}>回首页抚琴</a>
 		</div>
 
 		<div class="folio-music-lib-head">
@@ -182,32 +190,44 @@
 			<ul class="folio-music-list folio-music-list--wide" role="listbox" aria-label="Playlist">
 				{#each filtered as { t, i } (i)}
 					<li>
-						<button
-							type="button"
+						<div
 							class="folio-music-item"
 							class:is-active={i === currentIndex}
 							class:is-playing={i === currentIndex && isPlaying}
-							onclick={() => selectTrack(i)}
-							role="option"
-							aria-selected={i === currentIndex}
-							disabled={!ready}
 						>
-							<span class="folio-music-idx">{String(i + 1).padStart(2, "0")}</span>
-							{#if t.pic || t.cover}
-								<img class="folio-music-thumb" src={t.pic || t.cover} alt="" loading="lazy" />
-							{:else}
-								<span class="folio-music-thumb folio-music-thumb--empty"></span>
-							{/if}
-							<span class="folio-music-item-text">
-								<span class="folio-music-item-name">{t.name || "Untitled"}</span>
-								<span class="folio-music-item-artist">{t.artist || ""}</span>
-							</span>
+							<button
+								type="button"
+								class="folio-music-pick"
+								onclick={() => selectTrack(i)}
+								disabled={!ready}
+							>
+								<span class="folio-music-idx">{String(i + 1).padStart(2, "0")}</span>
+								{#if t.pic || t.cover}
+									<img class="folio-music-thumb" src={t.pic || t.cover} alt="" loading="lazy" />
+								{:else}
+									<span class="folio-music-thumb folio-music-thumb--empty"></span>
+								{/if}
+								<span class="folio-music-item-text">
+									<span class="folio-music-item-name">{t.name || "Untitled"}</span>
+									<span class="folio-music-item-artist">{t.artist || ""}</span>
+								</span>
+							</button>
+							<button
+								type="button"
+								class="folio-music-fav"
+								class:is-on={isFav(t, favKeys)}
+								onclick={(e) => starTrack(e, t)}
+								aria-label={isFav(t, favKeys) ? "取消收藏" : "加入偏好"}
+								title={isFav(t, favKeys) ? "取消收藏" : "加入偏好"}
+							>
+								藏
+							</button>
 							{#if i === currentIndex && isPlaying}
 								<span class="folio-music-eq" aria-hidden="true"><i></i><i></i><i></i></span>
 							{:else if i === currentIndex}
 								<span class="folio-music-picked">当前</span>
 							{/if}
-						</button>
+						</div>
 					</li>
 				{/each}
 			</ul>

@@ -3,7 +3,7 @@ import FolioHeader from "@/components/pages/portfolio/FolioHeader.astro";
 import ContactInk from "@/components/pages/portfolio/ContactInk.svelte";
 import HeroInk from "@/components/pages/portfolio/HeroInk.svelte";
 import InkPetals from "@/components/pages/portfolio/InkPetals.svelte";
-import BianzhongPlayer from "@/components/pages/portfolio/BianzhongPlayer.svelte";
+import GuqinPlayer from "@/components/pages/portfolio/GuqinPlayer.svelte";
 import { portfolioConfig, profileConfig } from "@/config";
 import { url } from "@/utils/url-utils";
 
@@ -29,7 +29,7 @@ const sectionNav = sections.map((section) => ({
 	<div class="folio-grid">
 		<HeroInk client:idle text={headline} />
 
-		<BianzhongPlayer client:load />
+		<GuqinPlayer client:load />
 
 		<aside
 			class="folio-tile folio-projects-wrap"
