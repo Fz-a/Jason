@@ -1,6 +1,6 @@
-/* Folio buddy v21 — dock snaps to centered mark. */
+/* Folio buddy v22 — golden-ratio dock size. */
 (function () {
-	const BOOT_VER = 21;
+	const BOOT_VER = 22;
 	if (window.__folioBuddyBootVer === BOOT_VER) return;
 	try {
 		window.__folioBuddyDestroyLive?.();
@@ -301,8 +301,7 @@
 		const dockBox = () => {
 			const dock = document.querySelector("[data-folio-buddy-dock]");
 			if (!dock) return null;
-			const mark = dock.querySelector(".folio-buddy-dock-mark");
-			const r = (mark || dock).getBoundingClientRect();
+			const r = dock.getBoundingClientRect();
 			if (r.width < 40 || r.height < 40) return null;
 			return r;
 		};
@@ -323,7 +322,11 @@
 			userFreed = false;
 			docked = true;
 			root.classList.add("is-docked", "is-home");
-			const side = Math.min(r.width, r.height) * 0.88;
+			const PHI = 1.6180339887;
+			const shortSide = Math.min(r.width, r.height);
+			const longSide = Math.max(r.width, r.height);
+			// Golden: 1/φ of the long side, but never overflow the short side.
+			const side = Math.min(shortSide * 0.9, longSide / PHI);
 			root.style.width = `${side}px`;
 			root.style.height = `${side}px`;
 			size = side;

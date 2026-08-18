@@ -156,7 +156,7 @@ html.folio-enter .folio-tile {
 	}
 
 	.folio-portrait,
-	.folio-qin {
+	.folio-phono {
 		grid-area: portrait;
 	}
 
@@ -317,42 +317,132 @@ html.folio-enter .folio-tile {
 	background: #f2e8d4;
 }
 
-.folio-qin {
+.folio-phono {
 	display: flex;
 	flex-direction: column;
 	gap: 0.45rem;
-	padding: 0.8rem 0.85rem 0.65rem;
+	padding: 0.75rem 0.8rem 0.6rem;
 	min-height: 16rem;
 	overflow: hidden;
 	background:
-		linear-gradient(165deg, rgb(255 249 237 / 0.96), rgb(228 214 190 / 0.92)),
-		#e8dcc6;
+		linear-gradient(165deg, rgb(255 248 236 / 0.96), rgb(232 218 196 / 0.92)),
+		#e9dcc6;
 }
 
-.folio-qin-head {
-	display: flex;
-	align-items: flex-start;
-	justify-content: space-between;
-	gap: 0.6rem;
-	min-width: 0;
+.folio-phono-stage {
+	position: relative;
+	display: grid;
+	place-items: center;
+	flex: 1;
+	min-height: 8.5rem;
 }
 
-.folio-qin-now {
-	min-width: 0;
+.folio-phono-disc {
+	position: relative;
+	width: min(58%, 9.2rem);
+	aspect-ratio: 1;
+	border: 0;
+	padding: 0;
+	border-radius: 50%;
+	cursor: pointer;
+	background:
+		repeating-radial-gradient(circle at 50% 50%, #2a241c 0 1px, #1a1612 2px 4px);
+	box-shadow:
+		inset 0 0 0 3px #4a3a28,
+		0 10px 18px rgb(26 24 20 / 0.2);
+}
+
+.folio-phono-grooves {
+	position: absolute;
+	inset: 8%;
+	border-radius: 50%;
+	background:
+		repeating-radial-gradient(circle at 50% 50%, transparent 0 3px, rgb(255 236 210 / 0.07) 3px 4px);
+	pointer-events: none;
+}
+
+.folio-phono-label {
+	position: absolute;
+	inset: 31%;
+	border-radius: 50%;
+	overflow: hidden;
+	display: grid;
+	place-items: center;
+	background: #8c2b24;
+	color: #f6ead8;
+	box-shadow: 0 0 0 2px #c4a574;
+}
+
+.folio-phono-label img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+.folio-phono-listen {
+	font-size: 0.78rem;
+	font-weight: 800;
+	letter-spacing: 0.12em;
+}
+
+.folio-phono-disc.is-spinning {
+	animation: folio-phono-spin 8s linear infinite;
+}
+
+@keyframes folio-phono-spin {
+	to {
+		transform: rotate(360deg);
+	}
+}
+
+.folio-phono-arm {
+	position: absolute;
+	top: 8%;
+	right: 18%;
+	width: 4.4rem;
+	height: 4.4rem;
+	transform-origin: 88% 12%;
+	transform: rotate(-18deg);
+	transition: transform 420ms cubic-bezier(0.22, 1, 0.36, 1);
+	pointer-events: none;
+}
+
+.folio-phono-arm.is-on {
+	transform: rotate(22deg);
+}
+
+.folio-phono-arm-bar {
+	position: absolute;
+	right: 0.15rem;
+	top: 0.15rem;
+	width: 0.22rem;
+	height: 3.4rem;
+	border-radius: 999px;
+	background: linear-gradient(#d8c39a, #8a7048);
+	transform: rotate(28deg);
+	transform-origin: top center;
+}
+
+.folio-phono-arm-head {
+	position: absolute;
+	left: 0.15rem;
+	bottom: 0.35rem;
+	width: 0.7rem;
+	height: 0.9rem;
+	border-radius: 0.18rem;
+	background: #3d3224;
+	box-shadow: 0 2px 4px rgb(26 24 20 / 0.2);
+}
+
+.folio-phono-meta {
 	display: grid;
 	gap: 0.08rem;
+	min-width: 0;
+	text-align: center;
 }
 
-.folio-qin-kicker {
-	margin: 0;
-	font-size: 0.62rem;
-	letter-spacing: 0.28em;
-	text-transform: uppercase;
-	color: rgb(26 24 20 / 0.42);
-}
-
-.folio-qin-title {
-	font-size: 0.92rem;
+.folio-phono-title {
+	font-size: 0.9rem;
 	font-weight: 750;
 	letter-spacing: -0.02em;
 	color: #1a1814;
@@ -361,173 +451,67 @@ html.folio-enter .folio-tile {
 	text-overflow: ellipsis;
 }
 
-.folio-qin-artist {
-	font-size: 0.72rem;
+.folio-phono-artist {
+	font-size: 0.7rem;
 	color: rgb(26 24 20 / 0.5);
 	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;
 }
 
-.folio-qin-stamps {
+.folio-phono-keys {
 	display: flex;
-	gap: 0.35rem;
-	flex-shrink: 0;
+	justify-content: center;
+	gap: 0.32rem;
 }
 
-.folio-qin-seal {
+.folio-phono-keys button {
 	width: 1.85rem;
 	height: 1.85rem;
 	border: 1px solid #8c2b24;
-	border-radius: 0.18rem;
+	border-radius: 0.16rem;
 	background: transparent;
 	color: #8c2b24;
-	font-size: 0.78rem;
-	font-weight: 800;
-	letter-spacing: 0.08em;
-	cursor: pointer;
-	transition:
-		background 180ms ease,
-		color 180ms ease,
-		transform 160ms ease;
-}
-
-.folio-qin-seal.is-on {
-	background: #8c2b24;
-	color: #f7efe2;
-}
-
-.folio-qin-seal:active {
-	transform: scale(0.94);
-}
-
-.folio-qin-body {
-	position: relative;
-	flex: 1;
-	display: flex;
-	flex-direction: column;
-	justify-content: center;
-	gap: 0.28rem;
-	min-height: 10.5rem;
-	padding: 0.7rem 0.55rem 0.55rem;
-	border-radius: 1.4rem 1.15rem 1.15rem 1.4rem;
-	background:
-		radial-gradient(circle at 12% 50%, rgb(255 255 255 / 0.08), transparent 28%),
-		linear-gradient(90deg, #6a4d32, #8b6744 18%, #5c422c 82%, #3f2d1e);
-	box-shadow:
-		inset 0 1px 0 rgb(255 236 210 / 0.18),
-		0 10px 18px rgb(26 24 20 / 0.12);
-}
-
-.folio-qin-hui {
-	position: absolute;
-	left: 18%;
-	right: 10%;
-	top: 0.42rem;
-	display: flex;
-	justify-content: space-between;
-	pointer-events: none;
-}
-
-.folio-qin-dot {
-	width: 0.28rem;
-	height: 0.28rem;
-	border-radius: 50%;
-	background: rgb(245 236 214 / 0.55);
-}
-
-.folio-qin-strings {
-	display: grid;
-	gap: 0.22rem;
-	padding-right: 0.15rem;
-}
-
-.folio-qin-string {
-	display: grid;
-	grid-template-columns: 1fr auto;
-	align-items: center;
-	gap: 0.45rem;
-	padding: 0;
-	border: 0;
-	background: transparent;
-	color: #f4ead8;
-	cursor: pointer;
-	font: inherit;
-	min-width: 0;
-}
-
-.folio-qin-wire {
-	height: 1px;
-	border-radius: 999px;
-	background: linear-gradient(90deg, rgb(246 236 214 / 0.2), rgb(246 236 214 / 0.95), rgb(246 236 214 / 0.35));
-	transform-origin: left center;
-	transition: transform 180ms ease, box-shadow 180ms ease;
-}
-
-.folio-qin-string:nth-child(1) .folio-qin-wire {
-	height: 1.5px;
-}
-.folio-qin-string:nth-child(2) .folio-qin-wire {
-	height: 1.25px;
-}
-
-.folio-qin-string:hover .folio-qin-wire,
-.folio-qin-string.is-live .folio-qin-wire {
-	box-shadow: 0 0 8px rgb(255 236 200 / 0.45);
-}
-
-.folio-qin-string.is-plucked .folio-qin-wire {
-	animation: folio-qin-pluck 280ms ease;
-}
-
-@keyframes folio-qin-pluck {
-	0% {
-		transform: scaleY(1) translateY(0);
-	}
-	35% {
-		transform: scaleY(1.8) translateY(2px);
-	}
-	100% {
-		transform: scaleY(1) translateY(0);
-	}
-}
-
-.folio-qin-s-label {
-	display: grid;
-	justify-items: end;
-	min-width: 3.4rem;
-	color: rgb(247 238 220 / 0.88);
-}
-
-.folio-qin-s-label b {
 	font-size: 0.72rem;
-	font-weight: 750;
-	letter-spacing: 0.12em;
+	font-weight: 800;
+	letter-spacing: 0.06em;
+	cursor: pointer;
 }
 
-.folio-qin-s-label small {
-	font-size: 0.52rem;
-	letter-spacing: 0.04em;
-	opacity: 0.72;
+.folio-phono-keys button.is-main {
+	width: 2.15rem;
+	background: #1a1814;
+	border-color: #1a1814;
+	color: #f6ead8;
 }
 
-.folio-qin-vol {
+.folio-phono-keys button.is-on {
+	background: #8c2b24;
+	border-color: #8c2b24;
+	color: #f6ead8;
+}
+
+.folio-phono-keys button.is-main.is-on {
+	background: #8c2b24;
+	border-color: #8c2b24;
+}
+
+.folio-phono-vol {
 	position: relative;
-	height: 0.72rem;
-	margin-top: 0.2rem;
+	height: 0.7rem;
 	border-radius: 999px;
-	background: rgb(26 24 20 / 0.28);
+	background: rgb(26 24 20 / 0.12);
 	cursor: ew-resize;
 	overflow: hidden;
 }
 
-.folio-qin-vol-fill {
+.folio-phono-vol-fill {
 	position: absolute;
 	inset: 0 auto 0 0;
-	background: linear-gradient(90deg, #c9a36a, #f0ddb4);
+	background: linear-gradient(90deg, #8c2b24, #c4a574);
 }
 
-.folio-qin-vol-label {
+.folio-phono-vol span {
 	position: relative;
 	z-index: 1;
 	display: flex;
@@ -536,11 +520,11 @@ html.folio-enter .folio-tile {
 	height: 100%;
 	font-size: 0.52rem;
 	letter-spacing: 0.16em;
-	color: rgb(26 24 20 / 0.7);
+	color: rgb(26 24 20 / 0.62);
 	pointer-events: none;
 }
 
-.folio-qin-note {
+.folio-phono-note {
 	margin: 0;
 	font-size: 0.62rem;
 	letter-spacing: 0.06em;
@@ -1149,7 +1133,7 @@ html.folio-enter .folio-tile {
 	.folio-clash-slash,
 	.folio-shadow-stage.is-playing::after,
 	.folio-hero.is-revealed .folio-brush-line,
-	.folio-qin-string.is-plucked .folio-qin-wire {
+	.folio-phono-disc.is-spinning {
 		animation: none !important;
 	}
 
@@ -3243,13 +3227,10 @@ body:has(.folio-shell) #portfolio-shell {
 		flex-direction: column;
 		align-items: flex-start;
 	}
-
-	.folio-qin-s-label small {
-		display: none;
-	}
 }
 
 @media (prefers-reduced-motion: reduce) {
+	.folio-phono-disc.is-spinning,
 	.folio-music-cover.is-spinning,
 	.folio-music-eq i {
 		animation: none;

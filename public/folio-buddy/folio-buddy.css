@@ -418,10 +418,11 @@
 	position: relative;
 	display: grid;
 	place-items: center;
+	container-type: size;
 }
 
 .folio-buddy-dock-mark {
-	width: min(72%, 8.5rem);
+	width: min(90cqmin, calc(100cqmax / 1.618));
 	aspect-ratio: 1;
 	border-radius: 50%;
 	border: 1px dashed rgb(42 38 32 / 0.14);

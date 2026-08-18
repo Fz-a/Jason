@@ -162,10 +162,10 @@
 					</p>
 				{:else}
 					<strong class="folio-music-banner-title">歌单库</strong>
-					<p class="folio-music-banner-meta">点选曲目后，回首页抚琴控制播放</p>
+					<p class="folio-music-banner-meta">点选曲目后，回首页用留声机播放</p>
 				{/if}
 			</div>
-			<a class="folio-music-to-bells" href={homeHref}>回首页抚琴</a>
+			<a class="folio-music-to-bells" href={homeHref}>回首页留声</a>
 		</div>
 
 		<div class="folio-music-lib-head">
