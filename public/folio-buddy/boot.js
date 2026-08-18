@@ -1,6 +1,6 @@
-/* Folio buddy v13 — mount immediately; shape order circle → triangle → drop. */
+/* Folio buddy v14 — genesis form-in: 一生二，二生三，三生万物. */
 (function () {
-	const BOOT_VER = 13;
+	const BOOT_VER = 14;
 	if (window.__folioBuddyBootVer === BOOT_VER) return;
 	try {
 		window.__folioBuddyDestroyLive?.();
@@ -182,6 +182,11 @@
 		root.id = "folio-buddy-root";
 		root.innerHTML = `
 			<button type="button" class="folio-buddy-avatar" aria-label="墨趣伙伴">
+				<div class="folio-buddy-genesis" aria-hidden="true">
+					<span class="folio-buddy-seed" data-n="1"></span>
+					<span class="folio-buddy-seed" data-n="2"></span>
+					<span class="folio-buddy-seed" data-n="3"></span>
+				</div>
 				<div class="folio-buddy-stage" aria-hidden="true"></div>
 			</button>
 			<div class="folio-buddy-chat" role="dialog" aria-label="墨趣问答" hidden>
@@ -234,6 +239,23 @@
 		bot.setGazeTarget(null);
 		bot.setColor("black", "light");
 		bot.setState("idle", { resetEyes: true, soft: true });
+
+		const reduceMotion =
+			typeof matchMedia === "function" && matchMedia("(prefers-reduced-motion: reduce)").matches;
+		const playGenesis = !reduceMotion && sessionStorage.getItem("folio-buddy-genesis") !== "1";
+		if (playGenesis) {
+			root.classList.add("is-forming");
+			root.classList.remove("is-formed");
+			sessionStorage.setItem("folio-buddy-genesis", "1");
+			window.setTimeout(() => {
+				root.classList.remove("is-forming");
+				root.classList.add("is-formed");
+				armIdle();
+			}, 3600);
+		} else {
+			root.classList.remove("is-forming");
+			root.classList.add("is-formed");
+		}
 
 		let actIdx = 1;
 		let idleWatch = 0;
@@ -443,7 +465,7 @@
 			avatar.releasePointerCapture?.(ptrId);
 			ptrId = null;
 			if (isHomeView()) {
-				cycleMood();
+				if (!root.classList.contains("is-forming")) cycleMood();
 				return;
 			}
 			if (dragged) {
@@ -479,7 +501,7 @@
 		});
 
 		syncPlace();
-		armIdle();
+		if (!playGenesis) armIdle();
 
 		live = {
 			bot,

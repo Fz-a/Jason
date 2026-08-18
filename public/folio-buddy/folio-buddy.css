@@ -76,6 +76,164 @@
 	--fg: #1a1814;
 }
 
+.folio-buddy-genesis {
+	position: absolute;
+	inset: 0;
+	z-index: 2;
+	pointer-events: none;
+	display: none;
+}
+
+.folio-buddy-seed {
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	width: 0.42rem;
+	height: 0.42rem;
+	margin: -0.21rem 0 0 -0.21rem;
+	border-radius: 50%;
+	background: #1a1814;
+	opacity: 0;
+	transform: scale(0);
+}
+
+#folio-buddy-root.is-forming .folio-buddy-genesis {
+	display: block;
+}
+
+#folio-buddy-root.is-forming .folio-buddy-avatar {
+	filter: none;
+}
+
+#folio-buddy-root.is-forming .folio-buddy-stage {
+	animation: none;
+}
+
+#folio-buddy-root.is-forming .folio-buddy-stage svg {
+	opacity: 0;
+	transform: scale(0.18);
+}
+
+#folio-buddy-root.is-forming .folio-buddy-seed[data-n="1"] {
+	animation: folio-buddy-one 3.6s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+
+#folio-buddy-root.is-forming .folio-buddy-seed[data-n="2"] {
+	animation: folio-buddy-two 3.6s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+
+#folio-buddy-root.is-forming .folio-buddy-seed[data-n="3"] {
+	animation: folio-buddy-three 3.6s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+
+#folio-buddy-root.is-formed .folio-buddy-stage svg {
+	animation: folio-buddy-awaken 1.15s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* 一：一点墨生 */
+@keyframes folio-buddy-one {
+	0% {
+		opacity: 0;
+		transform: scale(0);
+	}
+	8% {
+		opacity: 1;
+		transform: scale(0.7);
+	}
+	18% {
+		opacity: 1;
+		transform: scale(1);
+	}
+	32% {
+		opacity: 1;
+		transform: translate(-0.72rem, 0) scale(1.05);
+	}
+	52% {
+		opacity: 1;
+		transform: translate(-0.62rem, -0.52rem) scale(1.12);
+	}
+	72% {
+		opacity: 1;
+		transform: translate(0, 0) scale(2.4);
+	}
+	88% {
+		opacity: 0.35;
+		transform: translate(0, 0) scale(5.2);
+	}
+	100% {
+		opacity: 0;
+		transform: translate(0, 0) scale(7.4);
+	}
+}
+
+/* 二：一分为二 */
+@keyframes folio-buddy-two {
+	0%,
+	22% {
+		opacity: 0;
+		transform: scale(0);
+	}
+	32% {
+		opacity: 1;
+		transform: translate(0.72rem, 0) scale(1.05);
+	}
+	52% {
+		opacity: 1;
+		transform: translate(0.62rem, -0.52rem) scale(1.12);
+	}
+	72% {
+		opacity: 1;
+		transform: translate(0, 0) scale(2.4);
+	}
+	88% {
+		opacity: 0.35;
+		transform: translate(0, 0) scale(5.2);
+	}
+	100% {
+		opacity: 0;
+		transform: translate(0, 0) scale(7.4);
+	}
+}
+
+/* 三：二生三，三点成象 */
+@keyframes folio-buddy-three {
+	0%,
+	42% {
+		opacity: 0;
+		transform: scale(0);
+	}
+	52% {
+		opacity: 1;
+		transform: translate(0, 0.78rem) scale(1.12);
+	}
+	72% {
+		opacity: 1;
+		transform: translate(0, 0) scale(2.4);
+	}
+	88% {
+		opacity: 0.35;
+		transform: translate(0, 0) scale(5.2);
+	}
+	100% {
+		opacity: 0;
+		transform: translate(0, 0) scale(7.4);
+	}
+}
+
+/* 万物：聚成球体 */
+@keyframes folio-buddy-awaken {
+	0% {
+		opacity: 0;
+		transform: scale(0.28);
+		filter: blur(3px);
+	}
+	100% {
+		opacity: 1;
+		transform: scale(1);
+		filter: blur(0);
+	}
+}
+
 .folio-buddy-chat {
 	position: absolute;
 	left: 0;
@@ -289,8 +447,15 @@
 @media (prefers-reduced-motion: reduce) {
 	#folio-buddy-root,
 	.folio-buddy-chat,
-	.folio-buddy-avatar .folio-buddy-stage {
+	.folio-buddy-avatar .folio-buddy-stage,
+	#folio-buddy-root.is-forming .folio-buddy-seed,
+	#folio-buddy-root.is-formed .folio-buddy-stage svg {
 		transition: none;
 		animation: none;
+	}
+
+	#folio-buddy-root.is-forming .folio-buddy-stage svg {
+		opacity: 1;
+		transform: none;
 	}
 }
