@@ -1,0 +1,46 @@
+---
+import SectionGallery from "@/components/pages/portfolio/SectionGallery.svelte";
+import type { PortfolioSectionId } from "@/config";
+import { portfolioConfig } from "@/config";
+import type { GalleryNode } from "@/types/folioTree";
+import PortfolioLayout from "@/layouts/PortfolioLayout.astro";
+import { url } from "@/utils/url-utils";
+import type { PortfolioItem } from "@/types/portfolioConfig";
+
+interface Props {
+	sectionId: PortfolioSectionId;
+}
+
+function toNode(item: PortfolioItem): GalleryNode {
+	return {
+		id: item.id,
+		title: item.title,
+		summary: item.summary ?? "",
+		body: item.body ?? "",
+		accent: item.accent,
+		coverSrc: item.cover ? url(item.cover) : undefined,
+		kind: item.kind ?? (item.children?.length ? "folder" : "module"),
+		children: (item.children ?? []).map(toNode),
+	};
+}
+
+const { sectionId } = Astro.props;
+const section = portfolioConfig.sections.find((s) => s.id === sectionId);
+if (!section) {
+	throw new Error(`Unknown portfolio section: ${sectionId}`);
+}
+
+const seedNodes = (portfolioConfig.items[sectionId] ?? []).map(toNode);
+---
+
+<PortfolioLayout title={section.title} description={section.title}>
+	<section class="folio-bento folio-section-page" data-folio-section={sectionId}>
+		<SectionGallery
+			client:load
+			sectionId={sectionId}
+			sectionLabel={section.title}
+			homeHref={url("/")}
+			seedNodes={seedNodes}
+		/>
+	</section>
+</PortfolioLayout>

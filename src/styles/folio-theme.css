@@ -1,0 +1,116 @@
+/* Folio theme — white canvas + sand tiles */
+
+:root,
+:root.dark {
+	--folio-bg: #ffffff;
+	--folio-tile: #d2cdb8;
+	--folio-ink: #1a1a1a;
+	--folio-muted: rgba(26, 26, 26, 0.58);
+	--folio-contact: #525046;
+	--folio-contact-ink: #d2cdb8;
+	--folio-placeholder: #3a3832;
+	--folio-on-canvas: #1a1a1a;
+	--folio-divider: rgba(26, 26, 26, 0.12);
+	--folio-radius: 1.75rem;
+	--folio-gap: 0.9rem;
+
+	--page-bg: var(--folio-bg);
+	--card-bg: var(--folio-tile);
+	--card-bg-transparent: rgb(210 205 184 / var(--card-transparent-opacity, 0.94));
+	--float-panel-bg: var(--folio-tile);
+	--primary: #1a1a1a;
+	--primary-rgb: 26, 26, 26;
+	--btn-content: #1a1a1a;
+	--btn-regular-bg: rgba(26, 26, 26, 0.08);
+	--btn-regular-bg-hover: rgba(26, 26, 26, 0.14);
+	--btn-regular-bg-active: rgba(26, 26, 26, 0.2);
+	--btn-plain-bg-hover: rgba(26, 26, 26, 0.08);
+	--btn-plain-bg-active: rgba(26, 26, 26, 0.12);
+	--btn-card-bg-hover: rgba(26, 26, 26, 0.06);
+	--btn-card-bg-active: rgba(26, 26, 26, 0.12);
+	--deep-text: #1a1a1a;
+	--content-meta: rgba(26, 26, 26, 0.58);
+	--line-divider: rgba(26, 26, 26, 0.14);
+	--line-color: rgba(26, 26, 26, 0.18);
+	--meta-divider: rgba(26, 26, 26, 0.28);
+	--muted: rgba(26, 26, 26, 0.07);
+	--selection-bg: rgba(82, 80, 70, 0.28);
+	--codeblock-bg: #161616;
+	--codeblock-topbar-bg: #242424;
+	--display-light-icon: 0;
+	--display-dark-icon: 1;
+	--radius-large: var(--folio-radius);
+}
+
+html,
+body {
+	background-color: var(--folio-bg) !important;
+	color: var(--folio-on-canvas);
+}
+
+.card-base,
+.card-base-transparent,
+.btn-card,
+.float-panel,
+#nav-menu-panel,
+#display-setting,
+#translate-panel,
+#mobile-toc-panel,
+#search-panel,
+.dropdown-content,
+.category-bar,
+.folio-tile:not(.folio-contact) {
+	background-color: var(--folio-tile) !important;
+	color: var(--folio-ink) !important;
+	box-shadow: none !important;
+}
+
+.card-base-transparent {
+	background-color: var(--card-bg-transparent) !important;
+}
+
+#navbar > div {
+	border-radius: var(--folio-radius) !important;
+	background-color: var(--folio-tile) !important;
+	color: var(--folio-ink) !important;
+	border: none !important;
+	box-shadow: none !important;
+	--navbar-surface-blur: 0px !important;
+}
+
+#navbar > div::before {
+	backdrop-filter: none !important;
+}
+
+.enable-card-border #navbar > div:not(.absolute),
+.enable-card-border .card-base,
+.enable-card-border .card-base-transparent,
+.enable-card-border .btn-card {
+	border-color: color-mix(in srgb, var(--folio-ink) 12%, transparent) !important;
+	box-shadow: none !important;
+}
+
+#main-grid > .footer,
+.footer,
+body > footer {
+	color: var(--folio-on-canvas);
+}
+
+.card-base .custom-md,
+.card-base .prose,
+.card-base .custom-md a,
+.card-base .prose a,
+#main-grid .card-base,
+#swup-container .card-base,
+.post-list-container,
+.archive-list {
+	color: var(--folio-ink);
+}
+
+#progress-bar {
+	background: var(--folio-ink);
+}
+
+.folio-portrait {
+	background: #f2e8d4 !important;
+}

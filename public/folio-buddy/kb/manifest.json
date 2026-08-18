@@ -1,0 +1,8 @@
+{
+	"files": ["about.md", "experience.md", "site.md"],
+	"quick": [
+		{ "label": "你是谁？", "prompt": "简单介绍一下站主是谁，以及这个网站是做什么的。" },
+		{ "label": "经历", "prompt": "根据知识库，概括站主的个人经历与方向。" },
+		{ "label": "怎么联系", "prompt": "站主希望别人怎么联系？有哪些入口？" }
+	]
+}

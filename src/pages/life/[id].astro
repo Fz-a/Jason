@@ -1,0 +1,14 @@
+---
+import type { GetStaticPaths } from "astro";
+import DetailPage from "@/components/pages/portfolio/DetailPage.astro";
+import { portfolioConfig } from "@/config";
+
+export const getStaticPaths = (() => {
+	const items = portfolioConfig.items.life ?? [];
+	return items.map((item) => ({ params: { id: item.id } }));
+}) satisfies GetStaticPaths;
+
+const { id } = Astro.params;
+---
+
+<DetailPage sectionId="life" itemId={id!} />

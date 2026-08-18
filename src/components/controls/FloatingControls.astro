@@ -1,9 +1,12 @@
 ---
 import type { MarkdownHeading } from "astro";
+import { url } from "@/utils/url-utils";
+import BackNav from "./BackNav.astro";
 import BackToComment from "./BackToComment.astro";
 import BackToHome from "./BackToHome.astro";
 import BackToTop from "./BackToTop.astro";
 import FloatingTOC from "./FloatingTOC.astro";
+import FolioEditFab from "./FolioEditFab.astro";
 
 interface Props {
 	headings?: MarkdownHeading[];
@@ -11,14 +14,58 @@ interface Props {
 }
 
 const { headings, encrypted } = Astro.props;
+const homeUrl = url("/");
 ---
 
 <div class="floating-controls-container">
   <FloatingTOC headings={headings ?? []} encrypted={encrypted} />
   <BackToComment />
-  <BackToHome />
+  <div class="floating-nav-pair">
+    <FolioEditFab />
+    <BackNav />
+    <BackToHome />
+  </div>
   <BackToTop />
 </div>
+
+<script is:inline define:vars={{ homeUrl }}>
+  (() => {
+    if (window.__folioFabVisBound) return;
+    window.__folioFabVisBound = true;
+
+    function norm(p) {
+      return (p || "/").replace(/\/$/, "") || "/";
+    }
+
+    function updateFolioFabs() {
+      const path = norm(window.location.pathname);
+      const home = norm(homeUrl);
+      const onHome = path === home;
+      const onSection = !!document.querySelector("[data-folio-section]");
+
+      const back = document.getElementById("folio-back-btn");
+      const homeBtn = document.getElementById("back-to-home-btn");
+      const edit = document.getElementById("folio-edit-btn");
+
+      back?.classList.toggle("hide", onHome);
+      homeBtn?.classList.toggle("hide", onHome);
+
+      if (edit) {
+        if (onHome || !onSection) {
+          edit.classList.add("hide");
+          edit.classList.remove("toggled");
+          edit.querySelector("button")?.setAttribute("aria-label", "Edit");
+        } else {
+          edit.classList.remove("hide");
+        }
+      }
+    }
+
+    updateFolioFabs();
+    document.addEventListener("astro:page-load", updateFolioFabs);
+    document.addEventListener("swup:contentReplaced", updateFolioFabs);
+  })();
+</script>
 
 <style>
   .floating-controls-container {
@@ -27,15 +74,20 @@ const { headings, encrypted } = Astro.props;
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
-    align-items: flex-end; /* 右对齐 */
-    pointer-events: none; /* 容器不阻挡点击 */
-    
-    /* 默认桌面端位置 - 对应 BackToTop 的位置 */
+    align-items: flex-end;
+    pointer-events: none;
     right: 1rem;
     bottom: 4rem;
   }
 
-  /* 响应式调整 - 保持原有的位置逻辑 */
+  .floating-nav-pair {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5rem;
+    pointer-events: none;
+  }
+
   @media (max-width: 1024px) {
     .floating-controls-container {
       right: 1rem;
@@ -58,26 +110,84 @@ const { headings, encrypted } = Astro.props;
     }
   }
 
-  /* 高缩放比例适配 */
   @media (min-resolution: 2dppx) {
     .floating-controls-container {
       right: max(0.5rem, 2rem - 2vw);
       bottom: max(3rem, 4rem - 5vh);
     }
   }
-  
-  /* 横屏模式适配 */
+
   @media (orientation: landscape) and (max-height: 500px) {
     .floating-controls-container {
-      bottom: 4rem; 
+      bottom: 4rem;
     }
   }
 
-  /* 极低分辨率适配 */
   @media (max-width: 320px) {
     .floating-controls-container {
-        right: 0.125rem;
-        bottom: 4rem;
+      right: 0.125rem;
+      bottom: 4rem;
+    }
+  }
+</style>
+
+<style is:global>
+  .folio-nav-fab:not(.hide) {
+    --fab-delay: 0ms;
+    animation: folio-fab-pop 320ms cubic-bezier(0.22, 1, 0.36, 1) var(--fab-delay) both;
+  }
+
+  .folio-nav-fab-home:not(.hide) {
+    --fab-delay: 40ms;
+  }
+
+  .folio-nav-fab-edit.toggled:not(.hide) {
+    color: rgb(139 58 58 / 0.92);
+  }
+
+  .folio-nav-fab:not(.hide):hover {
+    transform: translateY(-1px);
+  }
+
+  .folio-nav-fab-back:not(.hide):hover :is(svg, .iconify) {
+    transform: translateX(-1.5px);
+    transition: transform 200ms ease;
+  }
+
+  .folio-nav-fab-home:not(.hide):hover :is(svg, .iconify) {
+    transform: translateY(-1px);
+    transition: transform 200ms ease;
+  }
+
+  .folio-nav-fab:not(.hide):active {
+    transform: scale(0.97);
+  }
+
+  .folio-nav-fab:not(.hide) :is(svg, .iconify) {
+    transition: transform 200ms ease;
+  }
+
+  @keyframes folio-fab-pop {
+    from {
+      opacity: 0;
+      transform: translateY(6px) scale(0.92);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .folio-nav-fab:not(.hide),
+    .folio-nav-fab-home:not(.hide) {
+      animation: none !important;
+    }
+
+    .folio-nav-fab:not(.hide):hover,
+    .folio-nav-fab-back:not(.hide):hover :is(svg, .iconify),
+    .folio-nav-fab-home:not(.hide):hover :is(svg, .iconify) {
+      transform: none;
     }
   }
 </style>

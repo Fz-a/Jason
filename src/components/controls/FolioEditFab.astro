@@ -1,0 +1,29 @@
+---
+import FloatingButton from "@/components/common/FloatingButton.astro";
+---
+
+<FloatingButton
+	id="folio-edit-btn"
+	icon="material-symbols:edit-outline-rounded"
+	toggleIcon="material-symbols:lock-outline"
+	ariaLabel="Edit"
+	onclick="folioEditToggle()"
+	class="hide folio-nav-fab folio-nav-fab-edit"
+/>
+
+<script is:inline>
+	window.folioEditToggle = function () {
+		if (!document.querySelector("[data-folio-section]")) return;
+		document.dispatchEvent(new CustomEvent("folio:edit-toggle", { cancelable: true }));
+	};
+
+	window.folioSyncEditFab = function (unlocked) {
+		const btn = document.getElementById("folio-edit-btn");
+		if (!btn) return;
+		btn.classList.toggle("toggled", !!unlocked);
+		btn.querySelector("button")?.setAttribute(
+			"aria-label",
+			unlocked ? "Lock editing" : "Edit",
+		);
+	};
+</script>

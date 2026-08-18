@@ -33,6 +33,7 @@ import { url } from "@/utils/url-utils";
 
 import "@/styles/main.css";
 import "@/styles/variables.styl";
+import "@/styles/folio-theme.css";
 import "@/styles/markdown-extend.styl";
 import "@rehype-callouts-theme";
 
@@ -44,6 +45,8 @@ interface Props {
 	setOGTypeArticle?: boolean;
 	postSlug?: string;
 	hasWallpaper?: boolean;
+	/** Force-disable banner layout classes (e.g. portfolio home) */
+	noBanner?: boolean;
 }
 
 let {
@@ -53,6 +56,7 @@ let {
 	setOGTypeArticle,
 	postSlug,
 	hasWallpaper = false,
+	noBanner = false,
 } = Astro.props;
 
 // apply a class to the body element to decide the height of the banner, only used for initial page load
@@ -71,7 +75,7 @@ const navbarTransparentMode =
 const shouldShowTopHighlight =
 	navbarTransparentMode === "full" || navbarTransparentMode === "semifull";
 
-const enableBanner = backgroundWallpaper.mode === "banner";
+const enableBanner = !noBanner && backgroundWallpaper.mode === "banner";
 
 // 子菜单 / 浮动面板的毛玻璃模糊度：跟随 navbar.blur，但不受壁纸模式影响，
 // 且带一个最小值 —— 导航栏可以用 blur: 0 关掉毛玻璃，面板则始终保留毛玻璃。
@@ -277,44 +281,11 @@ const siteLang = lang.replace("_", "-");
         cardTransparentOpacity: backgroundWallpaper.overlay?.cardOpacity ?? 0.6,
       }}
     >
-      // 主题初始化 - 与setting-utils.ts保持一致
-      const LIGHT_MODE = "light";
+      // Folio: force dark (beige tiles on black) — no light/system toggle
       const DARK_MODE = "dark";
-      const SYSTEM_MODE = "system";
-
-      // 获取存储的主题，如果没有则使用默认值
-      const theme = localStorage.getItem("theme") || defaultMode;
-
-      // 获取系统主题
-      function getSystemTheme() {
-        return window.matchMedia("(prefers-color-scheme: dark)").matches
-          ? DARK_MODE
-          : LIGHT_MODE;
-      }
-
-      // 解析主题（如果是system模式，则获取系统主题）
-      function resolveTheme(themeValue) {
-        if (themeValue === SYSTEM_MODE) {
-          return getSystemTheme();
-        }
-        return themeValue;
-      }
-
-      const resolvedTheme = resolveTheme(theme);
-      const isDark = resolvedTheme === DARK_MODE;
-
-      // 应用主题
-      if (isDark) {
-        document.documentElement.classList.add("dark");
-      } else {
-        document.documentElement.classList.remove("dark");
-      }
-
-      // Set the theme for Expressive Code
-      document.documentElement.setAttribute(
-        "data-theme",
-        isDark ? darkTheme : lightTheme
-      );
+      localStorage.setItem("theme", DARK_MODE);
+      document.documentElement.classList.add("dark");
+      document.documentElement.setAttribute("data-theme", darkTheme);
 
       // Load the hue from local storage
       const hue = localStorage.getItem("hue") || configHue;
@@ -634,6 +605,10 @@ const siteLang = lang.replace("_", "-");
 
     <!-- Tab 代码块交互 -->
     <CodeGroupManager />
+
+    <!-- Folio buddy — global float + chat (outside Swup) -->
+    <link rel="stylesheet" href="/folio-buddy/folio-buddy.css?v=11" data-swup-ignore-script />
+    <script is:inline src="/folio-buddy/boot.js?v=11" data-swup-ignore-script></script>
   </body>
 </html>
 

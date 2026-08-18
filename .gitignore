@@ -47,3 +47,11 @@ package/
 .codex*
 .claude
 .mimocode
+
+.tmp-grok/
+
+# accidental AI upscale dumps (GitHub 100MB limit)
+*_upscayl_*
+*realesrgan-x4plus*
+
+

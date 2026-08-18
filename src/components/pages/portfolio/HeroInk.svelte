@@ -1,0 +1,77 @@
+<script lang="ts">
+	import { onMount } from "svelte";
+
+	interface Props {
+		text: string;
+	}
+
+	let { text }: Props = $props();
+	let root = $state<HTMLElement | null>(null);
+	let mx = $state(0.5);
+	let my = $state(0.5);
+	let revealed = $state(false);
+
+	onMount(() => {
+		const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+		const skip =
+			reduce ||
+			document.documentElement.classList.contains("folio-nav") ||
+			!document.documentElement.classList.contains("folio-enter");
+		if (skip) {
+			revealed = true;
+			return;
+		}
+		const t = window.setTimeout(() => {
+			revealed = true;
+		}, 180);
+		return () => window.clearTimeout(t);
+	});
+
+	function onMove(e: PointerEvent) {
+		if (!root) return;
+		const r = root.getBoundingClientRect();
+		mx = (e.clientX - r.left) / r.width;
+		my = (e.clientY - r.top) / r.height;
+	}
+</script>
+
+<article
+	class="folio-tile folio-hero"
+	class:is-revealed={revealed}
+	bind:this={root}
+	style={`--bento-delay: 40ms; --mx: ${mx}; --my: ${my}`}
+	onpointermove={onMove}
+>
+	<svg class="folio-cloud folio-cloud-a" viewBox="0 0 160 72" aria-hidden="true">
+		<path
+			fill="currentColor"
+			d="M28 48c-10 0-18-6-18-14s8-14 18-12c2-10 12-16 22-14 4-8 14-12 24-8 8-6 20-4 26 4 12-2 22 6 22 16 10 0 18 8 16 18H28z"
+			opacity="0.12"
+		></path>
+		<path
+			fill="none"
+			stroke="currentColor"
+			stroke-width="1.4"
+			d="M34 50c-8-.5-14-5-14-11 0-6 5-11 13-10 1-8 9-13 18-11 4-6 12-9 20-6 7-5 17-3 22 4 10-1 18 6 17 14"
+			opacity="0.5"
+		></path>
+	</svg>
+	<svg class="folio-cloud folio-cloud-b" viewBox="0 0 120 56" aria-hidden="true">
+		<path
+			fill="none"
+			stroke="currentColor"
+			stroke-width="1.2"
+			d="M18 40c-6 0-12-4-12-9s5-9 12-8c1-7 8-11 15-9 3-5 10-8 16-5 5-4 13-3 17 3 8-1 14 4 14 11"
+			opacity="0.35"
+		></path>
+	</svg>
+
+	<div class="folio-ink-wash" aria-hidden="true"></div>
+
+	<h1 class="folio-headline folio-headline-zh">
+		{#each [...text] as char, i}
+			<span class="folio-char" style={`--i: ${i}`}>{char}</span>
+		{/each}
+	</h1>
+	<span class="folio-brush-line" aria-hidden="true"></span>
+</article>

@@ -4,7 +4,6 @@ import * as path from "node:path";
 import type { ImageMetadata } from "astro";
 import { Icon } from "astro-icon/components";
 import DisplaySettings from "@/components/controls/DisplaySettingsIntegrated.svelte";
-import LightDarkSwitch from "@/components/controls/LightDarkSwitch.svelte";
 import Search from "@/components/controls/Search.svelte";
 import MusicPlayer from "@/components/features/MusicPlayer.astro";
 import {
@@ -66,11 +65,13 @@ function isPageEnabled(link: NavBarLink): boolean {
 }
 
 function filterLinks(link: NavBarLink): NavBarLink | null {
-	if (!link.children) {
-		return isPageEnabled(link) ? link : null;
+	if (!link?.children) {
+		return link && isPageEnabled(link) ? link : null;
 	}
 
-	const filteredChildren = link.children.filter(isPageEnabled);
+	const filteredChildren = link.children.filter(
+		(child): child is NavBarLink => Boolean(child) && isPageEnabled(child),
+	);
 
 	if (filteredChildren.length === 0) return null;
 	if (filteredChildren.length === 1) return filteredChildren[0];
@@ -210,8 +211,6 @@ const logoVariants = await Promise.all(
                             <Icon is:inline name="material-symbols:palette-outline" class="text-[1.25rem]"></Icon>
                         </button>
                 )}
-                {/* @ts-ignore */}
-                <LightDarkSwitch client:load></LightDarkSwitch>
                 <button aria-label="Menu" aria-controls="nav-menu-panel" aria-expanded="false" name="Nav Menu" class="btn-plain scale-animation rounded-lg w-9 h-9 md:w-11 md:h-11 active:scale-90 lg:hidden!" id="nav-menu-switch">
                     <Icon is:inline name="material-symbols:menu-rounded" class="text-[1.25rem]"></Icon>
                 </button>

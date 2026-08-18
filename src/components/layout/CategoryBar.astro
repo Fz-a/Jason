@@ -13,16 +13,16 @@ const { currentPostCategory } = Astro.props as Props;
 
 const categories = await getCategoryList();
 const totalPosts = (await getSortedPostsList()).length;
-const homeUrl = url("/");
+const blogUrl = url("/blog/");
 const archiveUrl = url("/archive/");
 
 // 服务端计算初始高亮 pill（首屏无需等 JS）。
 // 查询串筛选（?category=/?tag=/?uncategorized）在静态页构建期不可知，
 // 交由客户端脚本在加载/导航时同步；此处只处理路径可确定的情况。
 const pathname = Astro.url.pathname.replace(/\/$/, "");
-const homePath = homeUrl.replace(/\/$/, "");
+const blogPath = blogUrl.replace(/\/$/, "");
 const archivePath = archiveUrl.replace(/\/$/, "");
-const isHome = pathname === homePath || pathname === "" || pathname === "/";
+const isBlogIndex = pathname === blogPath;
 const isCategories = pathname === "/categories";
 const isArchive = pathname === archivePath;
 const postCategory = (currentPostCategory || "").trim();
@@ -32,7 +32,7 @@ function initialActive(categoryName: string): {
 	active?: boolean;
 	soft?: boolean;
 } {
-	if (isHome) return categoryName === "" ? { active: true } : {};
+	if (isBlogIndex) return categoryName === "" ? { active: true } : {};
 	if (isCategories)
 		return categoryName === "__categories__" ? { active: true } : {};
 	if (isArchive) return categoryName === "__archive__" ? { active: true } : {};
@@ -44,13 +44,13 @@ function initialActive(categoryName: string): {
 <div
   class="card-base category-bar p-3 onload-animation"
   id="category-bar"
-  data-home-path={homeUrl}
+  data-home-path={blogUrl}
   data-archive-path={archiveUrl}
   data-current-post-category={currentPostCategory || ""}
 >
   <div class="category-bar-inner flex gap-2">
     <a
-      href={homeUrl}
+      href={blogUrl}
       class="category-pill focus-ring-inset text-sm px-3 py-1.5 shrink-0
              transition-colors duration-150 ease-out flex items-center justify-center"
       data-category-name=""
@@ -175,7 +175,7 @@ function initialActive(categoryName: string): {
     const pathname = currentUrl.pathname.replace(/\/$/, "");
     const homePath = (bar.getAttribute("data-home-path") || "/").replace(/\/$/, "");
     const archivePath = (bar.getAttribute("data-archive-path") || "/archive").replace(/\/$/, "");
-    const isHome = pathname === homePath || pathname === "" || pathname === "/";
+    const isHome = pathname === homePath;
     const isArchive = pathname === archivePath;
     const isCategories = pathname === "/categories";
 

@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Folio buddy</title>
+<style>
+  html, body {
+    margin: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: #e8dcc4;
+  }
+  body {
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+  }
+  .disk {
+    width: min(78%, 13.5rem);
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background:
+      radial-gradient(circle at 42% 32%, #fffdf8 0%, transparent 42%),
+      #efe6d2;
+    display: grid;
+    place-items: center;
+    box-shadow:
+      inset 0 -14px 28px rgb(42 38 32 / 0.06),
+      0 10px 28px rgb(26 24 20 / 0.08);
+  }
+  .disk svg {
+    width: 68%;
+    height: 68%;
+    overflow: visible;
+    color-scheme: light;
+    --bg: #efe6d2;
+    --fg: #111;
+  }
+</style>
+</head>
+<body>
+  <div class="disk" id="disk" title="点击切换表情">
+    <svg id="bot" role="img" aria-label="Interactive companion"></svg>
+  </div>
+  <script src="./geometry-data.js"></script>
+  <script src="./src/math.js"></script>
+  <script src="./src/tables.js"></script>
+  <script src="./src/pose.js"></script>
+  <script src="./src/tricks.js"></script>
+  <script src="./src/fx.js"></script>
+  <script src="./src/eyes.js"></script>
+  <script src="./src/character.js"></script>
+  <script>
+    const moods = ["curious", "happy", "playful", "excited", "listening", "proud", "laughing", "shy", "idle", "celebrate"];
+    let moodIdx = 0;
+    let resume;
+
+    const bot = new GrokCharacter(document.getElementById("bot"), {
+      mode: "onboarding",
+      shape: "blob",
+      color: "black",
+      scheme: "light",
+      loginWrap: true,
+      followPointer: true,
+      state: "curious",
+    });
+    bot.moodN = 1;
+    bot.setState("curious", { resetEyes: true });
+
+    document.body.addEventListener("click", () => {
+      moodIdx = (moodIdx + 1) % moods.length;
+      const next = moods[moodIdx];
+      bot.setMode("hold");
+      bot.setState(next, { resetEyes: true });
+      if (next === "celebrate") bot.spinOnce(1);
+      else bot.bounceOnce();
+      clearTimeout(resume);
+      resume = setTimeout(() => bot.setMode("onboarding"), 2800);
+    });
+  </script>
+</body>
+</html>

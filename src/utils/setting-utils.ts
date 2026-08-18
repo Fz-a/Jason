@@ -28,7 +28,7 @@ declare global {
 }
 
 export function getDefaultHue(): number {
-	const fallback = "250";
+	const fallback = "253";
 	// 检查是否在浏览器环境中
 	if (typeof document === "undefined") {
 		return Number.parseInt(fallback, 10);
@@ -101,7 +101,7 @@ export function applyThemeToDocument(theme: LIGHT_DARK_MODE): void {
 	const currentTheme = document.documentElement.getAttribute("data-theme");
 
 	// 计算目标主题状态
-	let targetIsDark = false; // 初始化默认值
+	let targetIsDark = false;
 	switch (resolvedTheme) {
 		case LIGHT_MODE:
 			targetIsDark = false;
@@ -110,7 +110,6 @@ export function applyThemeToDocument(theme: LIGHT_DARK_MODE): void {
 			targetIsDark = true;
 			break;
 		default:
-			// 处理默认情况，使用当前主题状态
 			targetIsDark = currentIsDark;
 			break;
 	}
@@ -154,27 +153,19 @@ let systemThemeListener:
 	| null = null;
 
 export function setTheme(theme: LIGHT_DARK_MODE): void {
-	// 检查是否在浏览器环境中
+	// Folio: ignore requested theme — always dark
+	void theme;
 	if (
 		typeof localStorage === "undefined" ||
 		typeof localStorage.setItem !== "function"
 	) {
+		applyThemeToDocument(DARK_MODE);
 		return;
 	}
 
-	// 先应用主题
-	applyThemeToDocument(theme);
-
-	// 保存到localStorage
-	localStorage.setItem("theme", theme);
-
-	// 如果切换到 system 模式，需要监听系统主题变化
-	if (theme === SYSTEM_MODE) {
-		setupSystemThemeListener();
-	} else {
-		// 如果切换其他模式，移除系统主题监听
-		cleanupSystemThemeListener();
-	}
+	applyThemeToDocument(DARK_MODE);
+	localStorage.setItem("theme", DARK_MODE);
+	cleanupSystemThemeListener();
 }
 
 // 设置系统主题监听器
@@ -248,16 +239,8 @@ function cleanupSystemThemeListener() {
 }
 
 export function getStoredTheme(): LIGHT_DARK_MODE {
-	// 检查是否在浏览器环境中
-	if (
-		typeof localStorage === "undefined" ||
-		typeof localStorage.getItem !== "function"
-	) {
-		return getDefaultTheme();
-	}
-	return (
-		(localStorage.getItem("theme") as LIGHT_DARK_MODE) || getDefaultTheme()
-	);
+	// Folio site is dark-only (beige tiles on black)
+	return DARK_MODE;
 }
 
 // 初始化主题监听器（用于页面加载后）

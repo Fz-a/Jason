@@ -1,0 +1,173 @@
+---
+import FolioHeader from "@/components/pages/portfolio/FolioHeader.astro";
+import ContactInk from "@/components/pages/portfolio/ContactInk.svelte";
+import HeroInk from "@/components/pages/portfolio/HeroInk.svelte";
+import InkPetals from "@/components/pages/portfolio/InkPetals.svelte";
+import PortraitGreet from "@/components/pages/portfolio/PortraitGreet.svelte";
+import { portfolioConfig, profileConfig } from "@/config";
+import { url } from "@/utils/url-utils";
+
+const {
+	brand,
+	brandAccent,
+	headline,
+	sections,
+	portrait,
+	contactHref,
+	contactTitle,
+} = portfolioConfig;
+
+const portraitSrc = portrait ? url(portrait) : "";
+const displayName = [brand, brandAccent].filter(Boolean).join(" ");
+const mailto =
+	profileConfig.links.find((l) => l.url.startsWith("mailto:"))?.url ?? "";
+
+const sectionNav = sections.map((section) => ({
+	id: section.id,
+	title: section.title,
+	href: url(section.href),
+	accent: section.accent || "#525046",
+	cover: `/portfolio/nav-${section.id}.jpg`,
+}));
+---
+
+<section class="folio-bento folio-home" aria-label="Portfolio home">
+	<InkPetals client:visible />
+
+	<FolioHeader />
+
+	<div class="folio-grid">
+		<HeroInk client:load text={headline} />
+
+		<PortraitGreet client:load src={portraitSrc} name={displayName} />
+
+		<aside
+			class="folio-tile folio-projects-wrap"
+			style="--bento-delay: 120ms"
+			data-folio-section-nav
+		>
+			<div class="folio-section-nav">
+				<div class="folio-section-preview" aria-hidden="true">
+					{
+						sectionNav.map((item, index) => (
+							<div
+								class:list={[
+									"folio-section-preview-frame",
+									{ "is-active": index === 0 },
+								]}
+								data-preview-id={item.id}
+								style={`--tile-accent: ${item.accent}; background-image: url('${item.cover}')`}
+							>
+								<img
+									src={item.cover}
+									alt=""
+									class="folio-section-preview-img"
+									width="1280"
+									height="800"
+									loading={index === 0 ? "eager" : "lazy"}
+									decoding="async"
+								/>
+							</div>
+						))
+					}
+				</div>
+
+				<nav class="folio-project-list" aria-label="Sections">
+					{
+						sectionNav.map((item, index) => (
+							<a
+								href={item.href}
+								class:list={["folio-project-link", { "is-active": index === 0 }]}
+								data-nav-id={item.id}
+							>
+								<span class="folio-project-name">{item.title}</span>
+								<span class="folio-ink-mark" aria-hidden="true" />
+							</a>
+						))
+					}
+				</nav>
+			</div>
+		</aside>
+
+		{/* Dock marker only — live buddy floats outside Swup and snaps here on home */}
+		<article
+			class="folio-tile folio-bio folio-buddy folio-buddy--dock"
+			style="--bento-delay: 160ms"
+			data-folio-buddy-dock
+		>
+			<div class="folio-buddy-dock-mark" aria-hidden="true"></div>
+			<span class="folio-buddy-dock-hint">墨趣</span>
+		</article>
+
+		<ContactInk
+			client:load
+			guestbookHref={url(contactHref)}
+			mailto={mailto}
+			title={contactTitle || "留墨"}
+		/>
+	</div>
+</section>
+
+<script>
+	function bindSectionNav(root: ParentNode = document) {
+		root.querySelectorAll<HTMLElement>("[data-folio-section-nav]").forEach((wrap) => {
+			if (wrap.dataset.bound === "1") return;
+			wrap.dataset.bound = "1";
+
+			const frames = [
+				...wrap.querySelectorAll<HTMLElement>("[data-preview-id]"),
+			];
+			const links = [...wrap.querySelectorAll<HTMLAnchorElement>("[data-nav-id]")];
+			let current =
+				frames.find((f) => f.classList.contains("is-active")) ?? frames[0] ?? null;
+			let timer = 0;
+			let clearing = 0;
+
+			const activate = (id: string) => {
+				const next = frames.find((f) => f.dataset.previewId === id);
+				if (!next || next === current) {
+					for (const link of links) {
+						link.classList.toggle("is-active", link.dataset.navId === id);
+					}
+					return;
+				}
+
+				window.clearTimeout(clearing);
+				for (const frame of frames) {
+					frame.classList.remove("is-active", "is-under");
+				}
+
+				if (current) current.classList.add("is-under");
+				// Force reflow so enter transition always runs
+				void next.offsetWidth;
+				next.classList.add("is-active");
+
+				for (const link of links) {
+					link.classList.toggle("is-active", link.dataset.navId === id);
+				}
+
+				const prev = current;
+				current = next;
+
+				clearing = window.setTimeout(() => {
+					if (prev && prev !== current) prev.classList.remove("is-under");
+				}, 760);
+			};
+
+			const queue = (id: string) => {
+				window.clearTimeout(timer);
+				timer = window.setTimeout(() => activate(id), 40);
+			};
+
+			for (const link of links) {
+				const id = link.dataset.navId;
+				if (!id) continue;
+				link.addEventListener("mouseenter", () => queue(id));
+				link.addEventListener("focus", () => activate(id));
+			}
+		});
+	}
+
+	bindSectionNav();
+	document.addEventListener("swup:page:view", () => bindSectionNav());
+</script>

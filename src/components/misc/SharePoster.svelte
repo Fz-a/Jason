@@ -22,7 +22,7 @@ export let avatarSelector: string | null = null;
 let showModal = false;
 let posterImage: string | null = null;
 let generating = false;
-let themeColor = "#558e88"; // Default blue
+let themeColor = "#2D8DEE"; // Default sky blue (palette primary)
 const headerTextColor = "#1f2937"; // 站点名称与 Logo 颜色
 
 onMount(() => {

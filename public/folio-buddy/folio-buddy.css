@@ -1,0 +1,296 @@
+/* Folio buddy — global float + chat (outside Swup) */
+#folio-buddy-root {
+	position: fixed;
+	z-index: 1100;
+	width: 5.75rem;
+	height: 5.75rem;
+	touch-action: none;
+	user-select: none;
+	--fb-x: 0px;
+	--fb-y: 0px;
+	left: var(--fb-x);
+	top: var(--fb-y);
+	transition:
+		width 380ms cubic-bezier(0.22, 1, 0.36, 1),
+		height 380ms cubic-bezier(0.22, 1, 0.36, 1),
+		left 420ms cubic-bezier(0.22, 1, 0.36, 1),
+		top 420ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+#folio-buddy-root.is-dragging {
+	transition: none;
+	cursor: grabbing;
+}
+
+#folio-buddy-root.is-home {
+	touch-action: manipulation;
+}
+
+#folio-buddy-root.is-home .folio-buddy-avatar {
+	cursor: pointer;
+}
+
+#folio-buddy-root.is-chat-open {
+	z-index: 1150;
+}
+
+.folio-buddy-avatar {
+	position: relative;
+	width: 100%;
+	height: 100%;
+	border: 0;
+	padding: 0;
+	margin: 0;
+	background: transparent;
+	cursor: grab;
+	border-radius: 50%;
+	display: grid;
+	place-items: center;
+	filter: drop-shadow(0 10px 18px rgb(26 24 20 / 0.14));
+}
+
+.folio-buddy-avatar:active {
+	cursor: grabbing;
+}
+
+.folio-buddy-avatar:focus-visible {
+	outline: 2px solid rgb(42 38 32 / 0.45);
+	outline-offset: 3px;
+}
+
+.folio-buddy-avatar .folio-buddy-stage {
+	width: 88%;
+	height: 88%;
+	display: grid;
+	place-items: center;
+	pointer-events: none;
+	animation: folio-buddy-float 7.5s ease-in-out infinite;
+}
+
+.folio-buddy-avatar .folio-buddy-stage svg {
+	width: 100%;
+	height: 100%;
+	overflow: visible;
+	color-scheme: light;
+	--bg: #f2ebe0;
+	--fg: #1a1814;
+}
+
+.folio-buddy-chat {
+	position: absolute;
+	left: 0;
+	bottom: calc(100% + 0.45rem);
+	width: min(14.25rem, calc(100vw - 1.4rem));
+	max-height: min(16.5rem, 42vh);
+	display: flex;
+	flex-direction: column;
+	gap: 0.35rem;
+	padding: 0.45rem 0.45rem 0.42rem;
+	border-radius: 0.85rem;
+	background: rgb(252 249 244 / 0.96);
+	border: 1px solid rgb(42 38 32 / 0.1);
+	box-shadow: 0 10px 24px rgb(26 24 20 / 0.12);
+	backdrop-filter: blur(8px);
+	opacity: 0;
+	pointer-events: none;
+	transform: translateY(6px) scale(0.97);
+	transform-origin: bottom left;
+	transition:
+		opacity 200ms ease,
+		transform 240ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+#folio-buddy-root.is-home .folio-buddy-chat {
+	display: none;
+}
+
+#folio-buddy-root.is-chat-open .folio-buddy-chat {
+	opacity: 1;
+	pointer-events: auto;
+	transform: translateY(0) scale(1);
+}
+
+#folio-buddy-root.is-chat-right .folio-buddy-chat {
+	left: auto;
+	right: 0;
+	transform-origin: bottom right;
+}
+
+.folio-buddy-chat-head {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 0.35rem;
+	padding: 0 0.05rem 0.05rem;
+}
+
+.folio-buddy-chat-title {
+	font-family: "Songti SC", "Noto Serif SC", "Source Han Serif SC", serif;
+	font-size: 0.78rem;
+	letter-spacing: 0.06em;
+	color: rgb(42 38 32 / 0.72);
+}
+
+.folio-buddy-chat-close {
+	border: 0;
+	background: transparent;
+	color: rgb(42 38 32 / 0.45);
+	font-size: 0.95rem;
+	line-height: 1;
+	cursor: pointer;
+	padding: 0.1rem 0.22rem;
+	border-radius: 0.3rem;
+}
+
+.folio-buddy-chat-close:hover {
+	background: rgb(42 38 32 / 0.06);
+	color: #2a2620;
+}
+
+.folio-buddy-quick {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.25rem;
+}
+
+.folio-buddy-quick button {
+	border: 1px solid rgb(42 38 32 / 0.1);
+	background: rgb(255 255 255 / 0.65);
+	color: #3a342c;
+	font-size: 0.65rem;
+	padding: 0.18rem 0.42rem;
+	border-radius: 999px;
+	cursor: pointer;
+	transition: background 160ms ease, border-color 160ms ease;
+}
+
+.folio-buddy-quick button:hover {
+	background: #fff;
+	border-color: rgb(42 38 32 / 0.22);
+}
+
+.folio-buddy-msgs {
+	flex: 1;
+	min-height: 4.2rem;
+	max-height: 8.2rem;
+	overflow: auto;
+	display: flex;
+	flex-direction: column;
+	gap: 0.32rem;
+	padding: 0.05rem 0;
+	scrollbar-width: thin;
+}
+
+.folio-buddy-bubble {
+	max-width: 94%;
+	padding: 0.38rem 0.5rem;
+	border-radius: 0.65rem;
+	font-size: 0.72rem;
+	line-height: 1.4;
+	white-space: pre-wrap;
+	word-break: break-word;
+}
+
+.folio-buddy-bubble.is-bot {
+	align-self: flex-start;
+	background: rgb(42 38 32 / 0.06);
+	color: #2a2620;
+	border-bottom-left-radius: 0.3rem;
+}
+
+.folio-buddy-bubble.is-user {
+	align-self: flex-end;
+	background: #2a2620;
+	color: #faf7f2;
+	border-bottom-right-radius: 0.3rem;
+}
+
+.folio-buddy-bubble.is-typing {
+	opacity: 0.7;
+	font-style: italic;
+}
+
+.folio-buddy-form {
+	display: flex;
+	gap: 0.28rem;
+	align-items: center;
+}
+
+.folio-buddy-form input {
+	flex: 1;
+	min-width: 0;
+	border: 1px solid rgb(42 38 32 / 0.12);
+	background: #fff;
+	border-radius: 0.55rem;
+	padding: 0.38rem 0.5rem;
+	font-size: 0.72rem;
+	color: #2a2620;
+	outline: none;
+}
+
+.folio-buddy-form input:focus {
+	border-color: rgb(42 38 32 / 0.28);
+}
+
+.folio-buddy-form button[type="submit"] {
+	border: 0;
+	background: #2a2620;
+	color: #faf7f2;
+	border-radius: 0.55rem;
+	padding: 0.38rem 0.52rem;
+	font-size: 0.68rem;
+	cursor: pointer;
+	white-space: nowrap;
+}
+
+.folio-buddy-form button[type="submit"]:disabled {
+	opacity: 0.5;
+	cursor: default;
+}
+
+/* Home dock placeholder (inside bento; character lives outside Swup) */
+.folio-buddy--dock {
+	position: relative;
+}
+
+.folio-buddy-dock-mark {
+	position: absolute;
+	inset: 12%;
+	border-radius: 50%;
+	border: 1px dashed rgb(42 38 32 / 0.14);
+	background:
+		radial-gradient(circle at 50% 42%, rgb(42 38 32 / 0.04), transparent 62%);
+	pointer-events: none;
+}
+
+.folio-buddy-dock-hint {
+	position: absolute;
+	left: 50%;
+	bottom: 0.85rem;
+	transform: translateX(-50%);
+	font-size: 0.68rem;
+	letter-spacing: 0.12em;
+	color: rgb(42 38 32 / 0.38);
+	pointer-events: none;
+	white-space: nowrap;
+}
+
+@media (max-width: 720px) {
+	#folio-buddy-root {
+		width: 4.6rem;
+		height: 4.6rem;
+	}
+
+	.folio-buddy-chat {
+		width: min(13.5rem, calc(100vw - 1.1rem));
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	#folio-buddy-root,
+	.folio-buddy-chat,
+	.folio-buddy-avatar .folio-buddy-stage {
+		transition: none;
+		animation: none;
+	}
+}

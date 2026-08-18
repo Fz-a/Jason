@@ -1,0 +1,61 @@
+---
+import FolioHeader from "@/components/pages/portfolio/FolioHeader.astro";
+import type { PortfolioSectionId } from "@/config";
+import { portfolioConfig } from "@/config";
+import PortfolioLayout from "@/layouts/PortfolioLayout.astro";
+import { url } from "@/utils/url-utils";
+
+interface Props {
+	sectionId: PortfolioSectionId;
+	itemId: string;
+}
+
+const { sectionId, itemId } = Astro.props;
+const section = portfolioConfig.sections.find((s) => s.id === sectionId);
+const item = portfolioConfig.items[sectionId]?.find((i) => i.id === itemId);
+
+if (!section || !item) {
+	return Astro.redirect(`/${sectionId}/`);
+}
+---
+
+<PortfolioLayout title={item.title} description={item.summary}>
+	<section class="folio-bento folio-detail-page">
+		<FolioHeader />
+
+		<article class="folio-tile folio-detail">
+			<a class="folio-back" href={url(`/${sectionId}/`)}>← {section.title}</a>
+			{
+				item.cover ? (
+					<img
+						src={url(item.cover)}
+						alt={item.title}
+						class="folio-detail-media"
+						loading="eager"
+					/>
+				) : (
+					<div
+						class="folio-detail-media folio-ph"
+						style={`background: ${item.accent || "var(--folio-placeholder)"}`}
+						aria-hidden="true"
+					/>
+				)
+			}
+			<p class="folio-kicker">{section.title}</p>
+			<h1 class="folio-detail-title">{item.title}</h1>
+			{item.summary && <p class="folio-detail-body">{item.summary}</p>}
+			{
+				item.href && (
+					<a
+						class="folio-btn"
+						href={item.external ? item.href : url(item.href)}
+						target={item.external ? "_blank" : undefined}
+						rel={item.external ? "noopener noreferrer" : undefined}
+					>
+						Open related
+					</a>
+				)
+			}
+		</article>
+	</section>
+</PortfolioLayout>

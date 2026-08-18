@@ -1,0 +1,30 @@
+---
+import { portfolioConfig } from "@/config";
+import { url } from "@/utils/url-utils";
+import { Icon } from "astro-icon/components";
+
+const { brand, brandAccent, socialLinks = [] } = portfolioConfig;
+const displayName = [brand, brandAccent].filter(Boolean).join(" ");
+---
+
+<header class="folio-tile folio-header">
+	<a class="folio-brand" href={url("/")}>{displayName}</a>
+	{
+		socialLinks.length > 0 && (
+			<div class="folio-social" aria-label="Social links">
+				{socialLinks.map((link) => (
+					<a
+						class="folio-social-link"
+						href={link.href}
+						target="_blank"
+						rel="noopener noreferrer"
+						aria-label={link.label}
+						title={link.label}
+					>
+						<Icon is:inline name={link.icon} class="folio-social-icon" />
+					</a>
+				))}
+			</div>
+		)
+	}
+</header>

@@ -1,0 +1,27 @@
+---
+import FloatingButton from "@/components/common/FloatingButton.astro";
+import { url } from "@/utils/url-utils";
+---
+
+<FloatingButton
+	id="folio-back-btn"
+	icon="material-symbols:arrow-back-rounded"
+	ariaLabel="Back"
+	onclick="folioNavigateBack()"
+	class="hide folio-nav-fab folio-nav-fab-back"
+/>
+
+<script is:inline define:vars={{ homeUrl: url("/") }}>
+	window.folioNavigateBack = function () {
+		if (document.querySelector("[data-folio-section]")) {
+			const ev = new CustomEvent("folio:tree-back", { cancelable: true });
+			if (!document.dispatchEvent(ev)) return;
+		}
+		if (window.history.length > 1) {
+			window.history.back();
+			return;
+		}
+		if (window.swup) window.swup.navigate(homeUrl);
+		else window.location.href = homeUrl;
+	};
+</script>

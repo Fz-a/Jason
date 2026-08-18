@@ -1,0 +1,108 @@
+---
+import FloatingControls from "@/components/controls/FloatingControls.astro";
+import Layout from "./Layout.astro";
+
+interface Props {
+	title?: string;
+	description?: string;
+	lang?: string;
+}
+
+const { title, description, lang } = Astro.props;
+---
+
+<Layout title={title} description={description} lang={lang} hasWallpaper={false} noBanner={true}>
+	{/*
+	  Swup 要求配置里的每个 container 在所有页面都存在。
+	  作品集布局没有侧栏/Banner，用隐藏占位满足替换，避免整页硬刷新。
+	*/}
+	<div id="banner-overlay-container" class="hidden" aria-hidden="true"></div>
+	<div id="banner-dim-container" class="hidden" aria-hidden="true"></div>
+	<div id="left-sidebar-dynamic" class="hidden" aria-hidden="true"></div>
+	<div id="right-sidebar-dynamic" class="hidden" aria-hidden="true"></div>
+	<div id="floating-toc-wrapper" class="hidden" aria-hidden="true"></div>
+
+	<div id="portfolio-shell" class="folio-shell relative z-20 w-full mx-auto px-3 sm:px-5 md:px-6 pt-5 md:pt-6">
+		<main id="swup-container" class="transition-swup-fade pb-8">
+			<slot />
+		</main>
+	</div>
+
+	<FloatingControls />
+</Layout>
+
+<style is:global>
+	.folio-shell {
+		max-width: 72rem;
+	}
+
+	body:has(.folio-shell) #progress-bar {
+		opacity: 0.35;
+	}
+
+	/* Swup 切页：保持内容可见，避免整块淡出到黑底造成频闪 */
+	html.is-changing body:has(.folio-shell) .transition-swup-fade,
+	html.is-animating body:has(.folio-shell) .transition-swup-fade,
+	html.is-leaving body:has(.folio-shell) .transition-swup-fade {
+		opacity: 1 !important;
+		transform: none !important;
+		transition: none !important;
+	}
+
+	/* 站内导航期间跳过入场动画与影子戏/毛笔字动画 */
+	html.folio-nav .folio-tile,
+	html.folio-nav .folio-tree-stage,
+	html.folio-nav .folio-char,
+	html.folio-nav .folio-brush-line,
+	html.folio-nav .folio-hero .folio-cloud {
+		animation: none !important;
+		transition: none !important;
+		opacity: 1 !important;
+		transform: none !important;
+		filter: none !important;
+	}
+
+	html.folio-nav .folio-hero {
+		/* 立刻视为已揭示，避免字先隐后显 */
+	}
+</style>
+
+<script is:inline>
+	(() => {
+		const html = document.documentElement;
+
+		function markNav() {
+			html.classList.add("folio-nav");
+			html.classList.remove("folio-enter");
+		}
+
+		function clearNav() {
+			requestAnimationFrame(() => {
+				requestAnimationFrame(() => {
+					html.classList.remove("folio-nav");
+				});
+			});
+		}
+
+		function bootEnter() {
+			if (html.dataset.folioBooted) return;
+			html.dataset.folioBooted = "1";
+			if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+			html.classList.add("folio-enter");
+			window.setTimeout(() => html.classList.remove("folio-enter"), 450);
+		}
+
+		function bind(swup) {
+			if (!swup?.hooks || html.dataset.folioSwupBound) return;
+			html.dataset.folioSwupBound = "1";
+			swup.hooks.on("visit:start", markNav);
+			swup.hooks.on("content:replace", markNav);
+			swup.hooks.on("page:view", clearNav);
+			swup.hooks.on("animation:in:end", clearNav);
+		}
+
+		bootEnter();
+		if (window.swup) bind(window.swup);
+		document.addEventListener("swup:enable", () => bind(window.swup));
+	})();
+</script>
