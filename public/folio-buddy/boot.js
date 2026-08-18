@@ -1,6 +1,6 @@
-/* Folio buddy v14 — genesis form-in: 一生二，二生三，三生万物. */
+/* Folio buddy v15 — snap in place, then form from ink (no fly-in). */
 (function () {
-	const BOOT_VER = 14;
+	const BOOT_VER = 15;
 	if (window.__folioBuddyBootVer === BOOT_VER) return;
 	try {
 		window.__folioBuddyDestroyLive?.();
@@ -180,6 +180,7 @@
 
 		root = document.createElement("div");
 		root.id = "folio-buddy-root";
+		root.className = "is-placing";
 		root.innerHTML = `
 			<button type="button" class="folio-buddy-avatar" aria-label="墨趣伙伴">
 				<div class="folio-buddy-genesis" aria-hidden="true">
@@ -242,11 +243,10 @@
 
 		const reduceMotion =
 			typeof matchMedia === "function" && matchMedia("(prefers-reduced-motion: reduce)").matches;
-		const playGenesis = !reduceMotion && sessionStorage.getItem("folio-buddy-genesis") !== "1";
+		const playGenesis = !reduceMotion;
 		if (playGenesis) {
 			root.classList.add("is-forming");
 			root.classList.remove("is-formed");
-			sessionStorage.setItem("folio-buddy-genesis", "1");
 			window.setTimeout(() => {
 				root.classList.remove("is-forming");
 				root.classList.add("is-formed");
@@ -309,7 +309,7 @@
 			return { x, y };
 		};
 
-		const placeFloat = (animate = true) => {
+		const placeFloat = (animate = false) => {
 			docked = false;
 			root.classList.remove("is-docked", "is-home");
 			root.style.width = "";
@@ -319,42 +319,44 @@
 			setPos(pos.x, pos.y, animate);
 		};
 
-		const placeDock = () => {
+		const placeDock = (animate = false) => {
 			const dock = document.querySelector("[data-folio-buddy-dock]");
 			if (!dock) {
-				placeFloat(true);
+				placeFloat(animate);
 				return;
 			}
 			const r = dock.getBoundingClientRect();
 			if (r.width < 40 || r.height < 40) {
-				placeFloat(true);
+				placeFloat(animate);
 				return;
 			}
 			userFreed = false;
 			docked = true;
 			root.classList.add("is-docked", "is-home");
-			root.classList.remove("is-dragging");
 			const side = Math.min(r.width, r.height) * 0.72;
 			root.style.width = `${side}px`;
 			root.style.height = `${side}px`;
 			size = side;
 			const x = r.left + (r.width - side) / 2;
 			const y = r.top + (r.height - side) / 2;
-			setPos(x, y, true);
+			setPos(x, y, animate);
 		};
 
 		const syncPlace = (resetFree = false) => {
 			if (resetFree) userFreed = false;
 			const home = isHomeView();
+			const first = root.classList.contains("is-placing");
 			if (home) {
-				placeDock();
+				placeDock(!first);
 				setChat(false);
 			} else if (resetFree || !userFreed) {
-				placeFloat(true);
+				placeFloat(!first);
 			} else {
 				const rect = root.getBoundingClientRect();
 				setPos(rect.left, rect.top, false);
 			}
+			root.classList.remove("is-placing");
+			root.classList.add("is-placed");
 			avatar?.setAttribute("aria-label", home ? "墨趣伙伴，点击互动" : "墨趣伙伴，点击提问，可拖动");
 		};
 
