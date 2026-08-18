@@ -356,10 +356,17 @@
 
   function nextGaze(state) {
     switch (state) {
-      case "idle":
-        return { x: 0, y: 0, hold: [2500, 5500] };
+      case "idle": {
+        // Soft wander — often recenter, sometimes glance aside.
+        if (Math.random() < 0.42) return { x: 0, y: 0, hold: [900, 1800] };
+        return {
+          x: rand(-0.55, 0.55) * 15,
+          y: rand(-0.4, 0.35) * 9,
+          hold: [700, 1600],
+        };
+      }
       case "listening":
-        return { x: rand(-0.3, 0.3) * 15, y: rand(-0.25, 0.25) * 9, hold: [2200, 4200] };
+        return { x: rand(-0.45, 0.45) * 15, y: rand(-0.35, 0.3) * 9, hold: [900, 2000] };
       case "thinking":
         return { x: sign() * rand(0.5, 1) * 15, y: -rand(0.4, 1) * 9, hold: [1500, 2800] };
       case "searching":
@@ -377,7 +384,7 @@
       case "drowsy":
         return { x: rand(-0.4, 0.4) * 15, y: rand(0.4, 1) * 9, hold: [2500, 4500] };
       case "happy":
-        return { x: rand(-0.7, 0.7) * 15, y: -rand(0, 0.6) * 9, hold: [1800, 3400] };
+        return { x: rand(-0.75, 0.75) * 15, y: -rand(0, 0.55) * 9, hold: [800, 1800] };
       case "curious":
         return { x: sign() * rand(0.6, 1) * 15, y: rand(-1, 1) * 9, hold: [950, 1900] };
       case "confused":
@@ -385,9 +392,9 @@
       case "bored":
         return { x: sign() * rand(0.7, 1) * 15, y: rand(0.4, 0.9) * 9, hold: [3000, 6000] };
       case "proud":
-        return { x: rand(-0.3, 0.3) * 15, y: -rand(0.3, 0.7) * 9, hold: [2600, 4600] };
+        return { x: rand(-0.4, 0.4) * 15, y: -rand(0.2, 0.65) * 9, hold: [1000, 2200] };
       case "shy":
-        return { x: sign() * rand(0.6, 1) * 15, y: rand(0.5, 1) * 9, hold: [2000, 4000] };
+        return { x: sign() * rand(0.45, 0.9) * 15, y: rand(0.35, 0.9) * 9, hold: [900, 2000] };
       case "sad":
         return { x: rand(-0.3, 0.3) * 15, y: rand(0.6, 1) * 9, hold: [2800, 5000] };
       case "laughing":

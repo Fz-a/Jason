@@ -11,8 +11,8 @@
       { at: now + 150, v: 1.08 },
       { at: now + 300, v: 1 }
     );
-    if (Math.random() < 0.14) {
-      q.push({ at: now + 370, v: 0.05 }, { at: now + 480, v: 1 });
+    if (Math.random() < 0.28) {
+      q.push({ at: now + 360, v: 0.05 }, { at: now + 460, v: 1 });
     }
   }
 

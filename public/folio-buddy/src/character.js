@@ -246,13 +246,13 @@
         this.eyeMorph.t = 1;
         this.eyeMorph.v = 0;
       } else if (name !== "sleeping" && name !== "waking") {
-        this._morphEyes(list[0], soft ? 2.4 : (name === "excited" ? 5.5 : 3.8));
+        this._morphEyes(list[0], soft ? 3.1 : (name === "excited" ? 5.5 : 3.8));
       }
-      this.eyeUntil = this.stateAt + rand(...EYE_HOLD_MS[name]) * (soft ? 1.35 : 1);
+      this.eyeUntil = this.stateAt + rand(...EYE_HOLD_MS[name]) * (soft ? 1.08 : 1);
       const blink = BLINK_MS[name];
-      this.blinkUntil = blink ? this.stateAt + rand(soft ? 4000 : 1500, soft ? 12000 : 7000) : Infinity;
-      this.gazeUntil = this.stateAt + rand(soft ? 1800 : 500, soft ? 4200 : 1400);
-      this.winkUntil = soft ? Infinity : this.stateAt + rand(3000, 8000);
+      this.blinkUntil = blink ? this.stateAt + rand(soft ? 900 : 700, soft ? 2800 : 2200) : Infinity;
+      this.gazeUntil = this.stateAt + rand(soft ? 400 : 320, soft ? 1100 : 900);
+      this.winkUntil = this.stateAt + rand(soft ? 5200 : 2800, soft ? 11000 : 7000);
       this.ctx = this._freshCtx(this.stateAt);
       this.ctx.stAt = this.stateAt + (
         soft ? rand(14000, 24000)
@@ -269,7 +269,7 @@
       }
       this.wildWide = false;
       if (name !== "writing") this.fx?.resetInk();
-      if (!soft && name !== "waking" && name !== "sleeping" && name !== "drowsy") {
+      if (name !== "waking" && name !== "sleeping" && name !== "drowsy") {
         EY.queueBlink(this.blinkQueue, this.stateAt);
       }
       if (soft) this.trickAt = this.stateAt + rand(20000, 40000);
@@ -616,7 +616,10 @@
       if (this.state !== "waking" && this.state !== "sleeping" && now >= this.eyeUntil) {
         const list = EYE_PLAYLIST[this.state];
         this.eyeIdx = (this.eyeIdx + 1 + Math.floor(rand(0, list.length - 1))) % list.length;
-        const stiff = this.state === "searching" || this.state === "excited" ? 10 : 6;
+        const stiff =
+          this.state === "searching" || this.state === "excited" ? 10
+          : this.state === "idle" || this.state === "happy" || this.state === "listening" ? 4.2
+          : 5.2;
         this._morphEyes(list[this.eyeIdx], stiff);
         this.eyeUntil = now + rand(...EYE_HOLD_MS[this.state]);
       }
@@ -639,7 +642,7 @@
       if (WINK_STATES.has(this.state) && now >= this.winkUntil) {
         this.winkAt = now;
         this.winkEye = Math.random() < 0.5 ? 0 : 1;
-        this.winkUntil = now + rand(4500, 10000);
+        this.winkUntil = now + rand(3800, 8200);
       }
 
       this.emphasisBlend += ((this.emphasis ? 1 : 0) - this.emphasisBlend) * Rn(0.12);

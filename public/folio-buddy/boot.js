@@ -1,6 +1,6 @@
-/* Folio buddy v17 — smoother wedge/teardrop morphs. */
+/* Folio buddy v18 — livelier eyes (blink, gaze, soft wink). */
 (function () {
-	const BOOT_VER = 17;
+	const BOOT_VER = 18;
 	if (window.__folioBuddyBootVer === BOOT_VER) return;
 	try {
 		window.__folioBuddyDestroyLive?.();
