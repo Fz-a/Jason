@@ -416,18 +416,15 @@
 /* Home dock placeholder (inside bento; character lives outside Swup) */
 .folio-buddy--dock {
 	position: relative;
-	display: grid;
-	place-items: center;
-	container-type: size;
 }
 
 .folio-buddy-dock-mark {
-	width: min(90cqmin, calc(100cqmax / 1.618));
-	aspect-ratio: 1;
+	position: absolute;
+	inset: 12%;
 	border-radius: 50%;
 	border: 1px dashed rgb(42 38 32 / 0.14);
 	background:
-		radial-gradient(circle at 50% 50%, rgb(42 38 32 / 0.05), transparent 64%);
+		radial-gradient(circle at 50% 42%, rgb(42 38 32 / 0.04), transparent 62%);
 	pointer-events: none;
 }
 

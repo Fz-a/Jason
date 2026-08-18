@@ -1,6 +1,6 @@
-/* Folio buddy v22 — golden-ratio dock size. */
+/* Folio buddy v23 — slightly smaller, original oval dock ring. */
 (function () {
-	const BOOT_VER = 22;
+	const BOOT_VER = 23;
 	if (window.__folioBuddyBootVer === BOOT_VER) return;
 	try {
 		window.__folioBuddyDestroyLive?.();
@@ -322,11 +322,8 @@
 			userFreed = false;
 			docked = true;
 			root.classList.add("is-docked", "is-home");
-			const PHI = 1.6180339887;
 			const shortSide = Math.min(r.width, r.height);
-			const longSide = Math.max(r.width, r.height);
-			// Golden: 1/φ of the long side, but never overflow the short side.
-			const side = Math.min(shortSide * 0.9, longSide / PHI);
+			const side = shortSide * 0.72;
 			root.style.width = `${side}px`;
 			root.style.height = `${side}px`;
 			size = side;
