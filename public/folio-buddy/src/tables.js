@@ -74,7 +74,7 @@
     spinTurn: [4.5, 1],
   };
 
-  const FACE_TUNE = { size: 0.9, gap: 1.14, height: 1.02, eyeWidth: 0.98, eyeHeight: 0.96 };
+  const FACE_TUNE = { size: 0.84, gap: 1.06, height: 1, eyeWidth: 0.92, eyeHeight: 0.9 };
   const POSE = { turn: 17, tilt: -14, roll: 29, scale: 1 };
   const POSE_HOME = { turn: 33, tilt: -19, roll: 38 };
   const UNIFORM_EYES = true;

@@ -38,6 +38,8 @@
       blinkX, gazeX, gazeY, winkAt, winkEye, turn, cr, pointer, notifyX,
       overlayX, eyeEls, badgeEl, badgeColor, Re, G9e, VJt, extras, ringHint,
     } = opt;
+    const keepInside = opt.keepInside !== false;
+    const inset = Math.max(0, opt.inset ?? 6);
     const pulse = 1 + 0.07 * Math.sin(morphT * Math.PI);
     const $i = {
       x: face.x,
@@ -150,8 +152,8 @@
       Kj -= 10 * $ee;
       Ko += 7 * $ee;
 
-      const Vee = clamp(_c * Hee * pulse, 0.02, 2.4);
-      const _2 = clamp(vre * lid * u1 * pulse, 0.02, 2.4);
+      const Vee0 = clamp(_c * Hee * pulse, 0.02, 2.4);
+      let _2 = clamp(vre * lid * u1 * pulse, 0.02, 2.4);
       eyeEls[i].style.display = bre && overlayX < 0.5 ? "" : "none";
       const useTurnOr3d = turn != null || use3d;
       const Ume = G9e * _2 + 2;
@@ -160,16 +162,29 @@
         top + Ume,
         bottom - Ume
       );
+      // Measure free width at the eye line and shrink if the silhouette is too sharp.
+      const [spanL0, spanR0] = liveSpan(vl);
+      const freeW = Math.max(0, spanR0 - spanL0 - inset * 2);
+      const needW = Math.max(a1, o1) * 2.2 * Vee0 + Math.abs(cents[1][0] - cents[0][0]) * $i.sx * 0.35;
+      const fit = keepInside && needW > 1 ? clamp(freeW / needW, 0.35, 1) : 1;
+      const Vee = Vee0 * fit;
+      _2 *= Math.sqrt(fit);
       let O2 = -Infinity, Xl = Infinity;
-      for (let p = 0; p < poly.length; p += 2) {
+      for (let p = 0; p < poly.length; p += 1) {
         const Frp = (poly[p][0] - Gn) * Vee;
         const [Ia2, li2] = liveSpan(vl + (poly[p][1] - Ti) * _2);
         if (Ia2 - Frp > O2) O2 = Ia2 - Frp;
         if (li2 - Frp < Xl) Xl = li2 - Frp;
       }
+      // Keep a margin so eye strokes don't peek past the silhouette.
+      O2 += inset;
+      Xl -= inset;
       const xre = Ca + Wo + Kj * $i.sx;
-      const lX = O2 <= Xl ? clamp(xre, O2, Xl) : (O2 + Xl) / 2;
-      let dd = lX + (xre - lX) * (1 - Tre);
+      let lX;
+      if (O2 <= Xl) lX = clamp(xre, O2, Xl);
+      else lX = (O2 + Xl) / 2;
+      // Always prefer the inside clamp; Tre used to leak eyes past sharp edges.
+      let dd = keepInside ? lX : lX + (xre - lX) * (1 - Tre);
       let Yj = vl;
       if (notifyX > 0.01) {
         const xr = 20 * clamp(notifyX, 0, 1.4);

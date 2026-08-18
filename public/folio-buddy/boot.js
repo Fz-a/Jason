@@ -1,6 +1,6 @@
-/* Folio buddy v18 — livelier eyes (blink, gaze, soft wink). */
+/* Folio buddy v19 — keep eyes inside sharp shapes. */
 (function () {
-	const BOOT_VER = 18;
+	const BOOT_VER = 19;
 	if (window.__folioBuddyBootVer === BOOT_VER) return;
 	try {
 		window.__folioBuddyDestroyLive?.();
@@ -230,6 +230,7 @@
 			color: "black",
 			scheme: "light",
 			loginWrap: true,
+			eyeTopology: false,
 			followPointer: false,
 			state: "idle",
 			emphasis: false,

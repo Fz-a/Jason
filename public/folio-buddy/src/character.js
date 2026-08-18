@@ -7,7 +7,7 @@
   const EY = g.GROK_EYES;
   const FX = g.GROK_FX;
   const {
-    spring, stepSpring, springSteps, clamp, rand, sign, K2, Dke, lerpPoly, lerpFace, relRot, mapPointer, Rn,
+    spring, stepSpring, springSteps, clamp, rand, sign, K2, Dke, lerpPoly, lerpFace, relRot, mapPointer, Rn, spanPoly,
   } = M;
   const {
     GROUPS, EYE_PLAYLIST, EYE_HOLD_MS, BLINK_MS,
@@ -766,15 +766,11 @@
         liveRing = turnAt(spinAmt);
         turned = true;
       }
-      let faceTop = shape.top;
-      let faceBottom = shape.bottom;
-      if (morphing || turned) {
-        faceTop = Infinity;
-        faceBottom = -Infinity;
-        for (const p of liveRing) {
-          if (p[1] < faceTop) faceTop = p[1];
-          if (p[1] > faceBottom) faceBottom = p[1];
-        }
+      let faceTop = Infinity;
+      let faceBottom = -Infinity;
+      for (const p of liveRing) {
+        if (p[1] < faceTop) faceTop = p[1];
+        if (p[1] > faceBottom) faceBottom = p[1];
       }
       let bodyD;
       if (Jc >= 1) {
@@ -804,21 +800,53 @@
       const overlayLive = yl > 0.001 || Math.abs(this.overlayTurn.t - this.overlayTurn.x) > 0.01;
       let cyl = overlayLive ? this.overlayTurn.x : null;
       if (ex.turn != null) cyl = (cyl ?? 0) + ex.turn;
-      const ringHint = morphing || turned ? liveRing : null;
+      const ringHint = liveRing;
       const hasPtr = !!(this.gazeTarget || (this.followPointer && this.pointerRaw));
+      // Narrow silhouettes (wedge/teardrop/hex): keep eyes smaller and lower so they stay inside.
+      let paintFace = face;
+      let paintTune = this.faceTune;
+      let gazeMul = 1;
+      if (liveRing) {
+        const midY = clamp(
+          R + (face.y || 0) * 0.55,
+          faceTop + 18,
+          faceBottom - 18,
+        );
+        const [spL, spR] = spanPoly(liveRing, midY, R);
+        const width = Math.max(0, spR - spL);
+        if (width < R * 1.55) {
+          const tight = clamp(width / (R * 1.55), 0.42, 1);
+          paintFace = {
+            ...face,
+            y: (face.y || 0) + (1 - tight) * 18,
+            sx: (face.sx || 1) * (0.72 + 0.28 * tight),
+            sy: (face.sy || 1) * (0.78 + 0.22 * tight),
+            eye: (face.eye || 1) * (0.7 + 0.3 * tight),
+            leftDX: (face.leftDX || 0) * tight,
+          };
+          paintTune = {
+            ...(this.faceTune || {}),
+            size: (this.faceTune?.size ?? 1) * (0.78 + 0.22 * tight),
+            gap: (this.faceTune?.gap ?? 1) * (0.82 + 0.18 * tight),
+            eyeWidth: (this.faceTune?.eyeWidth ?? 1) * (0.85 + 0.15 * tight),
+            eyeHeight: (this.faceTune?.eyeHeight ?? 1) * (0.88 + 0.12 * tight),
+          };
+          gazeMul = 0.35 + 0.65 * tight;
+        }
+      }
       EY.paintEyes({
         now,
         polys,
         morphT,
         shape,
-        face,
-        faceTune: this.faceTune,
+        face: paintFace,
+        faceTune: paintTune,
         uniformEyes: this.uniformEyes,
         eyeScaleProp: this.eyeScaleProp,
         blinkX: this.blink.x,
         eyeBoostX: this.eyeScale.x,
-        gazeX: this.gazeX.x,
-        gazeY: this.gazeY.x,
+        gazeX: this.gazeX.x * gazeMul,
+        gazeY: this.gazeY.x * gazeMul * 0.85,
         winkAt: this.winkAt,
         winkEye: this.winkEye,
         turn: cyl,
@@ -837,6 +865,8 @@
         badgeRing: restRing,
         top: faceTop,
         bottom: faceBottom,
+        keepInside: true,
+        inset: 8,
         emphasisBlend: this.emphasisBlend,
       });
 
