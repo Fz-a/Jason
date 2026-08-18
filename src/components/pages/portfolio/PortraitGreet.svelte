@@ -15,8 +15,9 @@
 			class="folio-portrait-img"
 			loading="eager"
 			fetchpriority="high"
-			width="2048"
-			height="2048"
+			decoding="async"
+			width="720"
+			height="900"
 			draggable="false"
 		/>
 	{:else}

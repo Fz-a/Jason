@@ -1,6 +1,6 @@
-/* Folio buddy v11 — home: no drag, click morphs; other pages: float + chat. */
+/* Folio buddy v12 — defer mount so the folio paints first. */
 (function () {
-	const BOOT_VER = 11;
+	const BOOT_VER = 12;
 	if (window.__folioBuddyBootVer === BOOT_VER) return;
 	try {
 		window.__folioBuddyDestroyLive?.();
@@ -506,7 +506,6 @@
 	async function mount() {
 		ensureCss();
 		await ensureScripts();
-		await loadKb();
 		const root = createShell();
 		if (live?.root === root && root.querySelector("svg[data-folio-buddy-svg]")) {
 			live.syncPlace?.(true);
@@ -514,12 +513,18 @@
 		}
 		destroyLive();
 		bindCompanion(root);
+		loadKb();
 	}
 
 	function onView() {
-		window.setTimeout(() => {
+		const run = () => {
 			mount().catch(console.error);
-		}, 50);
+		};
+		if (typeof requestIdleCallback === "function") {
+			requestIdleCallback(run, { timeout: 800 });
+		} else {
+			window.setTimeout(run, 180);
+		}
 	}
 
 	if (document.readyState === "loading") {

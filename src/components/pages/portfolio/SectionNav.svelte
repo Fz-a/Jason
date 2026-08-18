@@ -12,10 +12,10 @@
 
 	/** Hardcoded seal previews — always served from /public/portfolio */
 	const COVERS: Record<string, string> = {
-		knowledge: "/portfolio/nav-knowledge.jpg",
-		projects: "/portfolio/nav-projects.jpg",
-		works: "/portfolio/nav-works.jpg",
-		life: "/portfolio/nav-life.jpg",
+		knowledge: "/portfolio/nav-knowledge.webp",
+		projects: "/portfolio/nav-projects.webp",
+		works: "/portfolio/nav-works.webp",
+		life: "/portfolio/nav-life.webp",
 	};
 
 	let { items }: Props = $props();

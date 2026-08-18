@@ -27,7 +27,7 @@ const sectionNav = sections.map((section) => ({
 	title: section.title,
 	href: url(section.href),
 	accent: section.accent || "#525046",
-	cover: `/portfolio/nav-${section.id}.jpg`,
+	cover: `/portfolio/nav-${section.id}.webp`,
 }));
 ---
 
@@ -37,7 +37,7 @@ const sectionNav = sections.map((section) => ({
 	<FolioHeader />
 
 	<div class="folio-grid">
-		<HeroInk client:load text={headline} />
+		<HeroInk client:idle text={headline} />
 
 		<PortraitGreet client:load src={portraitSrc} name={displayName} />
 
@@ -100,7 +100,7 @@ const sectionNav = sections.map((section) => ({
 		</article>
 
 		<ContactInk
-			client:load
+			client:visible
 			guestbookHref={url(contactHref)}
 			mailto={mailto}
 			title={contactTitle || "留墨"}
