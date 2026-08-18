@@ -179,7 +179,7 @@
     setShape(name, { silent = false } = {}) {
       if (!g.GROK_GEO.shapes[name] || name === this.shapeName) return;
       const R = g.GROK_GEO.Re;
-      const k = K2(clamp(this.shapeSpring.x, 0, 1));
+      const k = clamp(this.shapeSpring.x, 0, 1);
       const rest = FX.shapeMetrics(g.GROK_GEO.shapes[this.shapeName], R);
       if (k >= 1 || !this.prevFace || !this.prevRing) {
         this.prevFace = rest.face;
@@ -384,7 +384,7 @@
         idPrefix: this.fx.uid,
         getRadius: () => {
           const sh = geo.shapes[this.shapeName];
-          const k = K2(clamp(this.shapeSpring.x, 0, 1));
+          const k = clamp(this.shapeSpring.x, 0, 1);
           const to = sh?.beltRadius || FX.beltRadius(sh.path, R);
           let je = k < 0.999 && this.prevBelt != null
             ? this.prevBelt + (to - this.prevBelt) * k
@@ -682,6 +682,10 @@
         stepSpring(this.overlay, ...SPRINGS.overlay, step);
         stepSpring(this.overlayMix, ...SPRINGS.overlayMix, step);
         stepSpring(this.shapeSpring, ...SPRINGS.shape, step);
+        if (this.shapeSpring.x > 0.992 && Math.abs(this.shapeSpring.v) < 0.08) {
+          this.shapeSpring.x = 1;
+          this.shapeSpring.v = 0;
+        }
         stepSpring(this.overlayTurn, ...SPRINGS.overlayTurn, step);
       }
       if (this.reduceMotion) {
@@ -720,8 +724,8 @@
       const geo = g.GROK_GEO;
       const R = geo.Re;
       const shape = geo.shapes[this.shapeName];
-      const morphK = K2(clamp(this.shapeSpring.x, 0, 1));
-      const morphing = morphK < 0.999 && this.prevFace;
+      const morphK = clamp(this.shapeSpring.x, 0, 1);
+      const morphing = morphK < 0.997 && this.prevFace;
       const face = morphing ? lerpFace(this.prevFace, shape.face, morphK) : shape.face;
       const fromTilt = this.prevTilt ?? (geo.shapes[this.prevShape]?.tiltScale || 1);
       const tilt = morphing
@@ -771,12 +775,12 @@
       }
       let bodyD;
       if (Jc >= 1) {
-        bodyD = pencil ? FX.closedSpline(FX.overlayRing(this.ovKind, R, tear)) : this.fx.circlePath;
-      } else if (Jc <= 0 && !morphing && !turned) {
-        bodyD = shape.path;
+        bodyD = pencil ? FX.ringPath(FX.overlayRing(this.ovKind, R, tear)) : this.fx.circlePath;
+      } else if (Jc <= 0) {
+        bodyD = FX.ringPath(liveRing);
       } else {
         const to = FX.overlayRing(this.ovKind || this.ovPrev, R, tear);
-        bodyD = FX.closedSpline(Jc <= 0 ? liveRing : FX.lerpRing(liveRing, to, K2(Jc)));
+        bodyD = FX.ringPath(FX.lerpRing(liveRing, to, K2(Jc)));
       }
       this.body.setAttribute("d", bodyD);
       this.clipPath.setAttribute("d", bodyD);

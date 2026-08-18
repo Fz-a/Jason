@@ -1,6 +1,6 @@
-/* Folio buddy v16 — snap in place, then form from ink (no fly-in). */
+/* Folio buddy v17 — smoother wedge/teardrop morphs. */
 (function () {
-	const BOOT_VER = 16;
+	const BOOT_VER = 17;
 	if (window.__folioBuddyBootVer === BOOT_VER) return;
 	try {
 		window.__folioBuddyDestroyLive?.();
@@ -278,9 +278,9 @@
 			timers.push(
 				window.setTimeout(() => {
 					bot.setState(mood, { resetEyes: false, soft: true });
-				}, 160),
+				}, 520),
 			);
-			timers.push(window.setTimeout(() => armIdle(), 2200));
+			timers.push(window.setTimeout(() => armIdle(), 2600));
 		};
 
 		const setPos = (x, y, animate) => {

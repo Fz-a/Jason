@@ -69,7 +69,7 @@
     humDots: [6, 1],
     overlay: [14, 1],
     overlayMix: [11, 1],
-    shape: [2.6, 1],
+    shape: [2.05, 1.08],
     overlayTurn: [14, 1],
     spinTurn: [4.5, 1],
   };

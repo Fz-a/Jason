@@ -69,12 +69,23 @@
     let t = `M${pts[0][0].toFixed(2)} ${pts[0][1].toFixed(2)}`;
     for (let s = 0; s < e; s++) {
       const r = pts[(s - 1 + e) % e], i = pts[s], o = pts[(s + 1) % e], l = pts[(s + 2) % e];
-      t += `C${(i[0] + (o[0] - r[0]) / 6).toFixed(2)} ${(i[1] + (o[1] - r[1]) / 6).toFixed(2)} ${(o[0] - (l[0] - i[0]) / 6).toFixed(2)} ${(o[1] - (l[1] - i[1]) / 6).toFixed(2)} ${o[0].toFixed(2)} ${o[1].toFixed(2)}`;
+      const d0 = Math.hypot(i[0] - r[0], i[1] - r[1]) || 1;
+      const d1 = Math.hypot(o[0] - i[0], o[1] - i[1]) || 1;
+      const d2 = Math.hypot(l[0] - o[0], l[1] - o[1]) || 1;
+      const k1 = d1 / (d0 + d1) / 3;
+      const k2 = d1 / (d1 + d2) / 3;
+      t += `C${(i[0] + (o[0] - r[0]) * k1).toFixed(2)} ${(i[1] + (o[1] - r[1]) * k1).toFixed(2)} ${(o[0] - (l[0] - i[0]) * k2).toFixed(2)} ${(o[1] - (l[1] - i[1]) * k2).toFixed(2)} ${o[0].toFixed(2)} ${o[1].toFixed(2)}`;
     }
     return t + "Z";
   }
 
-  function circleRing(R, n = 96) {
+  function ringPath(pts) {
+    let d = `M${pts[0][0].toFixed(2)} ${pts[0][1].toFixed(2)}`;
+    for (let i = 1; i < pts.length; i++) d += `L${pts[i][0].toFixed(2)} ${pts[i][1].toFixed(2)}`;
+    return d + "Z";
+  }
+
+  function circleRing(R, n = 128) {
     return Array.from({ length: n }, (_, e) => {
       const t = (e / n) * Math.PI * 2;
       return [R + Math.cos(t) * R, R + Math.sin(t) * R];
@@ -111,7 +122,7 @@
     return s;
   }
 
-  function polarRing(pts, R, n = 96) {
+  function polarRing(pts, R, n = 128) {
     return Array.from({ length: n }, (_, t) => {
       const s = (t / n) * Math.PI * 2, r = Math.cos(s), i = Math.sin(s);
       let o = 0;
@@ -887,6 +898,7 @@
     createParticles,
     OverlayLayer,
     closedSpline,
+    ringPath,
     circleRing,
     shapeRing,
     lerpRing,
