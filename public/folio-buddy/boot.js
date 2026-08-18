@@ -1,6 +1,6 @@
-/* Folio buddy v19 — keep eyes inside sharp shapes. */
+/* Folio buddy v20 — no triangle; keep eyes inside sharp silhouettes. */
 (function () {
-	const BOOT_VER = 19;
+	const BOOT_VER = 20;
 	if (window.__folioBuddyBootVer === BOOT_VER) return;
 	try {
 		window.__folioBuddyDestroyLive?.();
@@ -23,7 +23,7 @@
 	];
 
 	const IDLE_MS = 6800;
-	const SHAPES = ["blob", "wedge", "teardrop", "pebble", "squircle", "hex", "tablet"];
+	const SHAPES = ["blob", "teardrop", "pebble", "squircle", "hex", "tablet"];
 	const MOODS = ["idle", "listening", "happy", "proud", "shy", "happy", "idle", "listening"];
 
 	/** @type {any} */

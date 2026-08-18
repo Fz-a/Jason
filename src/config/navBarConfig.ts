@@ -16,6 +16,7 @@ const getDynamicNavBarConfig = (): NavBarConfig => {
 		LinkPresets.Projects,
 		LinkPresets.Works,
 		LinkPresets.Life,
+		LinkPresets.Music,
 		LinkPresets.Guestbook,
 	];
 
@@ -56,6 +57,11 @@ export const LinkPresets: Record<string, NavBarLink> = {
 		name: "DIY",
 		url: "/life/",
 		icon: "material-symbols:favorite",
+	},
+	Music: {
+		name: "Music",
+		url: "/music/",
+		icon: "material-symbols:music-note-rounded",
 	},
 	Blog: {
 		name: "Blog",

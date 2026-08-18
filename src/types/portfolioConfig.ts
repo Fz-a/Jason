@@ -4,7 +4,7 @@ export type PortfolioNavLink = {
 	href: string;
 };
 
-export type PortfolioSectionId = "knowledge" | "projects" | "works" | "life";
+export type PortfolioSectionId = "knowledge" | "projects" | "works" | "life" | "music";
 
 export type PortfolioMotto = {
 	/** Primary line (often Chinese) */

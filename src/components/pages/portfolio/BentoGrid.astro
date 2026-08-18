@@ -27,7 +27,7 @@ const sectionNav = sections.map((section) => ({
 	title: section.title,
 	href: url(section.href),
 	accent: section.accent || "#525046",
-	cover: `/portfolio/nav-${section.id}.webp`,
+	cover: section.cover || `/portfolio/nav-${section.id}.webp`,
 }));
 ---
 
@@ -96,7 +96,6 @@ const sectionNav = sections.map((section) => ({
 			data-folio-buddy-dock
 		>
 			<div class="folio-buddy-dock-mark" aria-hidden="true"></div>
-			<span class="folio-buddy-dock-hint">墨趣</span>
 		</article>
 
 		<ContactInk

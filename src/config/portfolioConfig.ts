@@ -10,6 +10,7 @@ export const portfolioConfig: PortfolioConfig = {
 		{ label: "PROJECTS", href: "/projects/" },
 		{ label: "UNIVERSITY", href: "/works/" },
 		{ label: "DIY", href: "/life/" },
+		{ label: "MUSIC", href: "/music/" },
 		{ label: "CONTACT", href: "/guestbook/" },
 	],
 	socialLinks: [
@@ -69,6 +70,14 @@ export const portfolioConfig: PortfolioConfig = {
 			href: "/life/",
 			accent: "#2f2d28",
 			cover: img("nav-life.webp"),
+		},
+		{
+			id: "music",
+			title: "Music",
+			titleZh: "Music",
+			href: "/music/",
+			accent: "#3a3832",
+			cover: img("nav-music.svg"),
 		},
 	],
 	items: {
@@ -224,5 +233,6 @@ export const portfolioConfig: PortfolioConfig = {
 				cover: img("volunteer.webp"),
 			},
 		],
+		music: [],
 	},
 };

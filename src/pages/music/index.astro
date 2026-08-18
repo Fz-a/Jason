@@ -1,0 +1,11 @@
+---
+import FolioMusic from "@/components/pages/portfolio/FolioMusic.svelte";
+import PortfolioLayout from "@/layouts/PortfolioLayout.astro";
+import { url } from "@/utils/url-utils";
+---
+
+<PortfolioLayout title="Music" description="Music library">
+	<section class="folio-bento folio-section-page folio-music-page" data-folio-section="music">
+		<FolioMusic client:load homeHref={url("/")} />
+	</section>
+</PortfolioLayout>

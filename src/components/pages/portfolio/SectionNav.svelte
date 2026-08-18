@@ -16,6 +16,7 @@
 		projects: "/portfolio/nav-projects.webp",
 		works: "/portfolio/nav-works.webp",
 		life: "/portfolio/nav-life.webp",
+		music: "/portfolio/nav-music.svg",
 	};
 
 	let { items }: Props = $props();
