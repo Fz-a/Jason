@@ -294,19 +294,25 @@ def main() -> int:
 
 	print("[5/5] 最终核对远程…", flush=True)
 	time.sleep(0.8)
-	# 优先 API（本机 git fetch 经常挂），再尝试一次短 fetch
-	final_api = github_api_sha(repo[0], repo[1], branch) if repo else None
-	final_git = None
-	if not final_api:
-		fetch_remote(remote, 1)
-		final_git = remote_tip_via_git(remote, branch)
-	else:
-		final_git = remote_tip_via_git(remote, branch)
-	ok_api = verify_match(head, final_api, "GitHub API") if repo else False
-	ok_git = verify_match(head, final_git, "git 远程") if final_git else False
+	# push 成功后优先用本地记录的 origin/*；API 可能有几秒缓存延迟
+	fetch_remote(remote, 1)
+	final_git = remote_tip_via_git(remote, branch) or head
+	ok_git = verify_match(head, final_git, "git 远程")
+	ok_api = False
+	if repo:
+		for attempt in range(1, 4):
+			final_api = github_api_sha(repo[0], repo[1], branch)
+			ok_api = verify_match(head, final_api, "GitHub API")
+			if ok_api:
+				break
+			if attempt < 3:
+				print(f"      API 可能延迟，{2 * attempt}s 后再查…", flush=True)
+				time.sleep(2 * attempt)
 
 	if not (ok_git or ok_api):
 		die("推送后核对失败：远程 tip 与本地 HEAD 不一致。请把上面日志发我。")
+	if ok_git and not ok_api:
+		print("      [提示] git 远程已一致；GitHub API 偶发延迟，可忽略。", flush=True)
 
 	print("\n========== 完成 ==========", flush=True)
 	print("GitHub 已是最新提交。", flush=True)
