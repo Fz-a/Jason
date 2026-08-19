@@ -29,6 +29,11 @@
 	visibility: hidden;
 }
 
+#folio-buddy-root.is-docked {
+	position: absolute;
+	z-index: 40;
+}
+
 #folio-buddy-root.is-home {
 	touch-action: manipulation;
 }
@@ -81,6 +86,91 @@
 	color-scheme: light;
 	--bg: #f2ebe0;
 	--fg: #1a1814;
+}
+
+.folio-buddy-eq {
+	display: none;
+	position: absolute;
+	inset: 0;
+	overflow: visible;
+	pointer-events: none;
+	z-index: 1;
+}
+
+.folio-buddy-eq-svg {
+	position: absolute;
+	inset: -22%;
+	width: 144%;
+	height: 144%;
+	overflow: visible;
+	display: block;
+}
+
+.folio-buddy-eq-field,
+.folio-buddy-eq-spikes,
+.folio-buddy-eq-spray {
+	overflow: visible;
+}
+
+.folio-buddy-eq-face {
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	z-index: 4;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.12rem;
+	transform: translate(-50%, -47%);
+	pointer-events: none;
+}
+
+.folio-buddy-eq-eye {
+	position: relative;
+	width: 0.84rem;
+	height: 0.84rem;
+	border-radius: 50%;
+	background: #f7f1e6;
+	overflow: hidden;
+	display: grid;
+	place-items: center;
+	transform-origin: center 55%;
+}
+
+.folio-buddy-eq-eye.is-r {
+	width: 0.84rem;
+	height: 0.84rem;
+	margin-top: 0;
+}
+
+.folio-buddy-eq-eye i {
+	display: block;
+	width: 0.34rem;
+	height: 0.34rem;
+	border-radius: 50%;
+	background: #141210;
+	transform: translate(0, 0);
+	will-change: transform;
+}
+
+#folio-buddy-root.is-eq .folio-buddy-eq {
+	display: block;
+}
+
+#folio-buddy-root.is-eq .folio-buddy-stage {
+	opacity: calc(1 - var(--fb-eq, 1));
+	visibility: visible;
+	animation: none;
+	pointer-events: none;
+	z-index: 2;
+}
+
+#folio-buddy-root.is-eq .folio-buddy-eq-face {
+	z-index: 5;
+}
+
+#folio-buddy-root.is-eq .folio-buddy-avatar {
+	filter: drop-shadow(0 8px 14px rgb(26 24 20 / 0.14));
 }
 
 .folio-buddy-genesis {

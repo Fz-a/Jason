@@ -67,6 +67,8 @@ declare global {
 			seekToTime: (time: number) => void;
 			playTrackByIndex: (index: number) => void;
 			loadTrack: (index: number, autoPlay: boolean) => void;
+			/** 0–1 spectrum bands for visualizers; falls back to synth if CORS blocks FFT */
+			getBands?: (count?: number) => number[];
 		};
 		/** 樱花特效管理器,Worker 模式与主线程回退模式均实现该接口 */
 		sakuraManager?: SakuraManagerLike;

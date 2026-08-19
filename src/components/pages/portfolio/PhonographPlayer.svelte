@@ -13,12 +13,9 @@
 			isPlaying: boolean;
 			playMode: number;
 			volume: number;
-			isMuted: boolean;
 			initialized: boolean;
 		};
 		togglePlay: () => void;
-		playNext: () => void;
-		playPrev: () => void;
 		playTrackByIndex: (i: number) => void;
 		setPlayMode: (mode: number) => void;
 		setVolume: (v: number) => void;
@@ -33,14 +30,12 @@
 	let isPlaying = $state(false);
 	let playMode = $state(0);
 	let volume = $state(0.7);
-	let title = $state("留声");
-	let artist = $state("点唱片播放");
+	let title = $state("暂无曲目");
+	let artist = $state("");
 	let favKeys = $state<string[]>([]);
 	let favOnly = $state(false);
-	let note = $state("");
 
 	const track = $derived(playlist[currentIndex] ?? null);
-	const cover = $derived(track?.pic || track?.cover || "");
 	const liked = $derived(isFav(track, favKeys));
 
 	function sync() {
@@ -52,10 +47,8 @@
 		playMode = s.playMode ?? 0;
 		volume = s.volume ?? 0.7;
 		const t = s.track;
-		if (t?.name) {
-			title = t.name;
-			artist = t.artist || "";
-		}
+		title = t?.name || "暂无曲目";
+		artist = t?.artist || "";
 	}
 
 	function on(name: string, fn: (e: CustomEvent) => void) {
@@ -71,10 +64,7 @@
 	function skip(dir: 1 | -1) {
 		if (!api) return;
 		const pool = favOnly ? favIndices() : playlist.map((_, i) => i);
-		if (!pool.length) {
-			note = favOnly ? "还没有收藏曲目" : "";
-			return;
-		}
+		if (!pool.length) return;
 		const pos = pool.indexOf(currentIndex);
 		const from = pos < 0 ? 0 : pos;
 		api.playTrackByIndex(pool[(from + dir + pool.length) % pool.length]);
@@ -85,51 +75,6 @@
 			fn();
 			sync();
 		});
-	}
-
-	function playPause() {
-		run(() => api?.togglePlay());
-	}
-
-	function prev() {
-		run(() => skip(-1));
-	}
-
-	function next() {
-		run(() => skip(1));
-	}
-
-	function shuffle() {
-		run(() => {
-			api?.setPlayMode(playMode === 2 ? 0 : 2);
-			if (!api?.getState().isPlaying) api?.togglePlay();
-		});
-	}
-
-	function stampFav() {
-		if (!track) {
-			note = "先选一首再收藏";
-			return;
-		}
-		favKeys = toggleFav(track);
-		note = liked ? "已移出偏好" : "已收入偏好";
-		window.setTimeout(() => {
-			note = "";
-		}, 1400);
-	}
-
-	function toggleFavOnly() {
-		if (!favKeys.length) {
-			note = "先盖印收藏";
-			favOnly = false;
-			return;
-		}
-		favOnly = !favOnly;
-		note = favOnly ? "只听偏好" : "听全部歌单";
-		if (favOnly && track && !isFav(track, favKeys)) skip(1);
-		window.setTimeout(() => {
-			note = "";
-		}, 1400);
 	}
 
 	function setVolFromEvent(e: PointerEvent) {
@@ -161,46 +106,52 @@
 	});
 </script>
 
-<article class="folio-tile folio-phono" style="--bento-delay: 90ms" aria-label="留声机">
-	<div class="folio-phono-stage">
+<article class="folio-tile folio-phono" style="--bento-delay: 90ms" aria-label="留声">
+	<span class="folio-phono-kicker">留声</span>
+
+	<div class="folio-phono-copy">
+		<strong class="folio-phono-title">{title}</strong>
+		{#if artist}
+			<span class="folio-phono-artist">{artist}</span>
+		{/if}
+	</div>
+
+	<nav class="folio-phono-nav" aria-label="播放控制">
+		<button type="button" onclick={() => run(() => skip(-1))}>上一</button>
+		<button type="button" class="is-play" class:is-on={isPlaying} onclick={() => run(() => api?.togglePlay())}>
+			{isPlaying ? "暂停" : "播放"}
+		</button>
+		<button type="button" onclick={() => run(() => skip(1))}>下一</button>
+	</nav>
+
+	<nav class="folio-phono-aux" aria-label="播放选项">
 		<button
 			type="button"
-			class="folio-phono-disc"
-			class:is-spinning={isPlaying}
-			onclick={playPause}
-			aria-label={isPlaying ? "暂停" : "播放"}
-			title={isPlaying ? "暂停" : "播放"}
-		>
-			<span class="folio-phono-grooves" aria-hidden="true"></span>
-			<span class="folio-phono-label">
-				{#if cover}
-					<img src={cover} alt="" />
-				{:else}
-					<span class="folio-phono-listen">{isPlaying ? "停" : "听"}</span>
-				{/if}
-			</span>
-		</button>
-		<div class="folio-phono-arm" class:is-on={isPlaying} aria-hidden="true">
-			<span class="folio-phono-arm-bar"></span>
-			<span class="folio-phono-arm-head"></span>
-		</div>
-	</div>
-
-	<div class="folio-phono-meta">
-		<strong class="folio-phono-title">{title}</strong>
-		<span class="folio-phono-artist">{artist}</span>
-	</div>
-
-	<div class="folio-phono-keys" role="group" aria-label="播放控制">
-		<button type="button" onclick={prev} title="上一首" aria-label="上一首">上</button>
-		<button type="button" class="is-main" class:is-on={isPlaying} onclick={playPause} title="播放 / 暂停">
-			{isPlaying ? "停" : "听"}
-		</button>
-		<button type="button" onclick={next} title="下一首" aria-label="下一首">下</button>
-		<button type="button" class:is-on={playMode === 2} onclick={shuffle} title="随机" aria-label="随机">散</button>
-		<button type="button" class:is-on={liked} onclick={stampFav} title="收藏" aria-label="收藏">藏</button>
-		<button type="button" class:is-on={favOnly} onclick={toggleFavOnly} title="只听偏好" aria-label="只听偏好">偏</button>
-	</div>
+			class:is-on={playMode === 2}
+			onclick={() =>
+				run(() => {
+					api?.setPlayMode(playMode === 2 ? 0 : 2);
+					if (!api?.getState().isPlaying) api?.togglePlay();
+				})}
+		>随机</button>
+		<button
+			type="button"
+			class:is-on={liked}
+			onclick={() => {
+				if (!track) return;
+				favKeys = toggleFav(track);
+			}}
+		>收藏</button>
+		<button
+			type="button"
+			class:is-on={favOnly}
+			onclick={() => {
+				if (!favKeys.length) return;
+				favOnly = !favOnly;
+				if (favOnly && track && !isFav(track, favKeys)) skip(1);
+			}}
+		>偏好</button>
+	</nav>
 
 	<div
 		bind:this={volEl}
@@ -218,8 +169,5 @@
 		onpointermove={(e) => e.buttons && setVolFromEvent(e)}
 	>
 		<div class="folio-phono-vol-fill" style={`width:${volume * 100}%`}></div>
-		<span>音量</span>
 	</div>
-
-	<p class="folio-phono-note">{note || "点唱片播放 · 歌单在 Music"}</p>
 </article>
