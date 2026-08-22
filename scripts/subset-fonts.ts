@@ -9,11 +9,12 @@ import { glob } from "glob";
 import subsetFont from "subset-font";
 import { fontConfig, fontsList } from "../src/config";
 import { collectUsedFontCssVars, toPublicPath } from "../src/utils/fontHelper";
+import { resolveDistDir } from "./resolve-dist-dir";
 
 // ─── 配置 ───────────────────────────────────────────────
 
-const DIST_DIR = "dist";
-const OUTPUT_DIR = "dist/_astro/fonts";
+const DIST_DIR = resolveDistDir();
+const OUTPUT_DIR = path.join(DIST_DIR, "_astro", "fonts");
 
 // ─── 字体配置解析 ────────────────────────────────────────
 
