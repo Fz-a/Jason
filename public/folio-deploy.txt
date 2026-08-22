@@ -1,0 +1,5 @@
+# Folio deploy marker — open this URL after push to confirm Cloudflare published the new build.
+# Expected: https://cjyfz.dpdns.org/folio-deploy.txt
+stamp=2026-08-22T10:00+08:00
+build=pnpm pages:build
+ui=cinema-collage-reorder

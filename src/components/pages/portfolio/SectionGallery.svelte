@@ -22,7 +22,8 @@
 
 	type Panel = "none" | "create" | "edit" | "module";
 
-	let nodes = $state<GalleryNode[]>([]);
+	/** Start from config seed so first paint is never an empty flash. */
+	let nodes = $state<GalleryNode[]>(cloneGalleryNodes(seedNodes));
 	let path = $state<string[]>([]);
 	let unlocked = $state(false);
 	let panel = $state<Panel>("none");
@@ -141,13 +142,33 @@
 	}
 
 	async function load() {
+		// Drop legacy localStorage trees from older folio builds (password / Module UI).
+		try {
+			const doomed: string[] = [];
+			for (let i = 0; i < localStorage.length; i++) {
+				const k = localStorage.key(i);
+				if (k?.startsWith("folio-section-tree:")) doomed.push(k);
+			}
+			for (const k of doomed) localStorage.removeItem(k);
+		} catch {
+			/* ignore */
+		}
+
 		try {
 			const res = await fetch(`/api/folio/?section=${encodeURIComponent(sectionId)}`);
 			if (res.ok) {
-				const data = (await res.json()) as { nodes?: GalleryNode[] };
+				const data = (await res.json()) as {
+					nodes?: GalleryNode[];
+					source?: string;
+				};
 				if (Array.isArray(data.nodes)) {
-					nodes = cloneGalleryNodes(data.nodes);
-					return;
+					// Prefer API when it has content, or when CMS explicitly owns the tree.
+					// Ignore empty "config" / unknown payloads so seed stays visible if API is broken.
+					const fromCms = data.source === "db" || data.source === "local";
+					if (data.nodes.length > 0 || fromCms) {
+						nodes = cloneGalleryNodes(data.nodes);
+						return;
+					}
 				}
 			}
 		} catch {

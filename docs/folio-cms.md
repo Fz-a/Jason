@@ -86,7 +86,10 @@ Default seed login: **admin** / **changeme** (override with `CMS_ADMIN_PASSWORD`
 ## Notes
 
 - Blog `posts` table exists for a later editor; not wired in the UI yet.
-- Prefer Cloudflare Pages for CMS deploys (`pnpm build:cf` + D1/R2 bindings).
+- Prefer Cloudflare Pages for CMS deploys (`pnpm build:cf` / `pnpm pages:build` + D1/R2 bindings).
+- **Cloudflare Pages build command must be** `pnpm pages:build` (or `pnpm build:cf`), **not** plain `pnpm build`.
+  Plain `pnpm build` skips the Cloudflare adapter → `/api/folio` 404 and the live site keeps looking “stuck”.
+- After each deploy, open `/folio-deploy.txt` — if missing or stale, Pages did not publish the latest commit.
 - Do not commit `.data/`, `.wrangler/`, or secrets.
 - On Windows PowerShell, set seed password with:  
   `$env:CMS_ADMIN_PASSWORD='secret'; pnpm exec tsx scripts/seed-folio-cms.ts --remote`

@@ -23,6 +23,7 @@
     "lqips": "npx tsx scripts/generate-lqips.ts",
     "dev:cf": "cross-env CMS_DEV=1 CF_WORKERS=1 astro dev",
     "build:cf": "cross-env CF_WORKERS=1 pnpm build",
+    "pages:build": "cross-env CF_WORKERS=1 pnpm build",
     "db:migrate": "wrangler d1 migrations apply jason-folio-cms --local --config wrangler.jsonc",
     "db:migrate:remote": "wrangler d1 migrations apply jason-folio-cms --remote --config wrangler.jsonc",
     "db:seed": "cross-env CMS_ADMIN_PASSWORD=changeme tsx scripts/seed-folio-cms.ts",
