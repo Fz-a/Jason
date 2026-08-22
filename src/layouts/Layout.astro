@@ -185,7 +185,7 @@ const siteLang = lang.replace("_", "-");
       content={description || siteConfig.description || pageTitle}
     />
 
-    <meta name="viewport" content="width=device-width" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="generator" content={Astro.generator} />
     {
       favicons.map((favicon) => (
@@ -607,7 +607,7 @@ const siteLang = lang.replace("_", "-");
     <CodeGroupManager />
 
     <!-- Folio buddy — global float + chat (outside Swup) -->
-    <link rel="stylesheet" href="/folio-buddy/folio-buddy.css?v=46" data-swup-ignore-script />
+    <link rel="stylesheet" href="/folio-buddy/folio-buddy.css?v=47" data-swup-ignore-script />
     <link rel="preload" href="/folio-buddy/geometry-data.js?v=46" as="script" />
     <link rel="preload" href="/folio-buddy/src/math.js?v=46" as="script" />
     <link rel="preload" href="/folio-buddy/src/tables.js?v=46" as="script" />
@@ -616,7 +616,7 @@ const siteLang = lang.replace("_", "-");
     <link rel="preload" href="/folio-buddy/src/fx.js?v=46" as="script" />
     <link rel="preload" href="/folio-buddy/src/eyes.js?v=46" as="script" />
     <link rel="preload" href="/folio-buddy/src/character.js?v=46" as="script" />
-    <script is:inline src="/folio-buddy/boot.js?v=46" data-swup-ignore-script></script>
+    <script is:inline src="/folio-buddy/boot.js?v=47" data-swup-ignore-script></script>
   </body>
 </html>
 
@@ -1075,7 +1075,21 @@ function disableAnimation() {
       }
 
     });
-    window.swup.hooks.on("visit:start", (visit: { to: { url: string } }) => {
+    window.swup.hooks.on("visit:start", (visit: { to: { url: string }; meta?: Record<string, unknown> }) => {
+      // Bust Swup cache for folio section pages — stale SSR shells keep old banner CSS/HTML
+      try {
+        const path = new URL(visit.to.url, window.location.origin).pathname.replace(/\/+$/, "") || "/";
+        if (/^\/(knowledge|projects|works|life|music)(\/|$)/.test(path + "/")) {
+          visit.meta = visit.meta || {};
+          visit.meta.cache = false;
+          window.swup?.cache?.delete?.(visit.to.url);
+          const alt = visit.to.url.endsWith("/") ? visit.to.url.slice(0, -1) : `${visit.to.url}/`;
+          window.swup?.cache?.delete?.(alt);
+        }
+      } catch {
+        /* ignore */
+      }
+
       // Start progress bar
       const progressBar = document.getElementById("progress-bar");
       if (progressBar) {

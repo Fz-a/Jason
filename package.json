@@ -20,7 +20,13 @@
     "format": "biome format --write ./src ./scripts",
     "lint": "biome check --write ./src ./scripts",
     "preinstall": "npx only-allow pnpm",
-    "lqips": "npx tsx scripts/generate-lqips.ts"
+    "lqips": "npx tsx scripts/generate-lqips.ts",
+    "dev:cf": "cross-env CMS_DEV=1 CF_WORKERS=1 astro dev",
+    "build:cf": "cross-env CF_WORKERS=1 pnpm build",
+    "db:migrate": "wrangler d1 migrations apply jason-folio-cms --local --config wrangler.jsonc",
+    "db:migrate:remote": "wrangler d1 migrations apply jason-folio-cms --remote --config wrangler.jsonc",
+    "db:seed": "cross-env CMS_ADMIN_PASSWORD=changeme tsx scripts/seed-folio-cms.ts",
+    "db:seed:remote": "tsx scripts/seed-folio-cms.ts --remote"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.10",
@@ -92,11 +98,13 @@
   "devDependencies": {
     "@astrojs/ts-plugin": "^1.10.10",
     "@biomejs/biome": "2.5.7",
+    "@cloudflare/workers-types": "^5.20260820.1",
     "@iconify-json/mdi": "^1.2.3",
     "@iconify-json/svg-spinners": "^1.2.4",
     "@tailwindcss/vite": "^4.3.3",
     "@types/qrcode": "^1.5.6",
     "@types/sanitize-html": "^2.16.1",
+    "cross-env": "^10.1.0",
     "esbuild": "^0.28.2",
     "pinyin-pro": "^3.28.2",
     "postcss-import": "^16.1.1",

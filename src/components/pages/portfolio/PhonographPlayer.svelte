@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onDestroy, onMount } from "svelte";
+	import { onDestroy, onMount, tick } from "svelte";
 	import { isFav, loadFavs, toggleFav, type FavTrack } from "@/utils/folio-music-favs";
 
 	type Track = FavTrack & { pic?: string; cover?: string };
@@ -24,6 +24,11 @@
 	let api: MusicApi | null = null;
 	let unsubs: Array<() => void> = [];
 	let volEl: HTMLDivElement | undefined;
+	let rootEl: HTMLElement | undefined;
+	let copyEl: HTMLElement | undefined;
+	let swapTimer = 0;
+	let pulseTimer = 0;
+	let lastTitle = "";
 
 	let playlist = $state<Track[]>([]);
 	let currentIndex = $state(0);
@@ -38,6 +43,41 @@
 	const track = $derived(playlist[currentIndex] ?? null);
 	const liked = $derived(isFav(track, favKeys));
 
+	function prefersReducedMotion() {
+		return (
+			typeof window !== "undefined" &&
+			window.matchMedia("(prefers-reduced-motion: reduce)").matches
+		);
+	}
+
+	function bumpCopy() {
+		if (typeof window === "undefined" || !copyEl || prefersReducedMotion()) return;
+		copyEl.classList.remove("is-swap");
+		void copyEl.offsetWidth;
+		copyEl.classList.add("is-swap");
+		window.clearTimeout(swapTimer);
+		swapTimer = window.setTimeout(() => copyEl?.classList.remove("is-swap"), 360);
+	}
+
+	function pulseShell() {
+		if (typeof window === "undefined" || !rootEl || prefersReducedMotion()) return;
+		rootEl.classList.remove("is-pulse");
+		void rootEl.offsetWidth;
+		rootEl.classList.add("is-pulse");
+		window.clearTimeout(pulseTimer);
+		pulseTimer = window.setTimeout(() => rootEl?.classList.remove("is-pulse"), 540);
+	}
+
+	function tap(e: MouseEvent) {
+		if (typeof window === "undefined") return;
+		const btn = e.currentTarget as HTMLElement | null;
+		if (!btn || prefersReducedMotion()) return;
+		btn.classList.remove("is-tap");
+		void btn.offsetWidth;
+		btn.classList.add("is-tap");
+		window.setTimeout(() => btn.classList.remove("is-tap"), 360);
+	}
+
 	function sync() {
 		if (!api) return;
 		const s = api.getState();
@@ -47,8 +87,13 @@
 		playMode = s.playMode ?? 0;
 		volume = s.volume ?? 0.7;
 		const t = s.track;
-		title = t?.name || "暂无曲目";
-		artist = t?.artist || "";
+		const nextTitle = t?.name || "暂无曲目";
+		const nextArtist = t?.artist || "";
+		const changed = lastTitle !== "" && (nextTitle !== title || nextArtist !== artist);
+		title = nextTitle;
+		artist = nextArtist;
+		lastTitle = nextTitle;
+		if (changed) void tick().then(bumpCopy);
 	}
 
 	function on(name: string, fn: (e: CustomEvent) => void) {
@@ -101,15 +146,24 @@
 	});
 
 	onDestroy(() => {
+		if (typeof window !== "undefined") {
+			window.clearTimeout(swapTimer);
+			window.clearTimeout(pulseTimer);
+		}
 		for (const off of unsubs) off();
 		unsubs = [];
 	});
 </script>
 
-<article class="folio-tile folio-phono" style="--bento-delay: 90ms" aria-label="留声">
+<article
+	bind:this={rootEl}
+	class="folio-tile folio-phono"
+	style="--bento-delay: 90ms"
+	aria-label="留声"
+>
 	<span class="folio-phono-kicker">留声</span>
 
-	<div class="folio-phono-copy">
+	<div class="folio-phono-copy" bind:this={copyEl}>
 		<strong class="folio-phono-title">{title}</strong>
 		{#if artist}
 			<span class="folio-phono-artist">{artist}</span>
@@ -117,27 +171,51 @@
 	</div>
 
 	<nav class="folio-phono-nav" aria-label="播放控制">
-		<button type="button" onclick={() => run(() => skip(-1))}>上一</button>
-		<button type="button" class="is-play" class:is-on={isPlaying} onclick={() => run(() => api?.togglePlay())}>
+		<button
+			type="button"
+			onclick={(e) => {
+				tap(e);
+				run(() => skip(-1));
+			}}
+		>上一</button>
+		<button
+			type="button"
+			class="is-play"
+			class:is-on={isPlaying}
+			onclick={(e) => {
+				tap(e);
+				pulseShell();
+				run(() => api?.togglePlay());
+			}}
+		>
 			{isPlaying ? "暂停" : "播放"}
 		</button>
-		<button type="button" onclick={() => run(() => skip(1))}>下一</button>
+		<button
+			type="button"
+			onclick={(e) => {
+				tap(e);
+				run(() => skip(1));
+			}}
+		>下一</button>
 	</nav>
 
 	<nav class="folio-phono-aux" aria-label="播放选项">
 		<button
 			type="button"
 			class:is-on={playMode === 2}
-			onclick={() =>
+			onclick={(e) => {
+				tap(e);
 				run(() => {
 					api?.setPlayMode(playMode === 2 ? 0 : 2);
 					if (!api?.getState().isPlaying) api?.togglePlay();
-				})}
+				});
+			}}
 		>随机</button>
 		<button
 			type="button"
 			class:is-on={liked}
-			onclick={() => {
+			onclick={(e) => {
+				tap(e);
 				if (!track) return;
 				favKeys = toggleFav(track);
 			}}
@@ -145,7 +223,8 @@
 		<button
 			type="button"
 			class:is-on={favOnly}
-			onclick={() => {
+			onclick={(e) => {
+				tap(e);
 				if (!favKeys.length) return;
 				favOnly = !favOnly;
 				if (favOnly && track && !isFav(track, favKeys)) skip(1);

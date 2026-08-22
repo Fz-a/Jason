@@ -7,5 +7,22 @@
 		"directory": "./dist",
 		"not_found_handling": "404-page",
 		"html_handling": "force-trailing-slash"
+	},
+	"d1_databases": [
+		{
+			"binding": "DB",
+			"database_name": "jason-folio-cms",
+			"database_id": "00000000-0000-0000-0000-000000000001",
+			"migrations_dir": "migrations"
+		}
+	],
+	"r2_buckets": [
+		{
+			"binding": "MEDIA",
+			"bucket_name": "jason-folio-media"
+		}
+	],
+	"vars": {
+		"CMS_ADMIN_USERNAME": "admin"
 	}
 }

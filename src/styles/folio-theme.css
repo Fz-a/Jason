@@ -59,7 +59,7 @@ body {
 #search-panel,
 .dropdown-content,
 .category-bar,
-.folio-tile:not(.folio-contact) {
+.folio-tile:not(.folio-contact):not(.folio-gallery-card):not(.folio-mast):not(.folio-empty) {
 	background-color: var(--folio-tile) !important;
 	color: var(--folio-ink) !important;
 	box-shadow: none !important;

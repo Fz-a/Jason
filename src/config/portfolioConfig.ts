@@ -77,7 +77,7 @@ export const portfolioConfig: PortfolioConfig = {
 			titleZh: "Music",
 			href: "/music/",
 			accent: "#3a3832",
-			cover: img("nav-music.svg"),
+			cover: img("nav-music.webp"),
 		},
 	],
 	items: {

@@ -1,6 +1,6 @@
 /* Folio buddy v46 — idle eyes restored, ferrofluid spikes. */
 (function () {
-	const BOOT_VER = 46;
+	const BOOT_VER = 47;
 	if (window.__folioBuddyBootVer === BOOT_VER) return;
 	try {
 		window.__folioBuddyDestroyLive?.();
@@ -173,10 +173,20 @@
 		return Math.max(a, Math.min(b, n));
 	}
 
+	function safeInsets() {
+		const narrow = window.innerWidth < 720;
+		const edge = narrow ? 10 : 8;
+		const bottom = narrow
+			? 18 + Math.round(window.visualViewport?.offsetTop || 0)
+			: 20;
+		return { edge, bottom };
+	}
+
 	function defaultFloatPos(size) {
+		const { edge, bottom } = safeInsets();
 		return {
-			x: 16,
-			y: window.innerHeight - size - 20,
+			x: edge + (window.innerWidth < 720 ? 4 : 8),
+			y: window.innerHeight - size - bottom,
 		};
 	}
 
@@ -623,8 +633,9 @@
 		const setPos = (x, y, animate, pin = false) => {
 			size = root.getBoundingClientRect().width || size;
 			if (!pin) {
-				x = clamp(x, 8, window.innerWidth - size - 8);
-				y = clamp(y, 8, window.innerHeight - size - 8);
+				const { edge, bottom } = safeInsets();
+				x = clamp(x, edge, window.innerWidth - size - edge);
+				y = clamp(y, edge, window.innerHeight - size - bottom);
 			}
 			if (!animate) root.classList.add("is-dragging");
 			root.style.setProperty("--fb-x", `${Math.round(x)}px`);

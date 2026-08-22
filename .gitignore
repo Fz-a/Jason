@@ -48,7 +48,15 @@ package/
 .claude
 .mimocode
 
+# Folio CMS local JSON store (dev fallback without D1)
+.data/
+.wrangler/
+
 .tmp-grok/
+tmp/
+
+# local personal photo dumps (not site assets)
+我的图片/
 
 # accidental AI upscale dumps (GitHub 100MB limit)
 *_upscayl_*

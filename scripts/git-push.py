@@ -3,6 +3,12 @@
 """
 可靠推送到 GitHub，并核对远程是否真的更新。
 
+会先自动提交本地代码改动（src/public/scripts 等），再 push。
+以前只推已有 commit：本地改了很多却显示「已与远程一致」——站点就不会更新。
+
+跳过：我的图片/、tmp/、.data/ 等本地素材。
+仅推送已有 commit：加 --no-commit
+
 失败原因（本机实测）：
   git 默认 HTTPS 常走 HTTP/2，访问 github.com:443 时会出现
   Recv failure / Connection was reset。改用 HTTP/1.1 + 加大
@@ -11,7 +17,7 @@
 用法：
   双击  推送.bat
   或：  py -3 scripts/git-push.py
-  或：  py -3 scripts/git-push.py --branch master
+  或：  py -3 scripts/git-push.py -m "feat: ..."
 """
 
 from __future__ import annotations
@@ -74,6 +80,37 @@ GIT_HTTP_FLAGS = [
 LOCAL_CONFIG = {
 	"http.version": "HTTP/1.1",
 	"http.postBuffer": "524288000",
+}
+
+# 推送前自动提交时跳过这些路径（本地素材/临时文件）
+SKIP_PREFIXES = (
+	"我的图片/",
+	"tmp/",
+	".data/",
+	".wrangler/",
+	"node_modules/",
+	"dist/",
+	".astro/",
+)
+
+SAFE_DIRS = (
+	"src/",
+	"public/",
+	"scripts/",
+	"migrations/",
+	"docs/",
+)
+
+SAFE_ROOT_FILES = {
+	".gitignore",
+	".env.example",
+	"package.json",
+	"pnpm-lock.yaml",
+	"astro.config.mjs",
+	"wrangler.jsonc",
+	"vercel.json",
+	"推送.bat",
+	"tsconfig.json",
 }
 
 
@@ -218,12 +255,110 @@ def verify_match(local: str, remote_sha: str | None, label: str) -> bool:
 	return ok
 
 
+def normalize_repo_path(path: str) -> str:
+	p = path.strip().strip('"').replace("\\", "/")
+	if " -> " in p:
+		p = p.split(" -> ", 1)[1]
+	return p
+
+
+def is_skippable(path: str) -> bool:
+	p = normalize_repo_path(path)
+	for prefix in SKIP_PREFIXES:
+		if p == prefix.rstrip("/") or p.startswith(prefix):
+			return True
+	return False
+
+
+def is_pushable(path: str) -> bool:
+	"""Tracked or new paths we are willing to auto-commit."""
+	p = normalize_repo_path(path)
+	if is_skippable(p):
+		return False
+	if p in SAFE_ROOT_FILES:
+		return True
+	if any(p.startswith(d) for d in SAFE_DIRS):
+		return True
+	# already-tracked files outside safe dirs (e.g. root configs already in repo)
+	r = git("ls-files", "--error-unmatch", p)
+	return r.returncode == 0
+
+
+def porcelain_paths() -> list[tuple[str, str]]:
+	r = git("status", "--porcelain", "-u")
+	if r.returncode != 0:
+		die(f"无法读取 git status：{out_text(r)}")
+	out: list[tuple[str, str]] = []
+	for line in (r.stdout or "").splitlines():
+		if len(line) < 4:
+			continue
+		code = line[:2]
+		path = normalize_repo_path(line[3:])
+		out.append((code, path))
+	return out
+
+
+def commit_local_changes(message: str | None) -> bool:
+	"""
+	有未提交改动时先提交，再推送。
+	以前只 push 已有 commit，本地改了一堆却显示「已一致」——这就是没推上去的原因。
+	"""
+	entries = porcelain_paths()
+	if not entries:
+		print("[提交] 工作区干净，无需新建提交。", flush=True)
+		return False
+
+	pushable = [p for _, p in entries if is_pushable(p)]
+	skipped = sorted({p for _, p in entries if is_skippable(p) or p not in pushable})
+
+	print("[提交] 发现本地未提交改动：", flush=True)
+	for code, path in entries:
+		mark = "跳过" if path not in pushable else "纳入"
+		print(f"      [{mark}] {code} {path}", flush=True)
+
+	if not pushable:
+		print(
+			"[警告] 有改动，但都在跳过列表（如 我的图片/、tmp/）。"
+			"没有可推送的代码提交。",
+			flush=True,
+		)
+		return False
+
+	# stage one-by-one so skips stay out
+	for path in pushable:
+		r = git("add", "--", path)
+		if r.returncode != 0:
+			die(f"git add 失败：{path}\n{out_text(r)}")
+
+	msg = (message or "").strip() or "chore: sync local folio updates"
+	# HEREDOC-style via -m; keep simple for Windows
+	r = git("commit", "-m", msg)
+	text = out_text(r)
+	if r.returncode != 0:
+		# nothing staged / hook etc.
+		if "nothing to commit" in text.lower():
+			print("[提交] 没有可提交内容。", flush=True)
+			return False
+		die(f"git commit 失败：{text}")
+
+	print(f"[提交] 已创建提交：{msg}", flush=True)
+	if skipped:
+		print(f"[提交] 已跳过 {len(skipped)} 项本地素材/临时文件（不会上传）。", flush=True)
+	return True
+
+
 def main() -> int:
 	parser = argparse.ArgumentParser(description="可靠推送到 GitHub 并核对")
 	parser.add_argument("--remote", default="origin")
 	parser.add_argument("--branch", default=None, help="默认当前分支")
 	parser.add_argument("--retries", type=int, default=MAX_RETRIES)
 	parser.add_argument("--setup-only", action="store_true")
+	parser.add_argument(
+		"--no-commit",
+		action="store_true",
+		help="不自动提交，仅推送已有 commit",
+	)
+	parser.add_argument("-m", "--message", default=None, help="自动提交时的说明")
 	args = parser.parse_args()
 
 	ensure_git()
@@ -234,15 +369,32 @@ def main() -> int:
 
 	branch = args.branch or current_branch()
 	remote = args.remote
-	head = local_head()
 	url = remote_url(remote)
 	repo = parse_github_repo(url)
 
 	print(f"[信息] 仓库目录: {ROOT}", flush=True)
 	print(f"[信息] 远程: {remote} → {url}", flush=True)
 	print(f"[信息] 分支: {branch}", flush=True)
-	print(f"[信息] 本地 HEAD: {head[:12]}…", flush=True)
 	print(f"[状态] {(git('status', '-sb').stdout or '').strip()}", flush=True)
+
+	print("[1.5/5] 检查是否需要先提交本地改动…", flush=True)
+	if args.no_commit:
+		dirty = porcelain_paths()
+		if dirty:
+			print(
+				"[警告] 仍有未提交改动，且使用了 --no-commit。"
+				"这些改动不会出现在 GitHub 上。",
+				flush=True,
+			)
+			for code, path in dirty[:20]:
+				print(f"      {code} {path}", flush=True)
+			if len(dirty) > 20:
+				print(f"      …另有 {len(dirty) - 20} 项", flush=True)
+	else:
+		commit_local_changes(args.message)
+
+	head = local_head()
+	print(f"[信息] 本地 HEAD: {head[:12]}…", flush=True)
 
 	# 优先 API（本机 git fetch/HTTPS 经常卡住或被重置）
 	print("[2/5] 查询远程 tip…", flush=True)
@@ -291,6 +443,9 @@ def main() -> int:
 			)
 	else:
 		print("[4/5] 跳过 push", flush=True)
+
+	# refresh head after push (same)
+	head = local_head()
 
 	print("[5/5] 最终核对远程…", flush=True)
 	time.sleep(0.8)

@@ -525,7 +525,30 @@
 	}
 
 	.folio-buddy-chat {
-		width: min(13.5rem, calc(100vw - 1.1rem));
+		width: min(15.5rem, calc(100vw - 1.25rem - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px)));
+		max-height: min(18rem, 48dvh);
+		bottom: calc(100% + 0.55rem);
+	}
+
+	.folio-buddy-msgs {
+		max-height: min(9.5rem, 28dvh);
+	}
+
+	.folio-buddy-form input {
+		min-height: 2.35rem;
+		font-size: 0.85rem;
+	}
+
+	.folio-buddy-form button {
+		min-width: 2.35rem;
+		min-height: 2.35rem;
+	}
+
+	.folio-buddy-quick button {
+		min-height: 1.85rem;
+		padding: 0.28rem 0.55rem;
+		font-size: 0.7rem;
+		touch-action: manipulation;
 	}
 }
 

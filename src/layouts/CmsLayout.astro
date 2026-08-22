@@ -1,0 +1,365 @@
+---
+import Layout from "@/layouts/Layout.astro";
+
+interface Props {
+	title?: string;
+}
+
+const { title = "Admin" } = Astro.props;
+---
+
+<Layout title={`${title} · CMS`} description="Folio CMS" hasWallpaper={false} noBanner={true}>
+	<div id="banner-overlay-container" class="hidden" aria-hidden="true"></div>
+	<div id="banner-dim-container" class="hidden" aria-hidden="true"></div>
+	<div id="left-sidebar-dynamic" class="hidden" aria-hidden="true"></div>
+	<div id="right-sidebar-dynamic" class="hidden" aria-hidden="true"></div>
+	<div id="floating-toc-wrapper" class="hidden" aria-hidden="true"></div>
+	<div id="swup-container" class="cms-shell transition-swup-fade">
+		<slot />
+	</div>
+</Layout>
+
+<style is:global>
+	.cms-shell {
+		min-height: 100dvh;
+		max-width: 56rem;
+		margin: 0 auto;
+		padding: max(1.25rem, env(safe-area-inset-top)) 1.25rem
+			max(2rem, env(safe-area-inset-bottom));
+		color: #1a1814;
+		font-family:
+			"Times New Roman", Times, "LXGW WenKai Mono Light", "霞鹜文楷",
+			"PingFang SC", "Microsoft YaHei", serif;
+		background:
+			radial-gradient(ellipse 90% 55% at 50% -8%, rgb(255 252 245 / 0.95), transparent 55%),
+			radial-gradient(ellipse 45% 40% at 100% 80%, rgb(210 200 180 / 0.35), transparent 50%),
+			linear-gradient(180deg, #f7f2e8, #efe7d8 45%, #e8dfcf);
+	}
+
+	.cms-card {
+		background: rgb(255 255 255 / 0.72);
+		border: 1px solid rgb(42 42 42 / 0.08);
+		border-radius: 1rem;
+		padding: 1.25rem 1.35rem;
+		box-shadow: 0 10px 28px rgb(0 0 0 / 0.06);
+		backdrop-filter: blur(10px);
+	}
+
+	.cms-nav {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem;
+		align-items: center;
+		margin-bottom: 1.25rem;
+	}
+
+	.cms-nav a,
+	.cms-btn {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		gap: 0.35rem;
+		border: 1px solid rgb(42 42 42 / 0.12);
+		background: rgb(255 255 255 / 0.65);
+		color: #2a2a2a;
+		text-decoration: none;
+		font: inherit;
+		font-size: 0.82rem;
+		padding: 0.42rem 0.85rem;
+		border-radius: 999px;
+		cursor: pointer;
+	}
+
+	.cms-nav a:hover,
+	.cms-btn:hover {
+		background: #fff;
+	}
+
+	.cms-btn-primary {
+		background: #2a2a2a;
+		color: #f4f0e8;
+		border-color: #2a2a2a;
+	}
+
+	.cms-btn-primary:hover {
+		background: #111;
+		color: #fff;
+	}
+
+	.cms-btn-danger {
+		color: #8b3a3a;
+		border-color: rgb(139 58 58 / 0.35);
+	}
+
+	.cms-title {
+		margin: 0 0 0.35rem;
+		font-size: 1.55rem;
+		font-weight: 650;
+		letter-spacing: 0.02em;
+	}
+
+	.cms-note {
+		margin: 0 0 1rem;
+		color: rgb(42 42 42 / 0.55);
+		font-size: 0.88rem;
+		line-height: 1.5;
+	}
+
+	.cms-field {
+		display: grid;
+		gap: 0.35rem;
+		margin-bottom: 0.85rem;
+		font-size: 0.82rem;
+	}
+
+	.cms-field span {
+		color: rgb(42 42 42 / 0.55);
+	}
+
+	.cms-field input,
+	.cms-field select,
+	.cms-field textarea {
+		width: 100%;
+		border: 1px solid rgb(42 42 42 / 0.12);
+		border-radius: 0.65rem;
+		padding: 0.55rem 0.75rem;
+		font: inherit;
+		background: rgb(255 255 255 / 0.85);
+	}
+
+	.cms-error {
+		color: #8b3a3a;
+		font-size: 0.82rem;
+		margin: 0 0 0.75rem;
+	}
+
+	.cms-grid {
+		display: grid;
+		gap: 0.75rem;
+	}
+
+	@media (min-width: 720px) {
+		.cms-grid-2 {
+			grid-template-columns: 1fr 1fr;
+		}
+	}
+
+	.cms-media-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(8.5rem, 1fr));
+		gap: 0.75rem;
+	}
+
+	.cms-media-item {
+		border-radius: 0.75rem;
+		overflow: hidden;
+		border: 1px solid rgb(42 42 42 / 0.08);
+		background: #fff;
+	}
+
+	.cms-media-item img {
+		display: block;
+		width: 100%;
+		aspect-ratio: 1;
+		object-fit: cover;
+	}
+
+	.cms-media-item button {
+		width: 100%;
+		border: 0;
+		background: #f7f3ea;
+		padding: 0.4rem;
+		font: inherit;
+		font-size: 0.7rem;
+		cursor: pointer;
+	}
+
+	/* —— Login gate —— */
+	.cms-login {
+		min-height: calc(100dvh - 4rem);
+		display: grid;
+		place-items: center;
+		padding: 1rem 0 2rem;
+	}
+
+	.cms-login-status {
+		margin: 0;
+		letter-spacing: 0.18em;
+		font-size: 0.78rem;
+		color: rgb(42 38 32 / 0.45);
+	}
+
+	.cms-login-sheet {
+		position: relative;
+		width: min(22rem, 100%);
+		padding: clamp(1.75rem, 4vw, 2.35rem) clamp(1.4rem, 3.5vw, 2rem)
+			clamp(1.5rem, 3vw, 1.9rem);
+		border: 1px solid rgb(42 38 32 / 0.1);
+		border-radius: 0.2rem 0.7rem 0.35rem 0.25rem;
+		background:
+			radial-gradient(ellipse 90% 50% at 50% 0%, rgb(255 252 245 / 0.9), transparent 55%),
+			linear-gradient(180deg, #fbf7ef 0%, #f3ebe0 48%, #ebe1d2 100%);
+		box-shadow:
+			0 1px 0 rgb(255 255 255 / 0.7) inset,
+			0 22px 48px rgb(42 38 32 / 0.1);
+		isolation: isolate;
+	}
+
+	.cms-login-sheet::before {
+		content: "";
+		position: absolute;
+		inset: 0;
+		z-index: 0;
+		pointer-events: none;
+		opacity: 0.42;
+		background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.1' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23f)' opacity='0.45'/%3E%3C/svg%3E");
+		background-size: 140px 140px;
+		mix-blend-mode: multiply;
+	}
+
+	.cms-login-sheet::after {
+		content: "";
+		position: absolute;
+		inset: 0.55rem;
+		z-index: 0;
+		pointer-events: none;
+		border: 1px solid rgb(42 38 32 / 0.08);
+		box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.28);
+	}
+
+	.cms-login-mark {
+		position: absolute;
+		top: 1.35rem;
+		right: 1.45rem;
+		z-index: 1;
+		width: 2.4rem;
+		height: 2.4rem;
+		border: 1.5px solid rgb(139 58 58 / 0.55);
+		border-radius: 0.2rem;
+		background:
+			linear-gradient(145deg, transparent 46%, rgb(139 58 58 / 0.55) 46% 54%, transparent 54%),
+			linear-gradient(45deg, transparent 46%, rgb(139 58 58 / 0.55) 46% 54%, transparent 54%);
+		opacity: 0.72;
+		rotate: -8deg;
+		pointer-events: none;
+	}
+
+	.cms-login-kicker,
+	.cms-login-title,
+	.cms-login-lead,
+	.cms-login-field,
+	.cms-login-error,
+	.cms-login-submit,
+	.cms-login-back {
+		position: relative;
+		z-index: 1;
+	}
+
+	.cms-login-kicker {
+		margin: 0 0 0.45rem;
+		font-size: 0.66rem;
+		letter-spacing: 0.22em;
+		text-transform: uppercase;
+		color: rgb(42 38 32 / 0.4);
+	}
+
+	.cms-login-title {
+		margin: 0;
+		font-family:
+			"Times New Roman", Times, "LXGW WenKai Mono Light", "霞鹜文楷", serif;
+		font-size: clamp(1.85rem, 4vw, 2.2rem);
+		font-weight: 700;
+		letter-spacing: 0.08em;
+		line-height: 1.15;
+		color: #1a1814;
+	}
+
+	.cms-login-lead {
+		margin: 0.55rem 0 1.45rem;
+		font-size: 0.88rem;
+		line-height: 1.55;
+		letter-spacing: 0.04em;
+		color: rgb(42 38 32 / 0.52);
+	}
+
+	.cms-login-field {
+		display: grid;
+		gap: 0.4rem;
+		margin-bottom: 1rem;
+	}
+
+	.cms-login-label {
+		font-size: 0.72rem;
+		letter-spacing: 0.18em;
+		color: rgb(42 38 32 / 0.48);
+	}
+
+	.cms-login-field input {
+		width: 100%;
+		box-sizing: border-box;
+		border: 1px solid rgb(42 38 32 / 0.16);
+		border-radius: 0.2rem;
+		padding: 0.78rem 0.9rem;
+		font: inherit;
+		font-size: 1rem;
+		letter-spacing: 0.2em;
+		color: #1a1814;
+		background: rgb(255 252 245 / 0.72);
+		outline: none;
+		transition:
+			border-color 180ms ease,
+			box-shadow 180ms ease;
+	}
+
+	.cms-login-field input:focus {
+		border-color: rgb(42 38 32 / 0.42);
+		box-shadow: 0 0 0 3px rgb(42 38 32 / 0.06);
+	}
+
+	.cms-login-error {
+		margin: -0.25rem 0 0.85rem;
+		font-size: 0.82rem;
+		letter-spacing: 0.06em;
+		color: #8b3a3a;
+	}
+
+	.cms-login-submit {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 100%;
+		margin-top: 0.15rem;
+		border: 0;
+		border-radius: 0.2rem;
+		padding: 0.78rem 1rem;
+		font: inherit;
+		font-size: 0.88rem;
+		letter-spacing: 0.28em;
+		color: #f7f1e6;
+		background: #1a1814;
+		cursor: pointer;
+		transition: background 180ms ease, opacity 180ms ease;
+	}
+
+	.cms-login-submit:hover:not(:disabled) {
+		background: #2c2822;
+	}
+
+	.cms-login-submit:disabled {
+		opacity: 0.45;
+		cursor: not-allowed;
+	}
+
+	.cms-login-back {
+		display: inline-block;
+		margin-top: 1.1rem;
+		font-size: 0.72rem;
+		letter-spacing: 0.14em;
+		color: rgb(42 38 32 / 0.42);
+		text-decoration: none;
+	}
+
+	.cms-login-back:hover {
+		color: #1a1814;
+	}
+</style>

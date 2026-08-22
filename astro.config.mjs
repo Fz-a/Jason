@@ -57,9 +57,19 @@ if (process.env.NODE_ENV === "development") {
 	setMaxListeners(20);
 }
 
-const adapter = process.env.CF_WORKERS
+const useCloudflare =
+	process.env.CF_WORKERS === "1" ||
+	process.env.CF_WORKERS === "true" ||
+	process.env.CMS_DEV === "1";
+
+/** Cloudflare adapter only for CF builds / `pnpm dev:cf` — plain `pnpm dev` stays on Node. */
+const adapter = useCloudflare
 	? cloudflare({
 			prerenderEnvironment: "node",
+			platformProxy: {
+				enabled: true,
+				configPath: "wrangler.jsonc",
+			},
 		})
 	: undefined;
 
@@ -111,6 +121,7 @@ export default defineConfig({
 	})(),
 
 	adapter,
+	output: useCloudflare ? "server" : undefined,
 
 	// 图像优化配置
 	image: {

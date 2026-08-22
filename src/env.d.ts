@@ -1,11 +1,32 @@
 /// <reference types="astro/client" />
+/// <reference types="@cloudflare/workers-types" />
 /// <reference path="../.astro/types.d.ts" />
 
+interface CmsEnv {
+	DB: D1Database;
+	MEDIA: R2Bucket;
+	CMS_SESSION_SECRET?: string;
+	CMS_ADMIN_USERNAME?: string;
+	CMS_ADMIN_PASSWORD?: string;
+}
+
+type Runtime = import("@astrojs/cloudflare").Runtime<CmsEnv>;
+
+declare namespace App {
+	interface Locals extends Runtime {}
+}
+
 declare global {
+	namespace Cloudflare {
+		interface Env extends CmsEnv {}
+	}
+
 	interface ImportMetaEnv {
 		readonly MEILI_MASTER_KEY: string;
-		// 视图设置面板总开关，可在部署平台配置（true / 1 / on / yes 开启）
 		readonly PUBLIC_DISPLAY_SETTINGS?: string;
+		readonly CMS_SESSION_SECRET?: string;
+		readonly CMS_ADMIN_USERNAME?: string;
+		readonly CMS_ADMIN_PASSWORD?: string;
 	}
 
 	interface ITOCManager {
@@ -27,11 +48,9 @@ declare global {
 		};
 		toggleFloatingTOC: () => void;
 		tocInternalNavigation: boolean;
-		// swup is defined in global.d.ts
 		// biome-ignore lint/suspicious/noExplicitAny: External library without types
 		spine: any;
 		closeAnnouncement: () => void;
-		// __fireflyMusic type is defined in global.d.ts
 		semifullScrollHandler?: (() => void) | undefined;
 		initSemifullScrollDetection?: () => void;
 	}
