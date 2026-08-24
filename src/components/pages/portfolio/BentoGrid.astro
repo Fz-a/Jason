@@ -22,14 +22,14 @@ const sectionNav = sections.map((section) => ({
 ---
 
 <section class="folio-bento folio-home" aria-label="Portfolio home">
-	<InkPetals client:visible />
+	<InkPetals client:only="svelte" />
 
 	<FolioHeader />
 
 	<div class="folio-grid">
-		<HeroInk client:idle text={headline} />
+		<HeroInk client:only="svelte" text={headline} />
 
-		<PhonographPlayer client:load />
+		<PhonographPlayer client:only="svelte" />
 
 		<aside
 			class="folio-tile folio-projects-wrap"
@@ -89,7 +89,7 @@ const sectionNav = sections.map((section) => ({
 		</article>
 
 		<ContactInk
-			client:visible
+			client:only="svelte"
 			guestbookHref={url(contactHref)}
 			mailto={mailto}
 			title={contactTitle || "留墨"}
@@ -156,6 +156,8 @@ const sectionNav = sections.map((section) => ({
 		});
 	}
 
-	bindSectionNav();
-	document.addEventListener("swup:page:view", () => bindSectionNav());
+	if (typeof window !== "undefined") {
+		bindSectionNav();
+		document.addEventListener("swup:page:view", () => bindSectionNav());
+	}
 </script>
