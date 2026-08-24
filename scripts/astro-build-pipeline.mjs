@@ -4,7 +4,7 @@
  * Set CF_WORKERS=0 to force a classic static Node build.
  */
 import { spawnSync } from "node:child_process";
-import { existsSync } from "node:fs";
+import { existsSync, rmSync } from "node:fs";
 import path from "node:path";
 
 // Cloudflare Pages / Workers Builds / explicit CF_WORKERS
@@ -21,6 +21,12 @@ if (!forceStatic && (onCloudflareCi || process.env.CF_WORKERS !== "0")) {
 		process.env.CF_WORKERS = "1";
 		console.log("[build] enabling CF_WORKERS=1 (Cloudflare output)");
 	}
+}
+
+// Cloudflare may restore a stale dist/ from build cache (old SESSION KV metadata).
+if (onCloudflareCi && existsSync("dist")) {
+	rmSync("dist", { recursive: true, force: true });
+	console.log("[build] cleared dist/ (avoid stale Workers build cache)");
 }
 
 function run(cmd, args, { optional = false } = {}) {
