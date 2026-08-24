@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * Cloudflare Workers Builds deploy step.
- * Publishes dist/server/entry.mjs + dist/client static assets via wrangler.
+ * Uses a minimal wrangler config so deploy does not auto-provision KV/D1/R2.
  */
 import { spawnSync } from "node:child_process";
 import fs from "node:fs";
@@ -9,10 +9,13 @@ import path from "node:path";
 
 const dist = path.resolve("dist");
 const client = path.join(dist, "client");
-const serverWrangler = path.join(dist, "server", "wrangler.json");
+const serverDir = path.join(dist, "server");
 const marker = path.join(client, "folio-deploy.txt");
+const rootWrangler = path.resolve("wrangler.jsonc");
+const deployConfig = path.join(serverDir, "wrangler.deploy.json");
+const redirectConfig = path.resolve(".wrangler/deploy/config.json");
 
-if (!fs.existsSync(path.join(dist, "server", "entry.mjs"))) {
+if (!fs.existsSync(path.join(serverDir, "entry.mjs"))) {
 	console.error("[deploy] missing dist/server/entry.mjs — run pnpm pages:build first");
 	process.exit(1);
 }
@@ -22,50 +25,72 @@ if (!fs.existsSync(marker)) {
 	process.exit(1);
 }
 
-const markerBody = fs.readFileSync(marker, "utf8").trim();
-console.log("[deploy] marker preview:\n", markerBody.split("\n").slice(0, 4).join("\n"));
+console.log(
+	"[deploy] marker preview:\n",
+	fs.readFileSync(marker, "utf8").trim().split("\n").slice(0, 4).join("\n"),
+);
 
-if (!fs.existsSync(serverWrangler)) {
-	console.error("[deploy] missing dist/server/wrangler.json");
-	process.exit(1);
+// Minimal config only — wrangler must NOT try to create KV/D1/R2 during deploy.
+const deployCfg = {
+	name: "firefly",
+	main: "entry.mjs",
+	compatibility_date: "2025-01-01",
+	compatibility_flags: ["nodejs_compat"],
+	assets: {
+		directory: "../client",
+		not_found_handling: "404-page",
+		html_handling: "force-trailing-slash",
+	},
+	vars: {
+		CMS_ADMIN_USERNAME: "admin",
+	},
+};
+fs.writeFileSync(deployConfig, `${JSON.stringify(deployCfg, null, "\t")}\n`);
+console.log("[deploy] wrote minimal dist/server/wrangler.deploy.json (no KV/D1/R2)");
+
+// wrangler merges repo-root wrangler.jsonc — strip bindings there during deploy.
+let rootBackup = null;
+if (fs.existsSync(rootWrangler)) {
+	rootBackup = `${rootWrangler}.deploy-backup`;
+	fs.copyFileSync(rootWrangler, rootBackup);
+	fs.writeFileSync(
+		rootWrangler,
+		`{
+	"name": "firefly",
+	"compatibility_date": "2025-01-01",
+	"compatibility_flags": ["nodejs_compat"]
+}
+`,
+	);
+	console.log("[deploy] temporarily minimized wrangler.jsonc for deploy merge");
 }
 
-const cfg = JSON.parse(fs.readFileSync(serverWrangler, "utf8"));
-delete cfg.r2_buckets;
-delete cfg.pages_build_output_dir;
-if (cfg.assets && "binding" in cfg.assets) delete cfg.assets.binding;
-// Placeholder D1 id breaks remote deploy; bind real D1 in the dashboard instead.
-const d1 = cfg.d1_databases?.[0];
-if (d1?.database_id?.startsWith("00000000")) {
-	delete cfg.d1_databases;
-	console.log("[deploy] skipped placeholder D1 binding (add DB in Cloudflare dashboard)");
+// Astro/vite may leave a redirect that still references bindings-rich config.
+if (fs.existsSync(redirectConfig)) {
+	fs.unlinkSync(redirectConfig);
+	console.log("[deploy] removed .wrangler/deploy/config.json redirect");
 }
-// Astro auto-provisions SESSION KV without an id; wrangler then tries to create it
-// and fails with code 10014 if the namespace already exists. Bind in dashboard instead.
-if (cfg.kv_namespaces?.length) {
-	delete cfg.kv_namespaces;
-	console.log("[deploy] skipped KV namespaces (bind SESSION in dashboard if needed)");
-}
-for (const key of ["rules", "images", "previews", "no_bundle"]) {
-	delete cfg[key];
-}
-fs.writeFileSync(serverWrangler, `${JSON.stringify(cfg, null, "\t")}\n`);
 
-console.log("[deploy] running: wrangler deploy --config dist/server/wrangler.json");
+console.log("[deploy] running: wrangler deploy --config dist/server/wrangler.deploy.json");
 const r = spawnSync(
 	"npx",
-	["wrangler", "deploy", "--config", "dist/server/wrangler.json"],
+	["wrangler", "deploy", "--config", "dist/server/wrangler.deploy.json"],
 	{
 		stdio: "inherit",
 		env: process.env,
 		shell: process.platform === "win32",
-		cwd: process.cwd(),
 	},
 );
+
+if (rootBackup && fs.existsSync(rootBackup)) {
+	fs.copyFileSync(rootBackup, rootWrangler);
+	fs.unlinkSync(rootBackup);
+	console.log("[deploy] restored wrangler.jsonc");
+}
 
 if ((r.status ?? 1) !== 0) {
 	console.error("[deploy] wrangler deploy failed");
 	process.exit(r.status ?? 1);
 }
 
-console.log("[deploy] done — verify https://<your-worker>.workers.dev/folio-deploy.txt");
+console.log("[deploy] done — verify https://firefly.<account>.workers.dev/folio-deploy.txt");

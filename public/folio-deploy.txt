@@ -4,5 +4,5 @@ stamp=2026-08-24T22:45+08:00
 build=pnpm pages:build
 deploy=leave-empty-or-pnpm-pages-deploy
 stamp=2026-08-24T23:30+08:00
-fix=skip-kv-session-provision
+fix=minimal-wrangler-deploy-config
 ui=cinema-collage-reorder
