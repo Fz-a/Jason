@@ -24,6 +24,7 @@
     "dev:cf": "cross-env CMS_DEV=1 CF_WORKERS=1 astro dev",
     "build:cf": "cross-env CF_WORKERS=1 node scripts/astro-build-pipeline.mjs",
     "pages:build": "cross-env CF_WORKERS=1 node scripts/astro-build-pipeline.mjs",
+    "pages:deploy": "node scripts/cf-pages-deploy.mjs",
     "build:static": "cross-env CF_WORKERS=0 node scripts/astro-build-pipeline.mjs",
     "db:migrate": "wrangler d1 migrations apply jason-folio-cms --local --config wrangler.jsonc",
     "db:migrate:remote": "wrangler d1 migrations apply jason-folio-cms --remote --config wrangler.jsonc",
