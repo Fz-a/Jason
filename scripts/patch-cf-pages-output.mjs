@@ -43,6 +43,7 @@ if (fs.existsSync(serverWrangler)) {
 	}
 	// R2 must be dashboard-bound after enabling the product; omit from deploy config.
 	delete cfg.r2_buckets;
+	if (cfg.kv_namespaces?.length) delete cfg.kv_namespaces;
 	for (const key of ["rules", "images", "previews", "no_bundle"]) {
 		delete cfg[key];
 	}

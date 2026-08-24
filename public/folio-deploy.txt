@@ -3,8 +3,6 @@
 stamp=2026-08-24T22:45+08:00
 build=pnpm pages:build
 deploy=leave-empty-or-pnpm-pages-deploy
-stamp=2026-08-24T23:20+08:00
-build=pnpm pages:build
-deploy=wrangler-deploy-dist-server
-fix=replace-hello-world-worker
+stamp=2026-08-24T23:30+08:00
+fix=skip-kv-session-provision
 ui=cinema-collage-reorder

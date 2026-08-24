@@ -40,6 +40,12 @@ if (d1?.database_id?.startsWith("00000000")) {
 	delete cfg.d1_databases;
 	console.log("[deploy] skipped placeholder D1 binding (add DB in Cloudflare dashboard)");
 }
+// Astro auto-provisions SESSION KV without an id; wrangler then tries to create it
+// and fails with code 10014 if the namespace already exists. Bind in dashboard instead.
+if (cfg.kv_namespaces?.length) {
+	delete cfg.kv_namespaces;
+	console.log("[deploy] skipped KV namespaces (bind SESSION in dashboard if needed)");
+}
 for (const key of ["rules", "images", "previews", "no_bundle"]) {
 	delete cfg[key];
 }
