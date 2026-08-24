@@ -66,4 +66,12 @@ if ((pf.status ?? 1) !== 0) {
 	);
 }
 
+if (
+	process.env.CF_WORKERS === "1" ||
+	process.env.CF_WORKERS === "true" ||
+	onCloudflareCi
+) {
+	run("node", ["scripts/patch-cf-pages-output.mjs"]);
+}
+
 console.log("\n[build] done");
