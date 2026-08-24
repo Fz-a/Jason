@@ -1,7 +1,13 @@
+import folioStaticSeed from "@/constants/folio-static-seed.json";
 import type { PortfolioItem, PortfolioSectionId } from "@/types/portfolioConfig";
 import type { GalleryNode } from "@/types/folioTree";
 import { portfolioConfig } from "@/config";
+import { normalizeGalleryNode } from "@/utils/folio-tree";
 import { url as siteUrl } from "@/utils/url-utils";
+
+type FolioStaticSeed = {
+	trees?: Partial<Record<PortfolioSectionId, GalleryNode[]>>;
+};
 
 const FOLIO_SECTIONS: PortfolioSectionId[] = [
 	"knowledge",
@@ -23,10 +29,15 @@ function toNode(item: PortfolioItem): GalleryNode {
 	};
 }
 
-/** Seed nodes from static portfolioConfig (fallback when D1 empty / unavailable). */
+/** Seed nodes for static HTML (exported CMS) or portfolioConfig fallback. */
 export function seedNodesForSection(sectionId: string): GalleryNode[] {
 	if (!FOLIO_SECTIONS.includes(sectionId as PortfolioSectionId)) return [];
-	return (portfolioConfig.items[sectionId as PortfolioSectionId] ?? []).map(toNode);
+	const sid = sectionId as PortfolioSectionId;
+	const exported = (folioStaticSeed as FolioStaticSeed).trees?.[sid];
+	if (exported !== undefined) {
+		return exported.map(normalizeGalleryNode);
+	}
+	return (portfolioConfig.items[sid] ?? []).map(toNode);
 }
 
 export function isFolioSection(sectionId: string): sectionId is PortfolioSectionId {

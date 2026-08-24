@@ -21,6 +21,7 @@
     "lint": "biome check --write ./src ./scripts",
     "preinstall": "npx only-allow pnpm",
     "lqips": "npx tsx scripts/generate-lqips.ts",
+    "folio:export": "node scripts/export-folio-static-seed.mjs",
     "dev:cf": "cross-env CMS_DEV=1 CF_WORKERS=1 astro dev",
     "build:cf": "cross-env CF_WORKERS=1 node scripts/astro-build-pipeline.mjs",
     "pages:build": "cross-env CF_STATIC_DEPLOY=1 node scripts/astro-build-pipeline.mjs",

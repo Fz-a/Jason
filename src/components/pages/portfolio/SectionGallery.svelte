@@ -641,7 +641,7 @@
 				<div class="folio-mast-title-row">
 					<h1 class="folio-section-heading">{bannerTitle}</h1>
 					<p class="folio-mast-meta">
-						<span class="folio-mast-count">{padIndex(children.length)}</span>
+						<span class="folio-mast-count">{String(children.length).padStart(2, "0")}</span>
 						<span class="folio-mast-count-label">篇</span>
 					</p>
 				</div>
