@@ -82,6 +82,7 @@ hideApiRoutesForStaticBuild();
 try {
 	if (staticDeploy) {
 		run("node", ["scripts/export-folio-static-seed.mjs"], { optional: true });
+		run("node", ["scripts/folio-media-optimize.mjs"], { optional: true });
 	}
 	run("npx", ["tsx", "scripts/generate-lqips.ts"], { optional: true });
 	run("npx", ["tsx", "scripts/generate-vndb-covers.ts"], { optional: true });

@@ -3,5 +3,5 @@
 stamp=2026-08-25T01:10+08:00
 build=CF_STATIC_DEPLOY=1
 deploy=static-assets-only
-fix=export-cms-static-seed
+fix=folio-webp-optimize
 ui=cinema-collage-reorder

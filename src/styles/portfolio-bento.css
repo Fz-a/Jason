@@ -2906,6 +2906,12 @@ html.folio-modal-open {
 	animation-delay: var(--bento-delay, 0ms);
 }
 
+/* Below-fold cards: skip layout/paint until near viewport */
+.folio-cinema:nth-child(n + 3) {
+	content-visibility: auto;
+	contain-intrinsic-size: auto 12rem;
+}
+
 .folio-cinema::before {
 	content: "";
 	position: absolute;

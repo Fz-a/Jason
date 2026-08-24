@@ -9,7 +9,7 @@
 				"title": "Voice eXperience System 100",
 				"summary": "AI Voice Interaction Terminal for Natural-Language Dialogue and Intelligent Robot Control",
 				"body": "",
-				"coverSrc": "/portfolio/cms/media_0bd8f3da9af041bf.png",
+				"coverSrc": "/portfolio/cms/media_0bd8f3da9af041bf.webp",
 				"coverPos": "60% 38%",
 				"accent": "#4a463e",
 				"kind": "module",
@@ -34,7 +34,7 @@
 				"title": "Mecanum Robot Full-Stack Training System",
 				"summary": "An integrated training platform covering embedded control, motion sensing, IoT communication, and mobile app development.",
 				"body": "",
-				"coverSrc": "/portfolio/cms/media_796fa230f69047f7.jpg",
+				"coverSrc": "/portfolio/cms/media_796fa230f69047f7.webp",
 				"coverPos": "50% 50%",
 				"accent": "#4a463e",
 				"kind": "module",
@@ -45,7 +45,7 @@
 				"title": "Agricultural RTK Positioning",
 				"summary": "Centimeter-level real-time positioning and monitoring for agricultural machinery",
 				"body": "",
-				"coverSrc": "/portfolio/cms/media_64d04176f71544e2.png",
+				"coverSrc": "/portfolio/cms/media_64d04176f71544e2.webp",
 				"coverPos": "50% 50%",
 				"accent": "#4a463e",
 				"kind": "module",
@@ -54,11 +54,11 @@
 					"layout": "2-split",
 					"cells": [
 						{
-							"src": "/portfolio/cms/media_b39f93fbe6784a17.png",
+							"src": "/portfolio/cms/media_b39f93fbe6784a17.webp",
 							"pos": "50% 50%"
 						},
 						{
-							"src": "/portfolio/cms/media_7db347c4c2464b87.jpg",
+							"src": "/portfolio/cms/media_7db347c4c2464b87.webp",
 							"pos": "50% 50%"
 						}
 					]
@@ -69,7 +69,7 @@
 				"title": "Smart Wearable for Elderly Care",
 				"summary": "An AI-enabled smart wearable that provides real-time health monitoring, fall detection, and intelligent elderly care.",
 				"body": "",
-				"coverSrc": "/portfolio/cms/media_6509a50e0cd64740.png",
+				"coverSrc": "/portfolio/cms/media_6509a50e0cd64740.webp",
 				"coverPos": "51% 26%",
 				"accent": "#4a463e",
 				"kind": "module",
@@ -78,15 +78,15 @@
 					"layout": "3-left-stack",
 					"cells": [
 						{
-							"src": "/portfolio/cms/media_3ebad67596654d95.png",
+							"src": "/portfolio/cms/media_3ebad67596654d95.webp",
 							"pos": "50% 50%"
 						},
 						{
-							"src": "/portfolio/cms/media_82ad7a9a4dd44475.png",
+							"src": "/portfolio/cms/media_82ad7a9a4dd44475.webp",
 							"pos": "50% 50%"
 						},
 						{
-							"src": "/portfolio/cms/media_07ee655e77da4dc3.jpg",
+							"src": "/portfolio/cms/media_07ee655e77da4dc3.webp",
 							"pos": "50% 50%"
 						}
 					]
@@ -97,7 +97,7 @@
 				"title": "Early Fire and Warning System",
 				"summary": "Early flame recognition and warning based on Yolov5",
 				"body": "",
-				"coverSrc": "/portfolio/cms/media_4d89ca8215584f32.jpg",
+				"coverSrc": "/portfolio/cms/media_4d89ca8215584f32.webp",
 				"coverPos": "50% 50%",
 				"accent": "#4a463e",
 				"kind": "module",
@@ -122,7 +122,7 @@
 				"title": "2.4 GHz AGV Remote Controller",
 				"summary": "A reliable wireless remote controller designed for precise and responsive operation of heavy-duty AGVs.",
 				"body": "",
-				"coverSrc": "/portfolio/cms/media_3f28c9d747fb414c.jpg",
+				"coverSrc": "/portfolio/cms/media_3f28c9d747fb414c.webp",
 				"coverPos": "50% 50%",
 				"accent": "#4a463e",
 				"kind": "module",
@@ -133,7 +133,7 @@
 				"title": "Multi-Vision Inspection Robot",
 				"summary": "An AI-powered multi-camera inspection robot integrating deep learning, ROS, and cloud-based IoT technology for real-time fire detection and autonomous emergency response.",
 				"body": "",
-				"coverSrc": "/portfolio/cms/media_5ae7373eaf6b47a2.png",
+				"coverSrc": "/portfolio/cms/media_5ae7373eaf6b47a2.webp",
 				"coverPos": "50% 50%",
 				"accent": "#4a463e",
 				"kind": "module",

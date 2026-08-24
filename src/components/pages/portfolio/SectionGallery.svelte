@@ -909,7 +909,9 @@
 								src={item.coverSrc}
 								alt=""
 								class="folio-tile-cover"
-								loading="lazy"
+								loading={i < 2 ? "eager" : "lazy"}
+								decoding="async"
+								fetchpriority={i === 0 ? "high" : undefined}
 								style={`object-position: ${item.coverPos || "50% 50%"}`}
 							/>
 						{:else if item.kind === "folder"}

@@ -5,17 +5,11 @@
  */
 import fs from "node:fs";
 import path from "node:path";
+import { COVER_MAX_WIDTH, writeOptimizedWebpFromBuffer } from "./folio-media-optimize.mjs";
 
 const storePath = path.resolve(".data/folio-cms-local.json");
 const outJson = path.resolve("src/constants/folio-static-seed.json");
 const mediaDir = path.resolve("public/portfolio/cms");
-
-const MIME_EXT = {
-	"image/jpeg": "jpg",
-	"image/png": "png",
-	"image/webp": "webp",
-	"image/gif": "gif",
-};
 
 function parseMediaId(url) {
 	if (!url || typeof url !== "string") return null;
@@ -48,22 +42,21 @@ function rewriteNodeUrls(node, urlMap) {
 	return next;
 }
 
-function writeMediaFiles(media, urlMap) {
+async function writeMediaFiles(media, urlMap) {
 	fs.mkdirSync(mediaDir, { recursive: true });
 	for (const entry of media) {
 		if (!entry?.id || !entry.dataUrl) continue;
 		const m = /^data:([^;]+);base64,(.+)$/.exec(entry.dataUrl);
 		if (!m) continue;
-		const mime = m[1];
-		const ext = MIME_EXT[mime] ?? "bin";
-		const fileName = `${entry.id}.${ext}`;
+		const buf = Buffer.from(m[2], "base64");
+		const fileName = `${entry.id}.webp`;
 		const dest = path.join(mediaDir, fileName);
-		fs.writeFileSync(dest, Buffer.from(m[2], "base64"));
+		await writeOptimizedWebpFromBuffer(buf, dest, COVER_MAX_WIDTH);
 		urlMap[entry.id] = `/portfolio/cms/${fileName}`;
 	}
 }
 
-function main() {
+async function main() {
 	if (!fs.existsSync(storePath)) {
 		console.log("[folio:export] no .data/folio-cms-local.json — keeping existing static seed");
 		return;
@@ -72,7 +65,7 @@ function main() {
 	const store = JSON.parse(fs.readFileSync(storePath, "utf8"));
 	const urlMap = {};
 	const media = Array.isArray(store.media) ? store.media : [];
-	writeMediaFiles(media, urlMap);
+	await writeMediaFiles(media, urlMap);
 
 	const trees = store.trees && typeof store.trees === "object" ? store.trees : {};
 	const exportedTrees = {};
@@ -94,8 +87,11 @@ function main() {
 		.map(([k, v]) => `${k}:${v.length}`)
 		.join(", ");
 	console.log(
-		`[folio:export] wrote ${outJson} (${sectionSummary || "no sections"}) + ${Object.keys(urlMap).length} media files`,
+		`[folio:export] wrote ${outJson} (${sectionSummary || "no sections"}) + ${Object.keys(urlMap).length} WebP media files (max ${COVER_MAX_WIDTH}px)`,
 	);
 }
 
-main();
+main().catch((err) => {
+	console.error("[folio:export] failed:", err);
+	process.exit(1);
+});
