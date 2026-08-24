@@ -1,8 +1,7 @@
 # Folio deploy marker — open this URL after push to confirm Cloudflare published the new build.
 # Expected: https://cjyfz.dpdns.org/folio-deploy.txt
-stamp=2026-08-24T22:45+08:00
+stamp=2026-08-24T23:45+08:00
 build=pnpm pages:build
-deploy=leave-empty-or-pnpm-pages-deploy
-stamp=2026-08-24T23:30+08:00
-fix=minimal-wrangler-deploy-config
+deploy=pnpm pages:deploy
+fix=astro-session-false-no-kv
 ui=cinema-collage-reorder

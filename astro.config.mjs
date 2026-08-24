@@ -67,6 +67,7 @@ const useCloudflare =
 /** Cloudflare adapter only for CF builds / `pnpm dev:cf` — plain `pnpm dev` stays on Node. */
 const adapter = useCloudflare
 	? cloudflare({
+			session: false,
 			prerenderEnvironment: "node",
 			platformProxy: {
 				enabled: true,
