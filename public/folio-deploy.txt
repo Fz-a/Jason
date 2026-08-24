@@ -3,5 +3,5 @@
 stamp=2026-08-24T22:45+08:00
 build=pnpm pages:build
 deploy=leave-empty-or-pnpm-pages-deploy
-fix=no-wrangler-deploy-r2
+fix=workers-deploy-and-dns
 ui=cinema-collage-reorder

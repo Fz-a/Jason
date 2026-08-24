@@ -1,26 +1,37 @@
 #!/usr/bin/env node
 /**
- * Cloudflare Pages deploy step.
+ * Cloudflare Workers Builds deploy step.
  *
- * Do NOT use `wrangler deploy` here — it provisions Worker bindings (R2/D1/KV)
- * via API and fails with code 10042 when R2 is not enabled on the account.
- *
- * Pages publishes the build output directory; this script only verifies it.
- * Bind D1/R2 in the Pages dashboard (Settings → Bindings), not wrangler.jsonc.
+ * Workers Builds requires an explicit deploy — unlike Pages git integration,
+ * the platform does not upload dist/ by itself after build.
  */
+import { spawnSync } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
 
 const dist = path.resolve("dist");
-const required = ["_worker.js", "folio-deploy.txt"];
+const serverWrangler = path.join(dist, "server", "wrangler.json");
 
-for (const file of required) {
-	const p = path.join(dist, file);
-	if (!fs.existsSync(p)) {
-		console.error(`[deploy] missing dist/${file} — build step may have failed`);
+for (const file of ["_worker.js", "folio-deploy.txt"]) {
+	if (!fs.existsSync(path.join(dist, file))) {
+		console.error(`[deploy] missing dist/${file} — run pnpm pages:build first`);
 		process.exit(1);
 	}
 }
 
-console.log("[deploy] dist/ ready for Cloudflare Pages (SSR via dist/_worker.js)");
-console.log("[deploy] skip wrangler deploy — Pages uploads pages_build_output_dir automatically");
+if (fs.existsSync(serverWrangler)) {
+	const cfg = JSON.parse(fs.readFileSync(serverWrangler, "utf8"));
+	delete cfg.r2_buckets;
+	delete cfg.pages_build_output_dir;
+	if (cfg.assets && "binding" in cfg.assets) delete cfg.assets.binding;
+	fs.writeFileSync(serverWrangler, `${JSON.stringify(cfg, null, "\t")}\n`);
+	console.log("[deploy] patched dist/server/wrangler.json (no R2 / ASSETS binding)");
+}
+
+console.log("[deploy] running wrangler deploy …");
+const r = spawnSync("npx", ["wrangler", "deploy"], {
+	stdio: "inherit",
+	env: process.env,
+	shell: process.platform === "win32",
+});
+process.exit(r.status ?? 1);
