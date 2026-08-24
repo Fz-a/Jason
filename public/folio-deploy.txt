@@ -3,5 +3,8 @@
 stamp=2026-08-24T22:45+08:00
 build=pnpm pages:build
 deploy=leave-empty-or-pnpm-pages-deploy
-fix=workers-deploy-and-dns
+stamp=2026-08-24T23:20+08:00
+build=pnpm pages:build
+deploy=wrangler-deploy-dist-server
+fix=replace-hello-world-worker
 ui=cinema-collage-reorder
