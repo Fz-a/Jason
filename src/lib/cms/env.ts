@@ -2,7 +2,7 @@ import type { APIContext } from "astro";
 
 export type CmsBindings = {
 	DB: D1Database;
-	MEDIA: R2Bucket;
+	MEDIA?: R2Bucket;
 	CMS_SESSION_SECRET?: string;
 	CMS_ADMIN_USERNAME?: string;
 	CMS_ADMIN_PASSWORD?: string;

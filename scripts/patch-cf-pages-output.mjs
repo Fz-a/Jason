@@ -41,6 +41,8 @@ if (fs.existsSync(serverWrangler)) {
 	if (cfg.assets && "binding" in cfg.assets) {
 		delete cfg.assets.binding;
 	}
+	// R2 must be dashboard-bound after enabling the product; omit from deploy config.
+	delete cfg.r2_buckets;
 	for (const key of ["rules", "images", "previews", "no_bundle"]) {
 		delete cfg[key];
 	}

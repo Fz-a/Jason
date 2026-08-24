@@ -11,12 +11,9 @@
 			"migrations_dir": "migrations"
 		}
 	],
-	"r2_buckets": [
-		{
-			"binding": "MEDIA",
-			"bucket_name": "jason-folio-media"
-		}
-	],
+	// R2 (MEDIA) is bound in the Cloudflare dashboard after enabling R2.
+	// Declaring r2_buckets here makes `wrangler deploy` fail with code 10042
+	// when R2 is not enabled on the account.
 	"vars": {
 		"CMS_ADMIN_USERNAME": "admin"
 	}
