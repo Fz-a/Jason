@@ -5,22 +5,46 @@
 		text: string;
 	}
 
+	/** Archimedean spiral (Spiral Search) — quiet ink flourish beside the headline. */
+	function buildInkSpiralPath(): string {
+		const turns = 3.1;
+		const baseR = 5.2;
+		const amp = 6.8;
+		const pulse = 1.1;
+		const scale = 0.82;
+		const steps = 88;
+		let d = "";
+		for (let i = 0; i <= steps; i++) {
+			const progress = i / steps;
+			const t = progress * Math.PI * 2;
+			const angle = t * turns;
+			const radius = baseR + (1 - Math.cos(t)) * (amp + pulse * 0.35);
+			const x = 50 + Math.cos(angle) * radius * scale;
+			const y = 50 + Math.sin(angle) * radius * scale;
+			d += `${i === 0 ? "M" : "L"}${x.toFixed(2)} ${y.toFixed(2)}`;
+		}
+		return d;
+	}
+
+	const inkSpiralPath = buildInkSpiralPath();
+
 	let { text }: Props = $props();
 	let root = $state<HTMLElement | null>(null);
 	let mx = $state(0.5);
 	let my = $state(0.5);
 	let revealed = $state(false);
+	let playSpiral = $state(false);
 
 	onMount(() => {
 		const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-		const skip =
-			reduce ||
-			document.documentElement.classList.contains("folio-nav") ||
-			!document.documentElement.classList.contains("folio-enter");
-		if (skip) {
+		// client:only mounts after folio-enter is often already gone — do NOT require it.
+		// Skip only when Swup is mid-hop (folio-nav) or user prefers reduced motion.
+		const skipNav = document.documentElement.classList.contains("folio-nav");
+		if (reduce || skipNav) {
 			revealed = true;
 			return;
 		}
+		playSpiral = true;
 		const t = window.setTimeout(() => {
 			revealed = true;
 		}, 180);
@@ -38,6 +62,7 @@
 <article
 	class="folio-tile folio-hero"
 	class:is-revealed={revealed}
+	class:has-ink-spiral={playSpiral}
 	bind:this={root}
 	style={`--bento-delay: 40ms; --mx: ${mx}; --my: ${my}`}
 	onpointermove={onMove}
@@ -65,6 +90,17 @@
 			opacity="0.35"
 		></path>
 	</svg>
+
+	{#if playSpiral}
+		<svg class="folio-ink-spiral" viewBox="0 0 100 100" aria-hidden="true">
+			<path
+				class="folio-ink-spiral-path"
+				fill="none"
+				pathLength="1"
+				d={inkSpiralPath}
+			></path>
+		</svg>
+	{/if}
 
 	<div class="folio-ink-wash" aria-hidden="true"></div>
 

@@ -222,6 +222,61 @@ html.folio-enter .folio-tile {
 	}
 }
 
+/* Quiet Archimedean spiral — homepage ink flourish (top-right of 知行合一 tile) */
+.folio-ink-spiral {
+	position: absolute;
+	top: 0.35rem;
+	right: 0.35rem;
+	width: clamp(5.5rem, 11vw, 7.5rem);
+	height: auto;
+	aspect-ratio: 1;
+	pointer-events: none;
+	z-index: 2;
+	color: var(--folio-ink, #1a1814);
+	opacity: 0;
+	transform: translate3d(
+		calc((var(--mx, 0.5) - 0.5) * -6px),
+		calc((var(--my, 0.5) - 0.5) * -4px),
+		0
+	);
+}
+
+.folio-ink-spiral-path {
+	stroke: currentColor;
+	stroke-width: 1.65;
+	stroke-linecap: round;
+	stroke-linejoin: round;
+	vector-effect: non-scaling-stroke;
+	stroke-dasharray: 1;
+	stroke-dashoffset: 1;
+	opacity: 0.55;
+}
+
+.folio-hero.has-ink-spiral .folio-ink-spiral {
+	animation: folio-ink-spiral-fade 3s ease 40ms forwards;
+}
+
+.folio-hero.has-ink-spiral .folio-ink-spiral-path {
+	animation: folio-ink-spiral-draw 1.5s cubic-bezier(0.22, 1, 0.36, 1) 60ms forwards;
+}
+
+@keyframes folio-ink-spiral-draw {
+	to {
+		stroke-dashoffset: 0;
+		opacity: 0.42;
+	}
+}
+
+@keyframes folio-ink-spiral-fade {
+	0%,
+	70% {
+		opacity: 1;
+	}
+	100% {
+		opacity: 0.72;
+	}
+}
+
 .folio-ink-wash {
 	position: absolute;
 	inset: -20%;
@@ -1141,6 +1196,21 @@ html.folio-enter .folio-tile {
 	.folio-shadow-stage.is-playing::after,
 	.folio-hero.is-revealed .folio-brush-line {
 		animation: none !important;
+	}
+
+	.folio-ink-spiral,
+	.folio-ink-spiral-path {
+		animation: none !important;
+	}
+
+	.folio-ink-spiral {
+		opacity: 0.45;
+	}
+
+	.folio-ink-spiral-path {
+		stroke-dasharray: 1;
+		stroke-dashoffset: 0;
+		opacity: 0.35;
 	}
 
 	.folio-char {
