@@ -5,13 +5,17 @@
 		text: string;
 	}
 
-	/** Quiet particle trails that travel along the cloud outlines. */
+	type Sample = { x: number; y: number };
+
+	/** Lean trails — samples cached once; ~30fps updates. */
 	const TRAIL = {
-		countA: 22,
-		countB: 16,
-		span: 0.34,
-		durationMs: 7800,
-		durationMsB: 9200,
+		countA: 12,
+		countB: 9,
+		span: 0.3,
+		durationMs: 9000,
+		durationMsB: 11000,
+		sampleCount: 64,
+		frameMs: 33,
 	} as const;
 
 	const CLOUD_STROKE_A =
@@ -23,25 +27,42 @@
 		return ((progress % 1) + 1) % 1;
 	}
 
-	function placeTrail(
-		path: SVGPathElement,
-		dots: SVGCircleElement[],
-		progress: number,
-		span: number,
-	) {
+	function samplePath(path: SVGPathElement, count: number): Sample[] {
 		const len = path.getTotalLength();
-		if (len <= 0 || dots.length === 0) return;
+		if (len <= 0) return [];
+		const out: Sample[] = new Array(count);
+		for (let i = 0; i < count; i++) {
+			const p = path.getPointAtLength((i / (count - 1)) * len);
+			out[i] = { x: p.x, y: p.y };
+		}
+		return out;
+	}
+
+	function sampleAt(samples: Sample[], progress: number): Sample {
+		const n = samples.length;
+		if (n === 0) return { x: 0, y: 0 };
+		if (n === 1) return samples[0]!;
+		const t = normalizeProgress(progress) * (n - 1);
+		const i = Math.floor(t);
+		const f = t - i;
+		const a = samples[i]!;
+		const b = samples[Math.min(i + 1, n - 1)]!;
+		return { x: a.x + (b.x - a.x) * f, y: a.y + (b.y - a.y) * f };
+	}
+
+	function placeTrail(samples: Sample[], dots: SVGCircleElement[], progress: number, span: number) {
+		if (samples.length === 0 || dots.length === 0) return;
+		const last = Math.max(1, dots.length - 1);
 		for (let index = 0; index < dots.length; index++) {
 			const node = dots[index];
 			if (!node) continue;
-			const tailOffset = index / Math.max(1, dots.length - 1);
-			const t = normalizeProgress(progress - tailOffset * span);
-			const point = path.getPointAtLength(t * len);
+			const tailOffset = index / last;
+			const point = sampleAt(samples, progress - tailOffset * span);
 			const fade = (1 - tailOffset) ** 0.56;
-			node.setAttribute("cx", point.x.toFixed(2));
-			node.setAttribute("cy", point.y.toFixed(2));
-			node.setAttribute("r", (0.55 + fade * 1.35).toFixed(2));
-			node.setAttribute("opacity", (0.06 + fade * 0.48).toFixed(3));
+			node.cx.baseVal.value = point.x;
+			node.cy.baseVal.value = point.y;
+			node.r.baseVal.value = 0.55 + fade * 1.25;
+			node.setAttribute("opacity", (0.06 + fade * 0.45).toFixed(3));
 		}
 	}
 
@@ -60,6 +81,7 @@
 		const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 		let raf = 0;
 		let cancelled = false;
+		let lastPaint = 0;
 		const revealTimer = window.setTimeout(() => {
 			revealed = true;
 		}, 180);
@@ -77,14 +99,15 @@
 			const dotsB = Array.from(
 				root.querySelectorAll<SVGCircleElement>(".folio-cloud-trail-b .folio-cloud-dot"),
 			);
+			const samplesA = samplePath(pathA, TRAIL.sampleCount);
+			const samplesB = samplePath(pathB, TRAIL.sampleCount);
 
 			if (reduce) {
-				// Static soft dots along the midpoints of each trail.
-				placeTrail(pathA, dotsA, 0.55, TRAIL.span);
-				placeTrail(pathB, dotsB, 0.4, TRAIL.span);
+				placeTrail(samplesA, dotsA, 0.55, TRAIL.span);
+				placeTrail(samplesB, dotsB, 0.4, TRAIL.span);
 				for (const node of [...dotsA, ...dotsB]) {
 					node.setAttribute("opacity", "0.22");
-					node.setAttribute("r", "0.9");
+					node.r.baseVal.value = 0.9;
 				}
 				return;
 			}
@@ -92,12 +115,19 @@
 			const startedAt = performance.now();
 			const render = (now: number) => {
 				if (cancelled) return;
-				const time = now - startedAt;
-				const progressA = (time % TRAIL.durationMs) / TRAIL.durationMs;
-				const progressB = (time % TRAIL.durationMsB) / TRAIL.durationMsB;
-				placeTrail(pathA, dotsA, progressA, TRAIL.span);
-				placeTrail(pathB, dotsB, progressB, TRAIL.span);
 				raf = requestAnimationFrame(render);
+				if (document.hidden) return;
+				if (now - lastPaint < TRAIL.frameMs) return;
+				lastPaint = now;
+
+				const time = now - startedAt;
+				placeTrail(samplesA, dotsA, (time % TRAIL.durationMs) / TRAIL.durationMs, TRAIL.span);
+				placeTrail(
+					samplesB,
+					dotsB,
+					(time % TRAIL.durationMsB) / TRAIL.durationMsB,
+					TRAIL.span,
+				);
 			};
 			raf = requestAnimationFrame(render);
 		})();
