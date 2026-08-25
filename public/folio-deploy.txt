@@ -1,7 +1,7 @@
 # Folio deploy marker — open this URL after push to confirm Cloudflare published the new build.
 # Expected: https://cjyfz.dpdns.org/folio-deploy.txt
-stamp=2026-08-25T12:15+08:00
+stamp=2026-08-25T12:20+08:00
 build=CF_STATIC_DEPLOY=1
 deploy=static-assets-only
-fix=hero-ink-cardioid-heart
+fix=hero-cloud-particle-trails
 ui=cinema-collage-reorder

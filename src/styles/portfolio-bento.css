@@ -192,6 +192,17 @@ html.folio-enter .folio-tile {
 	color: var(--folio-ink);
 	pointer-events: none;
 	will-change: transform;
+	overflow: visible;
+}
+
+.folio-cloud-guide {
+	fill: none;
+	stroke: none;
+	pointer-events: none;
+}
+
+.folio-cloud-dot {
+	vector-effect: non-scaling-stroke;
 }
 
 .folio-cloud-a {
@@ -220,34 +231,6 @@ html.folio-enter .folio-tile {
 	50% {
 		translate: -6px 4px;
 	}
-}
-
-/* Cardioid Heart ink flourish — Hero top-right; smaller restrained mark */
-.folio-ink-rose {
-	position: absolute;
-	top: 0.5rem;
-	right: 0.45rem;
-	width: clamp(3.4rem, 6.5vw, 4.4rem);
-	height: auto;
-	aspect-ratio: 1;
-	pointer-events: none;
-	z-index: 3;
-	color: #5c3a32;
-	opacity: 0.68;
-	overflow: visible;
-	transform: translate3d(
-		calc((var(--mx, 0.5) - 0.5) * -3px),
-		calc((var(--my, 0.5) - 0.5) * -2px),
-		0
-	);
-}
-
-.folio-ink-rose-path {
-	vector-effect: non-scaling-stroke;
-}
-
-.folio-ink-rose-dot {
-	vector-effect: non-scaling-stroke;
 }
 
 .folio-ink-wash {
@@ -1171,12 +1154,8 @@ html.folio-enter .folio-tile {
 		animation: none !important;
 	}
 
-	.folio-ink-rose {
-		opacity: 0.55;
-	}
-
-	.folio-ink-rose-dot {
-		display: none;
+	.folio-cloud-dot {
+		/* keep a few static dots when motion is reduced (placed by JS) */
 	}
 
 	.folio-char {
