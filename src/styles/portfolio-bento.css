@@ -222,18 +222,18 @@ html.folio-enter .folio-tile {
 	}
 }
 
-/* Archimedean spiral — Hero tile top-right; stroke draw driven by JS */
-.folio-ink-spiral {
+/* Rose Three ink flourish — Hero tile top-right */
+.folio-ink-rose {
 	position: absolute;
-	top: 0.2rem;
-	right: 0.15rem;
-	width: clamp(6.5rem, 13vw, 9rem);
+	top: 0.15rem;
+	right: 0.1rem;
+	width: clamp(6.8rem, 14vw, 9.5rem);
 	height: auto;
 	aspect-ratio: 1;
 	pointer-events: none;
 	z-index: 3;
 	color: #6b2e2e;
-	opacity: 0.82;
+	opacity: 0.88;
 	transform: translate3d(
 		calc((var(--mx, 0.5) - 0.5) * -6px),
 		calc((var(--my, 0.5) - 0.5) * -4px),
@@ -241,14 +241,12 @@ html.folio-enter .folio-tile {
 	);
 }
 
-.folio-ink-spiral-path {
-	stroke: currentColor;
-	stroke-width: 2.1;
-	stroke-linecap: round;
-	stroke-linejoin: round;
+.folio-ink-rose-path {
 	vector-effect: non-scaling-stroke;
-	opacity: 0.9;
-	/* dashoffset set inline by HeroInk onMount */
+}
+
+.folio-ink-rose-dot {
+	vector-effect: non-scaling-stroke;
 }
 
 .folio-ink-wash {
@@ -1172,18 +1170,12 @@ html.folio-enter .folio-tile {
 		animation: none !important;
 	}
 
-	.folio-ink-spiral,
-	.folio-ink-spiral-path {
-		animation: none !important;
-		transition: none !important;
+	.folio-ink-rose {
+		opacity: 0.7;
 	}
 
-	.folio-ink-spiral {
-		opacity: 0.82;
-	}
-
-	.folio-ink-spiral-path {
-		opacity: 0.9;
+	.folio-ink-rose-dot {
+		display: none;
 	}
 
 	.folio-char {

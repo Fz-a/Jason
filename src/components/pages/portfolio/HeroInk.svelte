@@ -5,87 +5,126 @@
 		text: string;
 	}
 
-	/** Archimedean spiral (Spiral Search) beside the headline. */
-	function buildInkSpiralPath(): string {
-		const turns = 3.1;
-		const baseR = 5.2;
-		const amp = 6.8;
-		const pulse = 1.1;
-		const scale = 0.82;
-		const steps = 88;
-		let d = "";
-		for (let i = 0; i <= steps; i++) {
-			const progress = i / steps;
-			const t = progress * Math.PI * 2;
-			const angle = t * turns;
-			const radius = baseR + (1 - Math.cos(t)) * (amp + pulse * 0.35);
-			const x = 50 + Math.cos(angle) * radius * scale;
-			const y = 50 + Math.sin(angle) * radius * scale;
-			d += `${i === 0 ? "M" : "L"}${x.toFixed(2)} ${y.toFixed(2)}`;
-		}
-		return d;
+	/** Rose Three — r = a cos(3θ), from math-curve-loaders. */
+	const ROSE = {
+		particleCount: 48,
+		trailSpan: 0.31,
+		durationMs: 5300,
+		rotationDurationMs: 28000,
+		pulseDurationMs: 4400,
+		strokeWidth: 1.35,
+		roseA: 9.2,
+		roseABoost: 0.6,
+		roseBreathBase: 0.72,
+		roseBreathBoost: 0.28,
+		roseScale: 3.25,
+	} as const;
+
+	function rosePoint(progress: number, detailScale: number) {
+		const t = progress * Math.PI * 2;
+		const a = ROSE.roseA + detailScale * ROSE.roseABoost;
+		const r =
+			a * (ROSE.roseBreathBase + detailScale * ROSE.roseBreathBoost) * Math.cos(3 * t);
+		return {
+			x: 50 + Math.cos(t) * r * ROSE.roseScale,
+			y: 50 + Math.sin(t) * r * ROSE.roseScale,
+		};
 	}
 
-	const inkSpiralPath = buildInkSpiralPath();
+	function normalizeProgress(progress: number) {
+		return ((progress % 1) + 1) % 1;
+	}
+
+	function getDetailScale(time: number) {
+		const pulseProgress = (time % ROSE.pulseDurationMs) / ROSE.pulseDurationMs;
+		const pulseAngle = pulseProgress * Math.PI * 2;
+		return 0.52 + ((Math.sin(pulseAngle + 0.55) + 1) / 2) * 0.48;
+	}
+
+	function getRotation(time: number) {
+		return -((time % ROSE.rotationDurationMs) / ROSE.rotationDurationMs) * 360;
+	}
+
+	function buildRosePath(detailScale: number, steps = 360) {
+		return Array.from({ length: steps + 1 }, (_, index) => {
+			const point = rosePoint(index / steps, detailScale);
+			return `${index === 0 ? "M" : "L"}${point.x.toFixed(2)} ${point.y.toFixed(2)}`;
+		}).join(" ");
+	}
 
 	let { text }: Props = $props();
 	let root = $state<HTMLElement | null>(null);
-	let spiralPathEl = $state<SVGPathElement | null>(null);
+	let roseGroup = $state<SVGGElement | null>(null);
+	let rosePath = $state<SVGPathElement | null>(null);
 	let mx = $state(0.5);
 	let my = $state(0.5);
 	let revealed = $state(false);
-	let spiralDrawn = $state(false);
+	let roseReady = $state(false);
+
+	const particleSlots = Array.from({ length: ROSE.particleCount }, (_, i) => i);
 
 	onMount(() => {
 		const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-		const timers: number[] = [];
-		let drawAnim: Animation | null = null;
-
-		timers.push(
-			window.setTimeout(() => {
-				revealed = true;
-			}, 180),
-		);
+		let raf = 0;
+		let cancelled = false;
+		const revealTimer = window.setTimeout(() => {
+			revealed = true;
+		}, 180);
 
 		void (async () => {
 			await tick();
-			const path = spiralPathEl;
-			if (!path) {
-				spiralDrawn = true;
+			if (cancelled) return;
+			const group = roseGroup;
+			const path = rosePath;
+			if (!group || !path) {
+				roseReady = true;
 				return;
 			}
 
-			const len = path.getTotalLength();
-			path.style.strokeDasharray = `${len}`;
-			path.style.strokeDashoffset = `${len}`;
+			const dots = Array.from(group.querySelectorAll<SVGCircleElement>(".folio-ink-rose-dot"));
 
 			if (reduce) {
-				path.style.strokeDashoffset = "0";
-				spiralDrawn = true;
+				path.setAttribute("d", buildRosePath(0.75));
+				path.setAttribute("opacity", "0.45");
+				for (const dot of dots) dot.setAttribute("opacity", "0");
+				roseReady = true;
 				return;
 			}
 
-			// Loop: ink draws → holds → fades back → redraws.
-			path.getBoundingClientRect();
-			drawAnim = path.animate(
-				[
-					{ strokeDashoffset: len, opacity: 0.35 },
-					{ strokeDashoffset: 0, opacity: 0.95, offset: 0.42 },
-					{ strokeDashoffset: 0, opacity: 0.9, offset: 0.68 },
-					{ strokeDashoffset: len, opacity: 0.3 },
-				],
-				{
-					duration: 3400,
-					easing: "cubic-bezier(0.45, 0.05, 0.25, 1)",
-					iterations: Number.POSITIVE_INFINITY,
-				},
-			);
-			spiralDrawn = true;
+			const startedAt = performance.now();
+			roseReady = true;
+
+			const render = (now: number) => {
+				if (cancelled) return;
+				const time = now - startedAt;
+				const progress = (time % ROSE.durationMs) / ROSE.durationMs;
+				const detailScale = getDetailScale(time);
+				group.setAttribute("transform", `rotate(${getRotation(time)} 50 50)`);
+				path.setAttribute("d", buildRosePath(detailScale));
+
+				for (let index = 0; index < dots.length; index++) {
+					const node = dots[index];
+					if (!node) continue;
+					const tailOffset = index / Math.max(1, ROSE.particleCount - 1);
+					const point = rosePoint(
+						normalizeProgress(progress - tailOffset * ROSE.trailSpan),
+						detailScale,
+					);
+					const fade = (1 - tailOffset) ** 0.56;
+					node.setAttribute("cx", point.x.toFixed(2));
+					node.setAttribute("cy", point.y.toFixed(2));
+					node.setAttribute("r", (0.55 + fade * 1.55).toFixed(2));
+					node.setAttribute("opacity", (0.06 + fade * 0.72).toFixed(3));
+				}
+				raf = requestAnimationFrame(render);
+			};
+			raf = requestAnimationFrame(render);
 		})();
 
 		return () => {
-			for (const id of timers) window.clearTimeout(id);
-			drawAnim?.cancel();
+			cancelled = true;
+			window.clearTimeout(revealTimer);
+			cancelAnimationFrame(raf);
 		};
 	});
 
@@ -100,7 +139,7 @@
 <article
 	class="folio-tile folio-hero"
 	class:is-revealed={revealed}
-	class:has-ink-spiral={spiralDrawn}
+	class:has-ink-rose={roseReady}
 	bind:this={root}
 	style={`--bento-delay: 40ms; --mx: ${mx}; --my: ${my}`}
 	onpointermove={onMove}
@@ -129,13 +168,23 @@
 		></path>
 	</svg>
 
-	<svg class="folio-ink-spiral" viewBox="0 0 100 100" aria-hidden="true">
-		<path
-			class="folio-ink-spiral-path"
-			bind:this={spiralPathEl}
-			fill="none"
-			d={inkSpiralPath}
-		></path>
+	<svg class="folio-ink-rose" viewBox="0 0 100 100" aria-hidden="true">
+		<g bind:this={roseGroup}>
+			<path
+				class="folio-ink-rose-path"
+				bind:this={rosePath}
+				fill="none"
+				stroke="currentColor"
+				stroke-linecap="round"
+				stroke-linejoin="round"
+				stroke-width={ROSE.strokeWidth}
+				opacity="0.14"
+			></path>
+			{#each particleSlots as _}
+				<circle class="folio-ink-rose-dot" fill="currentColor" cx="50" cy="50" r="0" opacity="0"
+				></circle>
+			{/each}
+		</g>
 	</svg>
 
 	<div class="folio-ink-wash" aria-hidden="true"></div>
