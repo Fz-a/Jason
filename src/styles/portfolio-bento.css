@@ -222,21 +222,21 @@ html.folio-enter .folio-tile {
 	}
 }
 
-/* Rose Three ink flourish — Hero top-right; restrained but visible */
+/* Thinking Nine ink flourish — Hero top-right; smaller restrained mark */
 .folio-ink-rose {
 	position: absolute;
-	top: 0.4rem;
-	right: 0.35rem;
-	width: clamp(4.6rem, 9vw, 6rem);
+	top: 0.5rem;
+	right: 0.45rem;
+	width: clamp(3.4rem, 6.5vw, 4.4rem);
 	height: auto;
 	aspect-ratio: 1;
 	pointer-events: none;
 	z-index: 3;
 	color: #5c3a32;
-	opacity: 0.72;
+	opacity: 0.68;
 	overflow: visible;
 	transform: translate3d(
-		calc((var(--mx, 0.5) - 0.5) * -4px),
+		calc((var(--mx, 0.5) - 0.5) * -3px),
 		calc((var(--my, 0.5) - 0.5) * -2px),
 		0
 	);
