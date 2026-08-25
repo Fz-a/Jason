@@ -5,19 +5,19 @@
 		text: string;
 	}
 
-	/** Rose Three — r = a cos(3θ), from math-curve-loaders. */
+	/** Rose Three — r = a cos(3θ); kept small and quiet for the paper hero. */
 	const ROSE = {
-		particleCount: 48,
-		trailSpan: 0.31,
-		durationMs: 5300,
-		rotationDurationMs: 28000,
-		pulseDurationMs: 4400,
-		strokeWidth: 1.35,
-		roseA: 9.2,
-		roseABoost: 0.6,
-		roseBreathBase: 0.72,
-		roseBreathBoost: 0.28,
-		roseScale: 3.25,
+		particleCount: 18,
+		trailSpan: 0.18,
+		durationMs: 7200,
+		rotationDurationMs: 52000,
+		pulseDurationMs: 6800,
+		strokeWidth: 0.75,
+		roseA: 7.8,
+		roseABoost: 0.16,
+		roseBreathBase: 0.82,
+		roseBreathBoost: 0.08,
+		roseScale: 2.2,
 	} as const;
 
 	function rosePoint(progress: number, detailScale: number) {
@@ -38,7 +38,7 @@
 	function getDetailScale(time: number) {
 		const pulseProgress = (time % ROSE.pulseDurationMs) / ROSE.pulseDurationMs;
 		const pulseAngle = pulseProgress * Math.PI * 2;
-		return 0.52 + ((Math.sin(pulseAngle + 0.55) + 1) / 2) * 0.48;
+		return 0.88 + ((Math.sin(pulseAngle + 0.55) + 1) / 2) * 0.12;
 	}
 
 	function getRotation(time: number) {
@@ -113,8 +113,8 @@
 					const fade = (1 - tailOffset) ** 0.56;
 					node.setAttribute("cx", point.x.toFixed(2));
 					node.setAttribute("cy", point.y.toFixed(2));
-					node.setAttribute("r", (0.55 + fade * 1.55).toFixed(2));
-					node.setAttribute("opacity", (0.06 + fade * 0.72).toFixed(3));
+					node.setAttribute("r", (0.28 + fade * 0.7).toFixed(2));
+					node.setAttribute("opacity", (0.03 + fade * 0.28).toFixed(3));
 				}
 				raf = requestAnimationFrame(render);
 			};
@@ -178,7 +178,7 @@
 				stroke-linecap="round"
 				stroke-linejoin="round"
 				stroke-width={ROSE.strokeWidth}
-				opacity="0.14"
+				opacity="0.05"
 			></path>
 			{#each particleSlots as _}
 				<circle class="folio-ink-rose-dot" fill="currentColor" cx="50" cy="50" r="0" opacity="0"

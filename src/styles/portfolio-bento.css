@@ -222,21 +222,21 @@ html.folio-enter .folio-tile {
 	}
 }
 
-/* Rose Three ink flourish — Hero tile top-right */
+/* Rose Three ink flourish — Hero tile top-right, quiet mark */
 .folio-ink-rose {
 	position: absolute;
-	top: 0.15rem;
-	right: 0.1rem;
-	width: clamp(6.8rem, 14vw, 9.5rem);
+	top: 0.55rem;
+	right: 0.55rem;
+	width: clamp(2.8rem, 5.5vw, 3.6rem);
 	height: auto;
 	aspect-ratio: 1;
 	pointer-events: none;
 	z-index: 3;
-	color: #6b2e2e;
-	opacity: 0.88;
+	color: #4a4038;
+	opacity: 0.38;
 	transform: translate3d(
-		calc((var(--mx, 0.5) - 0.5) * -6px),
-		calc((var(--my, 0.5) - 0.5) * -4px),
+		calc((var(--mx, 0.5) - 0.5) * -2px),
+		calc((var(--my, 0.5) - 0.5) * -1px),
 		0
 	);
 }
@@ -1171,7 +1171,7 @@ html.folio-enter .folio-tile {
 	}
 
 	.folio-ink-rose {
-		opacity: 0.7;
+		opacity: 0.4;
 	}
 
 	.folio-ink-rose-dot {
