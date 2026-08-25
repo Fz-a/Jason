@@ -6,36 +6,29 @@
 	}
 
 	/**
-	 * Thinking Nine — custom rose trail:
-	 * x = 50 + (R cos t − A s cos 9t) · scale
-	 * y = 50 + (R sin t − A s sin 9t) · scale
+	 * Cardioid Heart — r = a(1 + cos θ), rotated into a heart.
 	 * Size/placement stay quiet via CSS (.folio-ink-rose).
 	 */
 	const CURVE = {
-		particleCount: 36,
-		trailSpan: 0.32,
-		durationMs: 4700,
-		rotationDurationMs: 30000,
-		pulseDurationMs: 4200,
-		strokeWidth: 1.35,
-		baseRadius: 7,
-		detailAmplitude: 3,
-		petalCount: 9,
-		curveScale: 3.9,
+		particleCount: 40,
+		trailSpan: 0.3,
+		durationMs: 6200,
+		pulseDurationMs: 5200,
+		strokeWidth: 1.3,
+		cardioidA: 8.8,
+		cardioidPulse: 0.8,
+		cardioidScale: 2.15,
 	} as const;
 
 	function curvePoint(progress: number, detailScale: number) {
 		const t = progress * Math.PI * 2;
-		const petals = CURVE.petalCount;
-		const x =
-			CURVE.baseRadius * Math.cos(t) -
-			CURVE.detailAmplitude * detailScale * Math.cos(petals * t);
-		const y =
-			CURVE.baseRadius * Math.sin(t) -
-			CURVE.detailAmplitude * detailScale * Math.sin(petals * t);
+		const a = CURVE.cardioidA + detailScale * CURVE.cardioidPulse;
+		const r = a * (1 + Math.cos(t));
+		const baseX = Math.cos(t) * r;
+		const baseY = Math.sin(t) * r;
 		return {
-			x: 50 + x * CURVE.curveScale,
-			y: 50 + y * CURVE.curveScale,
+			x: 50 - baseY * CURVE.cardioidScale,
+			y: 50 - baseX * CURVE.cardioidScale,
 		};
 	}
 
@@ -47,10 +40,6 @@
 		const pulseProgress = (time % CURVE.pulseDurationMs) / CURVE.pulseDurationMs;
 		const pulseAngle = pulseProgress * Math.PI * 2;
 		return 0.52 + ((Math.sin(pulseAngle + 0.55) + 1) / 2) * 0.48;
-	}
-
-	function getRotation(time: number) {
-		return -((time % CURVE.rotationDurationMs) / CURVE.rotationDurationMs) * 360;
 	}
 
 	function buildCurvePath(detailScale: number, steps = 420) {
@@ -107,7 +96,6 @@
 				const time = now - startedAt;
 				const progress = (time % CURVE.durationMs) / CURVE.durationMs;
 				const detailScale = getDetailScale(time);
-				group.setAttribute("transform", `rotate(${getRotation(time)} 50 50)`);
 				path.setAttribute("d", buildCurvePath(detailScale));
 
 				for (let index = 0; index < dots.length; index++) {
