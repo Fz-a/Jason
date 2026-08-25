@@ -39,6 +39,7 @@
 	onMount(() => {
 		const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 		const timers: number[] = [];
+		let drawAnim: Animation | null = null;
 
 		timers.push(
 			window.setTimeout(() => {
@@ -64,19 +65,27 @@
 				return;
 			}
 
-			// Force paint at hidden state, then ease the stroke in.
+			// Loop: ink draws → holds → fades back → redraws.
 			path.getBoundingClientRect();
-			timers.push(
-				window.setTimeout(() => {
-					path.style.transition = "stroke-dashoffset 1.45s cubic-bezier(0.22, 1, 0.36, 1)";
-					path.style.strokeDashoffset = "0";
-					spiralDrawn = true;
-				}, 80),
+			drawAnim = path.animate(
+				[
+					{ strokeDashoffset: len, opacity: 0.35 },
+					{ strokeDashoffset: 0, opacity: 0.95, offset: 0.42 },
+					{ strokeDashoffset: 0, opacity: 0.9, offset: 0.68 },
+					{ strokeDashoffset: len, opacity: 0.3 },
+				],
+				{
+					duration: 3400,
+					easing: "cubic-bezier(0.45, 0.05, 0.25, 1)",
+					iterations: Number.POSITIVE_INFINITY,
+				},
 			);
+			spiralDrawn = true;
 		})();
 
 		return () => {
 			for (const id of timers) window.clearTimeout(id);
+			drawAnim?.cancel();
 		};
 	});
 
