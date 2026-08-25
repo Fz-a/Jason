@@ -1,11 +1,11 @@
 <script lang="ts">
-	import { onMount } from "svelte";
+	import { onMount, tick } from "svelte";
 
 	interface Props {
 		text: string;
 	}
 
-	/** Archimedean spiral (Spiral Search) — quiet ink flourish beside the headline. */
+	/** Archimedean spiral (Spiral Search) beside the headline. */
 	function buildInkSpiralPath(): string {
 		const turns = 3.1;
 		const baseR = 5.2;
@@ -30,25 +30,54 @@
 
 	let { text }: Props = $props();
 	let root = $state<HTMLElement | null>(null);
+	let spiralPathEl = $state<SVGPathElement | null>(null);
 	let mx = $state(0.5);
 	let my = $state(0.5);
 	let revealed = $state(false);
-	let playSpiral = $state(false);
+	let spiralDrawn = $state(false);
 
 	onMount(() => {
 		const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-		// client:only mounts after folio-enter is often already gone — do NOT require it.
-		// Skip only when Swup is mid-hop (folio-nav) or user prefers reduced motion.
-		const skipNav = document.documentElement.classList.contains("folio-nav");
-		if (reduce || skipNav) {
-			revealed = true;
-			return;
-		}
-		playSpiral = true;
-		const t = window.setTimeout(() => {
-			revealed = true;
-		}, 180);
-		return () => window.clearTimeout(t);
+		const timers: number[] = [];
+
+		timers.push(
+			window.setTimeout(() => {
+				revealed = true;
+			}, 180),
+		);
+
+		void (async () => {
+			await tick();
+			const path = spiralPathEl;
+			if (!path) {
+				spiralDrawn = true;
+				return;
+			}
+
+			const len = path.getTotalLength();
+			path.style.strokeDasharray = `${len}`;
+			path.style.strokeDashoffset = `${len}`;
+
+			if (reduce) {
+				path.style.strokeDashoffset = "0";
+				spiralDrawn = true;
+				return;
+			}
+
+			// Force paint at hidden state, then ease the stroke in.
+			path.getBoundingClientRect();
+			timers.push(
+				window.setTimeout(() => {
+					path.style.transition = "stroke-dashoffset 1.45s cubic-bezier(0.22, 1, 0.36, 1)";
+					path.style.strokeDashoffset = "0";
+					spiralDrawn = true;
+				}, 80),
+			);
+		})();
+
+		return () => {
+			for (const id of timers) window.clearTimeout(id);
+		};
 	});
 
 	function onMove(e: PointerEvent) {
@@ -62,7 +91,7 @@
 <article
 	class="folio-tile folio-hero"
 	class:is-revealed={revealed}
-	class:has-ink-spiral={playSpiral}
+	class:has-ink-spiral={spiralDrawn}
 	bind:this={root}
 	style={`--bento-delay: 40ms; --mx: ${mx}; --my: ${my}`}
 	onpointermove={onMove}
@@ -91,16 +120,14 @@
 		></path>
 	</svg>
 
-	{#if playSpiral}
-		<svg class="folio-ink-spiral" viewBox="0 0 100 100" aria-hidden="true">
-			<path
-				class="folio-ink-spiral-path"
-				fill="none"
-				pathLength="1"
-				d={inkSpiralPath}
-			></path>
-		</svg>
-	{/if}
+	<svg class="folio-ink-spiral" viewBox="0 0 100 100" aria-hidden="true">
+		<path
+			class="folio-ink-spiral-path"
+			bind:this={spiralPathEl}
+			fill="none"
+			d={inkSpiralPath}
+		></path>
+	</svg>
 
 	<div class="folio-ink-wash" aria-hidden="true"></div>
 

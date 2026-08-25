@@ -222,18 +222,18 @@ html.folio-enter .folio-tile {
 	}
 }
 
-/* Quiet Archimedean spiral — homepage ink flourish (top-right of 知行合一 tile) */
+/* Archimedean spiral — Hero tile top-right; stroke draw driven by JS */
 .folio-ink-spiral {
 	position: absolute;
-	top: 0.35rem;
-	right: 0.35rem;
-	width: clamp(5.5rem, 11vw, 7.5rem);
+	top: 0.2rem;
+	right: 0.15rem;
+	width: clamp(6.5rem, 13vw, 9rem);
 	height: auto;
 	aspect-ratio: 1;
 	pointer-events: none;
-	z-index: 2;
-	color: var(--folio-ink, #1a1814);
-	opacity: 0;
+	z-index: 3;
+	color: #6b2e2e;
+	opacity: 0.82;
 	transform: translate3d(
 		calc((var(--mx, 0.5) - 0.5) * -6px),
 		calc((var(--my, 0.5) - 0.5) * -4px),
@@ -243,38 +243,12 @@ html.folio-enter .folio-tile {
 
 .folio-ink-spiral-path {
 	stroke: currentColor;
-	stroke-width: 1.65;
+	stroke-width: 2.1;
 	stroke-linecap: round;
 	stroke-linejoin: round;
 	vector-effect: non-scaling-stroke;
-	stroke-dasharray: 1;
-	stroke-dashoffset: 1;
-	opacity: 0.55;
-}
-
-.folio-hero.has-ink-spiral .folio-ink-spiral {
-	animation: folio-ink-spiral-fade 3s ease 40ms forwards;
-}
-
-.folio-hero.has-ink-spiral .folio-ink-spiral-path {
-	animation: folio-ink-spiral-draw 1.5s cubic-bezier(0.22, 1, 0.36, 1) 60ms forwards;
-}
-
-@keyframes folio-ink-spiral-draw {
-	to {
-		stroke-dashoffset: 0;
-		opacity: 0.42;
-	}
-}
-
-@keyframes folio-ink-spiral-fade {
-	0%,
-	70% {
-		opacity: 1;
-	}
-	100% {
-		opacity: 0.72;
-	}
+	opacity: 0.9;
+	/* dashoffset set inline by HeroInk onMount */
 }
 
 .folio-ink-wash {
@@ -1201,16 +1175,15 @@ html.folio-enter .folio-tile {
 	.folio-ink-spiral,
 	.folio-ink-spiral-path {
 		animation: none !important;
+		transition: none !important;
 	}
 
 	.folio-ink-spiral {
-		opacity: 0.45;
+		opacity: 0.82;
 	}
 
 	.folio-ink-spiral-path {
-		stroke-dasharray: 1;
-		stroke-dashoffset: 0;
-		opacity: 0.35;
+		opacity: 0.9;
 	}
 
 	.folio-char {
