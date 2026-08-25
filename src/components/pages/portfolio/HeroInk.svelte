@@ -135,6 +135,11 @@
 			class="folio-cloud-guide"
 			bind:this={guideA}
 			fill="none"
+			stroke="currentColor"
+			stroke-width="1.15"
+			stroke-linecap="round"
+			stroke-linejoin="round"
+			opacity="0.22"
 			d={CLOUD_STROKE_A}
 		></path>
 		<g class="folio-cloud-trail folio-cloud-trail-a">
@@ -150,6 +155,11 @@
 			class="folio-cloud-guide"
 			bind:this={guideB}
 			fill="none"
+			stroke="currentColor"
+			stroke-width="1.05"
+			stroke-linecap="round"
+			stroke-linejoin="round"
+			opacity="0.18"
 			d={CLOUD_STROKE_B}
 		></path>
 		<g class="folio-cloud-trail folio-cloud-trail-b">
