@@ -5,19 +5,22 @@
 		text: string;
 	}
 
-	/** Rose Three — r = a cos(3θ); kept small and quiet for the paper hero. */
+	/**
+	 * Rose Three — r = a cos(3θ).
+	 * Sized to stay secondary to the headline, but still readable as ink.
+	 */
 	const ROSE = {
-		particleCount: 18,
-		trailSpan: 0.18,
-		durationMs: 7200,
-		rotationDurationMs: 52000,
-		pulseDurationMs: 6800,
-		strokeWidth: 0.75,
-		roseA: 7.8,
-		roseABoost: 0.16,
-		roseBreathBase: 0.82,
-		roseBreathBoost: 0.08,
-		roseScale: 2.2,
+		particleCount: 32,
+		trailSpan: 0.24,
+		durationMs: 6000,
+		rotationDurationMs: 36000,
+		pulseDurationMs: 5200,
+		strokeWidth: 1.25,
+		roseA: 8.6,
+		roseABoost: 0.35,
+		roseBreathBase: 0.76,
+		roseBreathBoost: 0.16,
+		roseScale: 2.85,
 	} as const;
 
 	function rosePoint(progress: number, detailScale: number) {
@@ -38,7 +41,7 @@
 	function getDetailScale(time: number) {
 		const pulseProgress = (time % ROSE.pulseDurationMs) / ROSE.pulseDurationMs;
 		const pulseAngle = pulseProgress * Math.PI * 2;
-		return 0.88 + ((Math.sin(pulseAngle + 0.55) + 1) / 2) * 0.12;
+		return 0.78 + ((Math.sin(pulseAngle + 0.55) + 1) / 2) * 0.22;
 	}
 
 	function getRotation(time: number) {
@@ -84,8 +87,8 @@
 			const dots = Array.from(group.querySelectorAll<SVGCircleElement>(".folio-ink-rose-dot"));
 
 			if (reduce) {
-				path.setAttribute("d", buildRosePath(0.75));
-				path.setAttribute("opacity", "0.45");
+				path.setAttribute("d", buildRosePath(0.85));
+				path.setAttribute("opacity", "0.35");
 				for (const dot of dots) dot.setAttribute("opacity", "0");
 				roseReady = true;
 				return;
@@ -113,8 +116,8 @@
 					const fade = (1 - tailOffset) ** 0.56;
 					node.setAttribute("cx", point.x.toFixed(2));
 					node.setAttribute("cy", point.y.toFixed(2));
-					node.setAttribute("r", (0.28 + fade * 0.7).toFixed(2));
-					node.setAttribute("opacity", (0.03 + fade * 0.28).toFixed(3));
+					node.setAttribute("r", (0.45 + fade * 1.15).toFixed(2));
+					node.setAttribute("opacity", (0.08 + fade * 0.55).toFixed(3));
 				}
 				raf = requestAnimationFrame(render);
 			};
@@ -168,7 +171,7 @@
 		></path>
 	</svg>
 
-	<svg class="folio-ink-rose" viewBox="0 0 100 100" aria-hidden="true">
+	<svg class="folio-ink-rose" viewBox="0 0 100 100" overflow="visible" aria-hidden="true">
 		<g bind:this={roseGroup}>
 			<path
 				class="folio-ink-rose-path"
@@ -178,7 +181,7 @@
 				stroke-linecap="round"
 				stroke-linejoin="round"
 				stroke-width={ROSE.strokeWidth}
-				opacity="0.05"
+				opacity="0.2"
 			></path>
 			{#each particleSlots as _}
 				<circle class="folio-ink-rose-dot" fill="currentColor" cx="50" cy="50" r="0" opacity="0"
