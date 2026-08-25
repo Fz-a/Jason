@@ -6,31 +6,36 @@
 	}
 
 	/**
-	 * Rose Three — r = a cos(3θ).
-	 * Sized to stay secondary to the headline, but still readable as ink.
+	 * Thinking Nine — custom rose trail:
+	 * x = 50 + (R cos t − A s cos 9t) · scale
+	 * y = 50 + (R sin t − A s sin 9t) · scale
+	 * Size/placement stay quiet via CSS (.folio-ink-rose).
 	 */
-	const ROSE = {
-		particleCount: 32,
-		trailSpan: 0.24,
-		durationMs: 6000,
-		rotationDurationMs: 36000,
-		pulseDurationMs: 5200,
-		strokeWidth: 1.25,
-		roseA: 8.6,
-		roseABoost: 0.35,
-		roseBreathBase: 0.76,
-		roseBreathBoost: 0.16,
-		roseScale: 2.85,
+	const CURVE = {
+		particleCount: 36,
+		trailSpan: 0.32,
+		durationMs: 4700,
+		rotationDurationMs: 30000,
+		pulseDurationMs: 4200,
+		strokeWidth: 1.35,
+		baseRadius: 7,
+		detailAmplitude: 3,
+		petalCount: 9,
+		curveScale: 3.9,
 	} as const;
 
-	function rosePoint(progress: number, detailScale: number) {
+	function curvePoint(progress: number, detailScale: number) {
 		const t = progress * Math.PI * 2;
-		const a = ROSE.roseA + detailScale * ROSE.roseABoost;
-		const r =
-			a * (ROSE.roseBreathBase + detailScale * ROSE.roseBreathBoost) * Math.cos(3 * t);
+		const petals = CURVE.petalCount;
+		const x =
+			CURVE.baseRadius * Math.cos(t) -
+			CURVE.detailAmplitude * detailScale * Math.cos(petals * t);
+		const y =
+			CURVE.baseRadius * Math.sin(t) -
+			CURVE.detailAmplitude * detailScale * Math.sin(petals * t);
 		return {
-			x: 50 + Math.cos(t) * r * ROSE.roseScale,
-			y: 50 + Math.sin(t) * r * ROSE.roseScale,
+			x: 50 + x * CURVE.curveScale,
+			y: 50 + y * CURVE.curveScale,
 		};
 	}
 
@@ -39,32 +44,32 @@
 	}
 
 	function getDetailScale(time: number) {
-		const pulseProgress = (time % ROSE.pulseDurationMs) / ROSE.pulseDurationMs;
+		const pulseProgress = (time % CURVE.pulseDurationMs) / CURVE.pulseDurationMs;
 		const pulseAngle = pulseProgress * Math.PI * 2;
-		return 0.78 + ((Math.sin(pulseAngle + 0.55) + 1) / 2) * 0.22;
+		return 0.52 + ((Math.sin(pulseAngle + 0.55) + 1) / 2) * 0.48;
 	}
 
 	function getRotation(time: number) {
-		return -((time % ROSE.rotationDurationMs) / ROSE.rotationDurationMs) * 360;
+		return -((time % CURVE.rotationDurationMs) / CURVE.rotationDurationMs) * 360;
 	}
 
-	function buildRosePath(detailScale: number, steps = 360) {
+	function buildCurvePath(detailScale: number, steps = 420) {
 		return Array.from({ length: steps + 1 }, (_, index) => {
-			const point = rosePoint(index / steps, detailScale);
+			const point = curvePoint(index / steps, detailScale);
 			return `${index === 0 ? "M" : "L"}${point.x.toFixed(2)} ${point.y.toFixed(2)}`;
 		}).join(" ");
 	}
 
 	let { text }: Props = $props();
 	let root = $state<HTMLElement | null>(null);
-	let roseGroup = $state<SVGGElement | null>(null);
-	let rosePath = $state<SVGPathElement | null>(null);
+	let curveGroup = $state<SVGGElement | null>(null);
+	let curvePath = $state<SVGPathElement | null>(null);
 	let mx = $state(0.5);
 	let my = $state(0.5);
 	let revealed = $state(false);
-	let roseReady = $state(false);
+	let curveReady = $state(false);
 
-	const particleSlots = Array.from({ length: ROSE.particleCount }, (_, i) => i);
+	const particleSlots = Array.from({ length: CURVE.particleCount }, (_, i) => i);
 
 	onMount(() => {
 		const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -77,47 +82,47 @@
 		void (async () => {
 			await tick();
 			if (cancelled) return;
-			const group = roseGroup;
-			const path = rosePath;
+			const group = curveGroup;
+			const path = curvePath;
 			if (!group || !path) {
-				roseReady = true;
+				curveReady = true;
 				return;
 			}
 
 			const dots = Array.from(group.querySelectorAll<SVGCircleElement>(".folio-ink-rose-dot"));
 
 			if (reduce) {
-				path.setAttribute("d", buildRosePath(0.85));
-				path.setAttribute("opacity", "0.35");
+				path.setAttribute("d", buildCurvePath(0.75));
+				path.setAttribute("opacity", "0.32");
 				for (const dot of dots) dot.setAttribute("opacity", "0");
-				roseReady = true;
+				curveReady = true;
 				return;
 			}
 
 			const startedAt = performance.now();
-			roseReady = true;
+			curveReady = true;
 
 			const render = (now: number) => {
 				if (cancelled) return;
 				const time = now - startedAt;
-				const progress = (time % ROSE.durationMs) / ROSE.durationMs;
+				const progress = (time % CURVE.durationMs) / CURVE.durationMs;
 				const detailScale = getDetailScale(time);
 				group.setAttribute("transform", `rotate(${getRotation(time)} 50 50)`);
-				path.setAttribute("d", buildRosePath(detailScale));
+				path.setAttribute("d", buildCurvePath(detailScale));
 
 				for (let index = 0; index < dots.length; index++) {
 					const node = dots[index];
 					if (!node) continue;
-					const tailOffset = index / Math.max(1, ROSE.particleCount - 1);
-					const point = rosePoint(
-						normalizeProgress(progress - tailOffset * ROSE.trailSpan),
+					const tailOffset = index / Math.max(1, CURVE.particleCount - 1);
+					const point = curvePoint(
+						normalizeProgress(progress - tailOffset * CURVE.trailSpan),
 						detailScale,
 					);
 					const fade = (1 - tailOffset) ** 0.56;
 					node.setAttribute("cx", point.x.toFixed(2));
 					node.setAttribute("cy", point.y.toFixed(2));
-					node.setAttribute("r", (0.45 + fade * 1.15).toFixed(2));
-					node.setAttribute("opacity", (0.08 + fade * 0.55).toFixed(3));
+					node.setAttribute("r", (0.4 + fade * 1.05).toFixed(2));
+					node.setAttribute("opacity", (0.07 + fade * 0.52).toFixed(3));
 				}
 				raf = requestAnimationFrame(render);
 			};
@@ -142,7 +147,7 @@
 <article
 	class="folio-tile folio-hero"
 	class:is-revealed={revealed}
-	class:has-ink-rose={roseReady}
+	class:has-ink-rose={curveReady}
 	bind:this={root}
 	style={`--bento-delay: 40ms; --mx: ${mx}; --my: ${my}`}
 	onpointermove={onMove}
@@ -172,16 +177,16 @@
 	</svg>
 
 	<svg class="folio-ink-rose" viewBox="0 0 100 100" overflow="visible" aria-hidden="true">
-		<g bind:this={roseGroup}>
+		<g bind:this={curveGroup}>
 			<path
 				class="folio-ink-rose-path"
-				bind:this={rosePath}
+				bind:this={curvePath}
 				fill="none"
 				stroke="currentColor"
 				stroke-linecap="round"
 				stroke-linejoin="round"
-				stroke-width={ROSE.strokeWidth}
-				opacity="0.2"
+				stroke-width={CURVE.strokeWidth}
+				opacity="0.18"
 			></path>
 			{#each particleSlots as _}
 				<circle class="folio-ink-rose-dot" fill="currentColor" cx="50" cy="50" r="0" opacity="0"
