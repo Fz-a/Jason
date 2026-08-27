@@ -92,6 +92,8 @@ try {
 	run("npx", ["tsx", "scripts/minify-inline-scripts.ts"], { optional: true });
 
 	const site = resolveDistSite();
+	run("node", ["scripts/sync-techfolio-dist.mjs", site]);
+
 	console.log(`[build] pagefind site → ${site}`);
 	const pf = spawnSync("npx", ["pagefind", "--site", site], {
 		stdio: "inherit",

@@ -8,7 +8,9 @@
 		layoutsForCount,
 		resizeCells,
 	} from "@/lib/folio/collage-layouts";
+	import FolioMediaLibrary from "@/components/pages/portfolio/FolioMediaLibrary.svelte";
 	import type { FolioCollage, FolioCollageCell } from "@/types/folioTree";
+	import { downloadFolioMedia } from "@/utils/folio-media";
 
 	interface Props {
 		collage?: FolioCollage;
@@ -27,8 +29,6 @@
 	let posDragging = $state(false);
 	let dropOver = $state<number | "frame" | null>(null);
 	let mediaOpen = $state(false);
-	let mediaItems = $state<{ id: string; url: string }[]>([]);
-	let mediaLoading = $state(false);
 	let fileInput: HTMLInputElement | undefined = $state();
 	let multiInput: HTMLInputElement | undefined = $state();
 	/** When set, next file pick fills this cell; null = fill empties from start */
@@ -298,25 +298,6 @@
 		}
 		mediaOpen = true;
 		mode = "fill";
-		mediaLoading = true;
-		try {
-			const res = await fetch("/api/media/");
-			const data = (await res.json()) as {
-				items?: { id: string; url: string }[];
-				error?: string;
-			};
-			if (!res.ok) {
-				flash(data.error || "无法加载媒体库");
-				mediaOpen = false;
-				return;
-			}
-			mediaItems = data.items ?? [];
-		} catch {
-			flash("无法加载媒体库");
-			mediaOpen = false;
-		} finally {
-			mediaLoading = false;
-		}
 	}
 
 	function pickMedia(url: string) {
@@ -328,7 +309,14 @@
 		}
 		patchCell(index, { src: url, pos: "50% 50%" });
 		activeCell = index;
-		flash("已从媒体库填入");
+		flash("已从相册库填入");
+	}
+
+	async function downloadCell(index: number) {
+		const src = collage?.cells[index]?.src;
+		if (!src) return;
+		const ok = await downloadFolioMedia({ url: src });
+		flash(ok ? "已开始下载" : "下载失败，请重试");
 	}
 
 	function onCellDragStart(index: number, e: DragEvent) {
@@ -407,7 +395,7 @@
 						class="folio-btn folio-btn-ghost"
 						onclick={() => void openMediaPicker()}
 					>
-						从媒体库填
+						从相册库填
 					</button>
 					<div class="folio-collage-mode" role="group" aria-label="编辑模式">
 						<button
@@ -569,7 +557,7 @@
 								class="folio-collage-cell-cta is-ghost"
 								onclick={() => void openMediaPicker(i)}
 							>
-								图库
+								相册
 							</button>
 						</div>
 					{:else}
@@ -593,7 +581,14 @@
 						class="folio-btn folio-btn-ghost"
 						onclick={() => void openMediaPicker(idx)}
 					>
-						图库换图
+						相册换图
+					</button>
+					<button
+						type="button"
+						class="folio-btn folio-btn-ghost"
+						onclick={() => void downloadCell(idx)}
+					>
+						下载
 					</button>
 					<button
 						type="button"
@@ -620,44 +615,21 @@
 						class="folio-btn folio-btn-ghost"
 						onclick={() => void openMediaPicker(idx)}
 					>
-						从媒体库选
+						从相册库选
 					</button>
 				{/if}
 			</div>
 		{/if}
 
 		{#if mediaOpen}
-			<div class="folio-collage-media" role="dialog" aria-label="媒体库">
-				<div class="folio-collage-media-head">
-					<span>
-						选择图片
-						{#if activeCell != null}
-							· 填入格子 {activeCell + 1}
-						{/if}
-					</span>
-					<button type="button" class="folio-btn folio-btn-ghost" onclick={() => (mediaOpen = false)}>
-						完成
-					</button>
-				</div>
-				{#if mediaLoading}
-					<p class="folio-collage-status">加载中…</p>
-				{:else if mediaItems.length === 0}
-					<p class="folio-collage-status">媒体库为空，请先批量上传。</p>
-				{:else}
-					<div class="folio-collage-media-grid">
-						{#each mediaItems as item}
-							<button
-								type="button"
-								class="folio-collage-media-item"
-								onclick={() => pickMedia(item.url)}
-							>
-								<img src={item.url} alt="" loading="lazy" />
-							</button>
-						{/each}
-					</div>
-					<p class="folio-collage-hint">可连续点选多张，会优先填入空格。</p>
-				{/if}
-			</div>
+			<FolioMediaLibrary
+				open={mediaOpen}
+				title="相册库"
+				hint="点击选用 · 可连续点选多张，会优先填入空格。"
+				onSelect={(item) => pickMedia(item.url)}
+				onClose={() => (mediaOpen = false)}
+				onFlash={flash}
+			/>
 		{/if}
 	</section>
 {/if}

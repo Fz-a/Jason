@@ -1,13 +1,8 @@
 <script lang="ts">
 	import { onMount } from "svelte";
+	import { downloadFolioMedia, type FolioMediaItem } from "@/utils/folio-media";
 
-	type MediaItem = {
-		id: string;
-		url: string;
-		mime: string;
-		size: number;
-		created_at: string;
-	};
+	type MediaItem = FolioMediaItem;
 
 	let items = $state<MediaItem[]>([]);
 	let error = $state("");
@@ -80,6 +75,12 @@
 			toast = url;
 		}
 	}
+
+	async function downloadItem(item: MediaItem) {
+		const ok = await downloadFolioMedia(item);
+		toast = ok ? "Download started" : "Download failed";
+		window.setTimeout(() => (toast = ""), 2000);
+	}
 </script>
 
 {#if ready}
@@ -90,8 +91,8 @@
 	</nav>
 
 	<div class="cms-card">
-		<h1 class="cms-title">Media library</h1>
-		<p class="cms-note">JPEG / PNG / WebP / GIF · max 5MB. Files go to R2 in production.</p>
+		<h1 class="cms-title">相册库</h1>
+		<p class="cms-note">JPEG / PNG / WebP / GIF · max 5MB. 编辑时上传的图片会集中保存在这里。</p>
 
 		<label class="cms-btn cms-btn-primary" style="display:inline-flex; cursor:pointer">
 			{uploading ? "Uploading…" : "Upload image"}
@@ -109,7 +110,10 @@
 				{#each items as item}
 					<div class="cms-media-item">
 						<img src={item.url} alt="" loading="lazy" />
-						<button type="button" onclick={() => copyUrl(item.url)}>Copy URL</button>
+						<div class="cms-media-item-actions">
+							<button type="button" onclick={() => copyUrl(item.url)}>Copy URL</button>
+							<button type="button" onclick={() => void downloadItem(item)}>Download</button>
+						</div>
 					</div>
 				{/each}
 			</div>

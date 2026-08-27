@@ -21,6 +21,13 @@ export const GET: APIRoute = async ({ url, locals }) => {
 		);
 		headers.set("Cache-Control", "public, max-age=31536000, immutable");
 		if (obj.size != null) headers.set("Content-Length", String(obj.size));
+		if (url.searchParams.get("download") === "1") {
+			const ext = row.r2_key.split(".").pop() || "jpg";
+			headers.set(
+				"Content-Disposition",
+				`attachment; filename="${row.id}.${ext}"`,
+			);
+		}
 		return new Response(obj.body, { status: 200, headers });
 	}
 
@@ -31,12 +38,24 @@ export const GET: APIRoute = async ({ url, locals }) => {
 	const match = /^data:([^;]+);base64,(.+)$/.exec(row.dataUrl);
 	if (!match) return errorJson("Corrupt media", 500);
 	const bytes = Buffer.from(match[2]!, "base64");
+	const headers: Record<string, string> = {
+		"Content-Type": match[1] || row.mime,
+		"Cache-Control": "public, max-age=31536000, immutable",
+		"Content-Length": String(bytes.length),
+	};
+	if (url.searchParams.get("download") === "1") {
+		const ext =
+			row.mime === "image/png"
+				? "png"
+				: row.mime === "image/webp"
+					? "webp"
+					: row.mime === "image/gif"
+						? "gif"
+						: "jpg";
+		headers["Content-Disposition"] = `attachment; filename="${row.id}.${ext}"`;
+	}
 	return new Response(bytes, {
 		status: 200,
-		headers: {
-			"Content-Type": match[1] || row.mime,
-			"Cache-Control": "public, max-age=31536000, immutable",
-			"Content-Length": String(bytes.length),
-		},
+		headers,
 	});
 };

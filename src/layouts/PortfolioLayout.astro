@@ -11,7 +11,7 @@ interface Props {
 const { title, description, lang } = Astro.props;
 ---
 
-<Layout title={title} description={description} lang={lang} hasWallpaper={false} noBanner={true}>
+<Layout title={title} description={description} lang={lang} hasWallpaper={false} noBanner={true} disableFolioBuddy={true}>
 	{/*
 	  Swup 要求配置里的每个 container 在所有页面都存在。
 	  作品集布局没有侧栏/Banner，用隐藏占位满足替换，避免整页硬刷新。

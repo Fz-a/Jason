@@ -32,8 +32,11 @@ export const portfolioConfig: PortfolioConfig = {
 	],
 	tagline: "",
 	headline: "知行合一",
+	headlineGloss: "Unity of Knowledge and Action",
 	bio: "",
 	portrait: img("avatar.webp"),
+	/** Placeholder until you pick one from the media library */
+	homeWipeBg: img("music-bg.png"),
 	contactHref: "/guestbook/",
 	contactEyebrow: "",
 	contactTitle: "留墨",

@@ -41,6 +41,7 @@
 	let favOnly = $state(false);
 
 	const track = $derived(playlist[currentIndex] ?? null);
+	const cover = $derived(track?.pic || track?.cover || "");
 	const liked = $derived(isFav(track, favKeys));
 
 	function prefersReducedMotion() {
@@ -122,6 +123,11 @@
 		});
 	}
 
+	function playPause() {
+		pulseShell();
+		run(() => api?.togglePlay());
+	}
+
 	function setVolFromEvent(e: PointerEvent) {
 		if (!volEl) return;
 		const rect = volEl.getBoundingClientRect();
@@ -161,7 +167,29 @@
 	style="--bento-delay: 90ms"
 	aria-label="留声"
 >
-	<span class="folio-phono-kicker">留声</span>
+	<div class="folio-phono-stage">
+		<button
+			type="button"
+			class="folio-phono-disc"
+			class:is-spinning={isPlaying}
+			onclick={playPause}
+			aria-label={isPlaying ? "暂停" : "播放"}
+			title={isPlaying ? "暂停" : "播放"}
+		>
+			<span class="folio-phono-grooves" aria-hidden="true"></span>
+			<span class="folio-phono-label">
+				{#if cover}
+					<img src={cover} alt="" />
+				{:else}
+					<span class="folio-phono-listen">{isPlaying ? "停" : "听"}</span>
+				{/if}
+			</span>
+		</button>
+		<div class="folio-phono-arm" class:is-on={isPlaying} aria-hidden="true">
+			<span class="folio-phono-arm-bar"></span>
+			<span class="folio-phono-arm-head"></span>
+		</div>
+	</div>
 
 	<div class="folio-phono-copy" bind:this={copyEl}>
 		<strong class="folio-phono-title">{title}</strong>
@@ -184,8 +212,7 @@
 			class:is-on={isPlaying}
 			onclick={(e) => {
 				tap(e);
-				pulseShell();
-				run(() => api?.togglePlay());
+				playPause();
 			}}
 		>
 			{isPlaying ? "暂停" : "播放"}

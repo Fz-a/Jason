@@ -7,15 +7,17 @@
 
 	type Sample = { x: number; y: number };
 
-	/** Lean trails — samples cached once; ~30fps updates. */
+	/** Soft ink trails — dense micro-dots + blur; A/B out of phase & opposite. */
 	const TRAIL = {
-		countA: 12,
-		countB: 9,
-		span: 0.3,
+		countA: 20,
+		countB: 15,
+		span: 0.38,
 		durationMs: 9000,
-		durationMsB: 11000,
-		sampleCount: 64,
-		frameMs: 33,
+		durationMsB: 12000,
+		/** Large phase gap vs A. */
+		phaseB: 0.62,
+		sampleCount: 96,
+		frameMs: 20,
 	} as const;
 
 	const CLOUD_STROKE_A =
@@ -50,6 +52,11 @@
 		return { x: a.x + (b.x - a.x) * f, y: a.y + (b.y - a.y) * f };
 	}
 
+	function smoothstep(t: number) {
+		const x = Math.max(0, Math.min(1, t));
+		return x * x * (3 - 2 * x);
+	}
+
 	function placeTrail(samples: Sample[], dots: SVGCircleElement[], progress: number, span: number) {
 		if (samples.length === 0 || dots.length === 0) return;
 		const last = Math.max(1, dots.length - 1);
@@ -58,11 +65,11 @@
 			if (!node) continue;
 			const tailOffset = index / last;
 			const point = sampleAt(samples, progress - tailOffset * span);
-			const fade = (1 - tailOffset) ** 0.56;
+			const fade = smoothstep(1 - tailOffset);
 			node.cx.baseVal.value = point.x;
 			node.cy.baseVal.value = point.y;
-			node.r.baseVal.value = 0.55 + fade * 1.25;
-			node.setAttribute("opacity", (0.06 + fade * 0.45).toFixed(3));
+			node.r.baseVal.value = 0.22 + fade * 0.42;
+			node.setAttribute("opacity", (0.008 + fade * 0.09).toFixed(3));
 		}
 	}
 
@@ -104,10 +111,10 @@
 
 			if (reduce) {
 				placeTrail(samplesA, dotsA, 0.55, TRAIL.span);
-				placeTrail(samplesB, dotsB, 0.4, TRAIL.span);
+				placeTrail(samplesB, dotsB, 0.18, TRAIL.span);
 				for (const node of [...dotsA, ...dotsB]) {
-					node.setAttribute("opacity", "0.22");
-					node.r.baseVal.value = 0.9;
+					node.setAttribute("opacity", "0.06");
+					node.r.baseVal.value = 0.35;
 				}
 				return;
 			}
@@ -121,13 +128,11 @@
 				lastPaint = now;
 
 				const time = now - startedAt;
-				placeTrail(samplesA, dotsA, (time % TRAIL.durationMs) / TRAIL.durationMs, TRAIL.span);
-				placeTrail(
-					samplesB,
-					dotsB,
-					(time % TRAIL.durationMsB) / TRAIL.durationMsB,
-					TRAIL.span,
-				);
+				const progressA = (time % TRAIL.durationMs) / TRAIL.durationMs;
+				/** B runs opposite along its path, with a larger phase offset. */
+				const progressB = TRAIL.phaseB - (time % TRAIL.durationMsB) / TRAIL.durationMsB;
+				placeTrail(samplesA, dotsA, progressA, TRAIL.span);
+				placeTrail(samplesB, dotsB, progressB, TRAIL.span);
 			};
 			raf = requestAnimationFrame(render);
 		})();
@@ -155,6 +160,16 @@
 	onpointermove={onMove}
 >
 	<svg class="folio-cloud folio-cloud-a" viewBox="0 0 160 72" aria-hidden="true">
+		<defs>
+			<radialGradient id="folio-trail-dot" cx="50%" cy="50%" r="50%">
+				<stop offset="0%" stop-color="currentColor" stop-opacity="0.55" />
+				<stop offset="72%" stop-color="currentColor" stop-opacity="0.12" />
+				<stop offset="100%" stop-color="currentColor" stop-opacity="0" />
+			</radialGradient>
+			<filter id="folio-trail-soften" x="-80%" y="-80%" width="260%" height="260%">
+				<feGaussianBlur stdDeviation="0.55" />
+			</filter>
+		</defs>
 		<path
 			class="folio-cloud-fill"
 			fill="currentColor"
@@ -169,12 +184,18 @@
 			stroke-width="1.15"
 			stroke-linecap="round"
 			stroke-linejoin="round"
-			opacity="0.22"
+			opacity="0.16"
 			d={CLOUD_STROKE_A}
 		></path>
-		<g class="folio-cloud-trail folio-cloud-trail-a">
+		<g class="folio-cloud-trail folio-cloud-trail-a" filter="url(#folio-trail-soften)">
 			{#each slotsA as _}
-				<circle class="folio-cloud-dot" fill="currentColor" cx="0" cy="0" r="0" opacity="0"
+				<circle
+					class="folio-cloud-dot"
+					fill="url(#folio-trail-dot)"
+					cx="0"
+					cy="0"
+					r="0"
+					opacity="0"
 				></circle>
 			{/each}
 		</g>
@@ -189,12 +210,18 @@
 			stroke-width="1.05"
 			stroke-linecap="round"
 			stroke-linejoin="round"
-			opacity="0.18"
+			opacity="0.14"
 			d={CLOUD_STROKE_B}
 		></path>
-		<g class="folio-cloud-trail folio-cloud-trail-b">
+		<g class="folio-cloud-trail folio-cloud-trail-b" filter="url(#folio-trail-soften)">
 			{#each slotsB as _}
-				<circle class="folio-cloud-dot" fill="currentColor" cx="0" cy="0" r="0" opacity="0"
+				<circle
+					class="folio-cloud-dot"
+					fill="url(#folio-trail-dot)"
+					cx="0"
+					cy="0"
+					r="0"
+					opacity="0"
 				></circle>
 			{/each}
 		</g>

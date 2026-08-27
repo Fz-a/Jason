@@ -72,4 +72,6 @@ export type PortfolioConfig = {
 	contactHref: string;
 	contactEyebrow?: string;
 	contactTitle?: string;
+	/** MiMo home — full-bleed image revealed by pointer wipe (swap via config or CMS export) */
+	homeWipeBg?: string;
 };

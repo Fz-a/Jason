@@ -9,6 +9,9 @@ public/vndb-covers/
 
 # dependencies
 node_modules/
+techfolio/node_modules/
+techfolio/.next/
+techfolio/out/
 
 # logs
 npm-debug.log*

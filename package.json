@@ -7,8 +7,9 @@
   },
   "packageManager": "pnpm@11.22.0",
   "scripts": {
-    "dev": "astro dev",
-    "start": "astro dev",
+    "dev": "npm --prefix techfolio run dev",
+    "dev:astro": "astro dev --port 4322",
+    "start": "npm --prefix techfolio run dev",
     "check": "astro check",
     "build": "node scripts/astro-build-pipeline.mjs",
     "preview": "astro preview",
@@ -33,7 +34,10 @@
     "db:migrate": "wrangler d1 migrations apply jason-folio-cms --local --config wrangler.jsonc",
     "db:migrate:remote": "wrangler d1 migrations apply jason-folio-cms --remote --config wrangler.jsonc",
     "db:seed": "cross-env CMS_ADMIN_PASSWORD=changeme tsx scripts/seed-folio-cms.ts",
-    "db:seed:remote": "tsx scripts/seed-folio-cms.ts --remote"
+    "db:seed:remote": "tsx scripts/seed-folio-cms.ts --remote",
+    "techfolio:dev": "npm --prefix techfolio run dev",
+    "techfolio:build": "npm --prefix techfolio run build",
+    "techfolio:start": "npm --prefix techfolio run start"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.10",

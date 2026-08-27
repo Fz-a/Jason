@@ -3,13 +3,13 @@
 :root,
 :root.dark {
 	--folio-bg: #ffffff;
-	--folio-tile: #d2cdb8;
-	--folio-ink: #1a1a1a;
-	--folio-muted: rgba(26, 26, 26, 0.58);
-	--folio-contact: #525046;
-	--folio-contact-ink: #d2cdb8;
-	--folio-placeholder: #3a3832;
-	--folio-on-canvas: #1a1a1a;
+	--folio-tile: #f5f5f5;
+	--folio-ink: #0a0a0a;
+	--folio-muted: rgba(10, 10, 10, 0.52);
+	--folio-contact: #404040;
+	--folio-contact-ink: #f5f5f5;
+	--folio-placeholder: #525252;
+	--folio-on-canvas: #0a0a0a;
 	--folio-divider: rgba(26, 26, 26, 0.12);
 	--folio-radius: 1.75rem;
 	--folio-gap: 0.9rem;

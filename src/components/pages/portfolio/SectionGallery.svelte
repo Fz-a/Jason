@@ -1,8 +1,10 @@
 <script lang="ts">
 	import { onMount } from "svelte";
 	import FolioCollage from "@/components/pages/portfolio/FolioCollage.svelte";
+	import FolioMediaLibrary from "@/components/pages/portfolio/FolioMediaLibrary.svelte";
 	import FolderCover from "@/components/pages/portfolio/FolderCover.svelte";
 	import type { FolioCollage as FolioCollageData, GalleryNode, GalleryNodeKind } from "@/types/folioTree";
+	import { downloadFolioMedia } from "@/utils/folio-media";
 	import {
 		cloneGalleryNodes,
 		findGalleryNode,
@@ -39,6 +41,7 @@
 	let draftCover = $state("");
 	let draftCoverPos = $state("50% 50%");
 	let coverPosDragging = $state(false);
+	let coverLibraryOpen = $state(false);
 	let stageOn = $state(true);
 	let navLock = false;
 	let dragFrom = $state<number | null>(null);
@@ -563,6 +566,18 @@
 		flash(draftKind === "folder" ? "Default typewriter cover will be used" : "Cover cleared");
 	}
 
+	async function downloadDraftCover() {
+		if (!draftCover) return;
+		const ok = await downloadFolioMedia({ url: draftCover });
+		flash(ok ? "已开始下载" : "下载失败，请重试");
+	}
+
+	function pickCoverFromLibrary(url: string) {
+		draftCover = url;
+		draftCoverPos = "50% 50%";
+		flash("已从相册库选用封面");
+	}
+
 	function onDropCover(e: DragEvent) {
 		e.preventDefault();
 		modalDrag = false;
@@ -812,7 +827,7 @@
 				{/if}
 				<div class="folio-cover-actions">
 					<label class="folio-modal-pick">
-						Choose image
+						上传图片
 						<input
 							type="file"
 							accept="image/*"
@@ -824,12 +839,31 @@
 							}}
 						/>
 					</label>
+					<button
+						type="button"
+						class="folio-modal-pick"
+						onclick={() => (coverLibraryOpen = !coverLibraryOpen)}
+					>
+						{coverLibraryOpen ? "收起相册库" : "从相册库选"}
+					</button>
 					{#if draftCover}
+						<button type="button" class="folio-modal-pick" onclick={() => void downloadDraftCover()}>
+							下载
+						</button>
 						<button type="button" class="folio-modal-pick" onclick={clearDraftCover}>
-							Clear
+							清除
 						</button>
 					{/if}
 				</div>
+				{#if coverLibraryOpen}
+					<FolioMediaLibrary
+						open={coverLibraryOpen}
+						title="相册库"
+						hint="上传或选用已有图片作为封面。"
+						onSelect={(item) => pickCoverFromLibrary(item.url)}
+						onFlash={flash}
+					/>
+				{/if}
 			</div>
 
 			<label class="folio-editor-field">

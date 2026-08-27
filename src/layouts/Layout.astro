@@ -47,6 +47,8 @@ interface Props {
 	hasWallpaper?: boolean;
 	/** Force-disable banner layout classes (e.g. portfolio home) */
 	noBanner?: boolean;
+	/** Disable folio buddy (小精灵) on portfolio pages */
+	disableFolioBuddy?: boolean;
 }
 
 let {
@@ -57,6 +59,7 @@ let {
 	postSlug,
 	hasWallpaper = false,
 	noBanner = false,
+	disableFolioBuddy = false,
 } = Astro.props;
 
 // apply a class to the body element to decide the height of the banner, only used for initial page load
@@ -607,16 +610,20 @@ const siteLang = lang.replace("_", "-");
     <CodeGroupManager />
 
     <!-- Folio buddy — global float + chat (outside Swup) -->
-    <link rel="stylesheet" href="/folio-buddy/folio-buddy.css?v=47" data-swup-ignore-script />
-    <link rel="preload" href="/folio-buddy/geometry-data.js?v=46" as="script" />
-    <link rel="preload" href="/folio-buddy/src/math.js?v=46" as="script" />
-    <link rel="preload" href="/folio-buddy/src/tables.js?v=46" as="script" />
-    <link rel="preload" href="/folio-buddy/src/pose.js?v=46" as="script" />
-    <link rel="preload" href="/folio-buddy/src/tricks.js?v=46" as="script" />
-    <link rel="preload" href="/folio-buddy/src/fx.js?v=46" as="script" />
-    <link rel="preload" href="/folio-buddy/src/eyes.js?v=46" as="script" />
-    <link rel="preload" href="/folio-buddy/src/character.js?v=46" as="script" />
-    <script is:inline src="/folio-buddy/boot.js?v=47" data-swup-ignore-script></script>
+    {!disableFolioBuddy && (
+      <>
+        <link rel="stylesheet" href="/folio-buddy/folio-buddy.css?v=47" data-swup-ignore-script />
+        <link rel="preload" href="/folio-buddy/geometry-data.js?v=46" as="script" />
+        <link rel="preload" href="/folio-buddy/src/math.js?v=46" as="script" />
+        <link rel="preload" href="/folio-buddy/src/tables.js?v=46" as="script" />
+        <link rel="preload" href="/folio-buddy/src/pose.js?v=46" as="script" />
+        <link rel="preload" href="/folio-buddy/src/tricks.js?v=46" as="script" />
+        <link rel="preload" href="/folio-buddy/src/fx.js?v=46" as="script" />
+        <link rel="preload" href="/folio-buddy/src/eyes.js?v=46" as="script" />
+        <link rel="preload" href="/folio-buddy/src/character.js?v=46" as="script" />
+        <script is:inline src="/folio-buddy/boot.js?v=47" data-swup-ignore-script></script>
+      </>
+    )}
   </body>
 </html>
 

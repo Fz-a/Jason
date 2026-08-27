@@ -1,9 +1,6 @@
 ---
-import BentoGrid from "@/components/pages/portfolio/BentoGrid.astro";
-import { siteConfig } from "@/config";
-import PortfolioLayout from "@/layouts/PortfolioLayout.astro";
+/** Astro 无首页内容；开发时跳转到 techfolio（pnpm dev → :4321） */
+if (import.meta.env.DEV) {
+	return Astro.redirect("http://localhost:4321/");
+}
 ---
-
-<PortfolioLayout description={siteConfig.description}>
-	<BentoGrid />
-</PortfolioLayout>

@@ -1,7 +1,7 @@
 {
   "buildCommand": "pnpm build",
   "outputDirectory": "dist",
-  "installCommand": "pnpm install",
+  "installCommand": "pnpm install && npm --prefix techfolio ci",
   "framework": "astro",
   "headers": [
     {
@@ -27,6 +27,15 @@
     },
     {
       "source": "/_astro/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    },
+    {
+      "source": "/_next/(.*)",
       "headers": [
         {
           "key": "Cache-Control",
