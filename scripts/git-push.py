@@ -34,6 +34,7 @@ import sys
 import time
 import urllib.error
 import urllib.request
+from http.client import IncompleteRead, RemoteDisconnected
 from pathlib import Path
 
 
@@ -295,7 +296,15 @@ def github_api_sha(owner: str, repo: str, branch: str) -> str | None:
 			data = json.loads(resp.read().decode("utf-8", errors="replace"))
 		sha = data.get("sha")
 		return sha if isinstance(sha, str) and len(sha) >= 7 else None
-	except (urllib.error.URLError, TimeoutError, json.JSONDecodeError, ValueError) as e:
+	except (
+		urllib.error.URLError,
+		TimeoutError,
+		json.JSONDecodeError,
+		ValueError,
+		ConnectionResetError,
+		IncompleteRead,
+		RemoteDisconnected,
+	) as e:
 		print(f"      [警告] GitHub API 查询失败：{e}", flush=True)
 		return None
 
