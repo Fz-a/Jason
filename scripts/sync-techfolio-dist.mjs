@@ -3,6 +3,7 @@
  * Build techfolio (Next static export) and merge into Astro dist so `/` is the portfolio home.
  * Cloudflare CI only installs root pnpm deps — always npm-install techfolio before building.
  */
+import "./mirror-env.mjs";
 import { spawnSync } from "node:child_process";
 import { cpSync, existsSync } from "node:fs";
 import path from "node:path";

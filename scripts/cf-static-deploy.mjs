@@ -3,6 +3,7 @@
  * Deploy static dist/ to Cloudflare Workers (assets-only).
  * Free-tier Workers cannot host the ~36 MiB SSR bundle (code 10027).
  */
+import "./mirror-env.mjs";
 import { spawnSync } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";

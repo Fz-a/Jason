@@ -12,6 +12,13 @@ echo  Repo: %CD%
 echo ========================================
 echo.
 
+if exist "%~dp0mirror.env" (
+  echo [mirror] scripts\mirror.env found
+) else if exist "%~dp0mirror.env.example" (
+  echo [mirror] Tip: copy scripts\mirror.env.example to scripts\mirror.env for proxy/registry
+)
+echo.
+
 where git >nul 2>&1
 if errorlevel 1 (
   echo [ERROR] git not found. Install Git for Windows.

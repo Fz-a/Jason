@@ -25,8 +25,10 @@ from __future__ import annotations
 import argparse
 import io
 import json
+import os
 import re
 import shutil
+import socket
 import subprocess
 import sys
 import time
@@ -63,6 +65,9 @@ except Exception:
 	pass
 
 ROOT = Path(__file__).resolve().parents[1]
+MIRROR_ENV = ROOT / "scripts" / "mirror.env"
+MIRROR_ENV_EXAMPLE = ROOT / "scripts" / "mirror.env.example"
+DEFAULT_PROXY_PORTS = (7897, 7890, 10809, 1080)
 MAX_RETRIES = 6
 RETRY_SLEEP = 2.5
 
@@ -104,6 +109,7 @@ SAFE_DIRS = (
 SAFE_ROOT_FILES = {
 	".gitignore",
 	".env.example",
+	".npmrc",
 	"package.json",
 	"pnpm-lock.yaml",
 	"astro.config.mjs",
@@ -114,7 +120,87 @@ SAFE_ROOT_FILES = {
 }
 
 
+def load_mirror_env() -> list[str]:
+	"""Load scripts/mirror.env into os.environ (without overriding existing vars)."""
+	if not MIRROR_ENV.exists():
+		return []
+	loaded: list[str] = []
+	for raw in MIRROR_ENV.read_text(encoding="utf-8").splitlines():
+		line = raw.strip()
+		if not line or line.startswith("#"):
+			continue
+		if "=" not in line:
+			continue
+		key, value = line.split("=", 1)
+		key = key.strip()
+		value = value.strip().strip('"').strip("'")
+		if key and key not in os.environ:
+			os.environ[key] = value
+			loaded.append(key)
+	return loaded
+
+
+def probe_local_proxy(ports: tuple[int, ...] = DEFAULT_PROXY_PORTS) -> str | None:
+	for port in ports:
+		try:
+			with socket.create_connection(("127.0.0.1", port), timeout=0.35):
+				return f"http://127.0.0.1:{port}"
+		except OSError:
+			continue
+	return None
+
+
+def setup_network_mirrors() -> None:
+	loaded = load_mirror_env()
+	if loaded:
+		print(f"[镜像] 已加载 {MIRROR_ENV.name}: {', '.join(loaded)}")
+
+	auto_probe = os.environ.get("AUTO_PROBE_PROXY", "1") not in ("0", "false", "False")
+	has_proxy = any(
+		os.environ.get(k)
+		for k in ("HTTPS_PROXY", "HTTP_PROXY", "GIT_HTTPS_PROXY", "GIT_HTTP_PROXY")
+	)
+	if not has_proxy and auto_probe:
+		proxy = probe_local_proxy()
+		if proxy:
+			os.environ.setdefault("HTTPS_PROXY", proxy)
+			os.environ.setdefault("HTTP_PROXY", proxy)
+			os.environ.setdefault("GIT_HTTPS_PROXY", proxy)
+			os.environ.setdefault("GIT_HTTP_PROXY", proxy)
+			print(f"[镜像] 检测到本地代理，自动使用 {proxy}")
+
+	registry = os.environ.get("NPM_CONFIG_REGISTRY")
+	if registry:
+		print(f"[镜像] npm registry = {registry}")
+
+
+def setup_git_proxy_from_env() -> None:
+	proxy = (
+		os.environ.get("GIT_HTTPS_PROXY")
+		or os.environ.get("HTTPS_PROXY")
+		or os.environ.get("GIT_HTTP_PROXY")
+		or os.environ.get("HTTP_PROXY")
+	)
+	if not proxy:
+		return
+	for key in ("http.proxy", "https.proxy"):
+		r = git("config", "--local", key, proxy)
+		if r.returncode != 0:
+			die(f"写入 git {key} 失败：{out_text(r)}")
+	print(f"[镜像] git http(s).proxy = {proxy}")
+
+
+def urlopen_with_proxy(req: urllib.request.Request, timeout: int = 25):
+	proxy = os.environ.get("HTTPS_PROXY") or os.environ.get("HTTP_PROXY")
+	if not proxy:
+		return urllib.request.urlopen(req, timeout=timeout)
+	handler = urllib.request.ProxyHandler({"http": proxy, "https": proxy})
+	opener = urllib.request.build_opener(handler)
+	return opener.open(req, timeout=timeout)
+
+
 def run(cmd: list[str], *, timeout: int | None = 120) -> subprocess.CompletedProcess[str]:
+	env = os.environ.copy()
 	return subprocess.run(
 		cmd,
 		cwd=ROOT,
@@ -123,6 +209,7 @@ def run(cmd: list[str], *, timeout: int | None = 120) -> subprocess.CompletedPro
 		errors="replace",
 		capture_output=True,
 		timeout=timeout,
+		env=env,
 	)
 
 
@@ -198,7 +285,7 @@ def github_api_sha(owner: str, repo: str, branch: str) -> str | None:
 		},
 	)
 	try:
-		with urllib.request.urlopen(req, timeout=25) as resp:
+		with urlopen_with_proxy(req, timeout=25) as resp:
 			data = json.loads(resp.read().decode("utf-8", errors="replace"))
 		sha = data.get("sha")
 		return sha if isinstance(sha, str) and len(sha) >= 7 else None
@@ -362,7 +449,9 @@ def main() -> int:
 	args = parser.parse_args()
 
 	ensure_git()
+	setup_network_mirrors()
 	setup_local_config()
+	setup_git_proxy_from_env()
 	if args.setup_only:
 		print("[完成] 仅配置，未推送。")
 		return 0
@@ -435,11 +524,18 @@ def main() -> int:
 				print(f"[重试] {RETRY_SLEEP}s 后重试…", flush=True)
 				time.sleep(RETRY_SLEEP)
 		if not pushed:
+			hint = ""
+			if not MIRROR_ENV.exists() and MIRROR_ENV_EXAMPLE.exists():
+				hint = (
+					f"\n  4) 复制镜像配置：copy scripts\\mirror.env.example scripts\\mirror.env\n"
+					f"     修改代理端口后重试（见 scripts/mirror.env.example）"
+				)
 			die(
 				"多次推送仍失败。请检查：\n"
-				"  1) 网络 / 代理是否可用\n"
+				"  1) 网络 / 代理是否可用（scripts/mirror.env）\n"
 				"  2) Windows「凭据管理器」里 GitHub 登录是否有效\n"
 				"  3) 或改 SSH：git remote set-url origin git@github.com:OWNER/REPO.git"
+				f"{hint}"
 			)
 	else:
 		print("[4/5] 跳过 push", flush=True)

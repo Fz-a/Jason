@@ -4,6 +4,7 @@
  * CF_STATIC_DEPLOY=1 → static HTML for free-tier Workers assets deploy.
  * CF_WORKERS=1 → SSR + Cloudflare adapter (needs paid plan to deploy worker).
  */
+import "./mirror-env.mjs";
 import { spawnSync } from "node:child_process";
 import { cpSync, existsSync, rmSync } from "node:fs";
 import path from "node:path";
