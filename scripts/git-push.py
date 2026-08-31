@@ -96,12 +96,18 @@ SKIP_PREFIXES = (
 	"node_modules/",
 	"dist/",
 	".astro/",
+	"__pycache__/",
+	"personal-site/",
+	"techfolio/node_modules/",
+	"techfolio/.next/",
+	"techfolio/out/",
 )
 
 SAFE_DIRS = (
 	"src/",
 	"public/",
 	"scripts/",
+	"techfolio/",
 	"migrations/",
 	"docs/",
 )
@@ -351,6 +357,8 @@ def normalize_repo_path(path: str) -> str:
 
 def is_skippable(path: str) -> bool:
 	p = normalize_repo_path(path)
+	if "__pycache__" in p.split("/"):
+		return True
 	for prefix in SKIP_PREFIXES:
 		if p == prefix.rstrip("/") or p.startswith(prefix):
 			return True
@@ -405,14 +413,18 @@ def commit_local_changes(message: str | None) -> bool:
 
 	if not pushable:
 		print(
-			"[警告] 有改动，但都在跳过列表（如 我的图片/、tmp/）。"
-			"没有可推送的代码提交。",
+			"[警告] 有改动，但都不在自动提交白名单内（或属于跳过目录）。"
+			"这些文件不会出现在 GitHub 上。",
 			flush=True,
 		)
 		return False
 
-	# stage one-by-one so skips stay out
-	for path in pushable:
+	# stage one-by-one so skips stay out (skip paths already in the index)
+	for code, path in entries:
+		if path not in pushable:
+			continue
+		if code[0] not in (" ", "?"):
+			continue
 		r = git("add", "--", path)
 		if r.returncode != 0:
 			die(f"git add 失败：{path}\n{out_text(r)}")
@@ -480,7 +492,15 @@ def main() -> int:
 			if len(dirty) > 20:
 				print(f"      …另有 {len(dirty) - 20} 项", flush=True)
 	else:
-		commit_local_changes(args.message)
+		committed = commit_local_changes(args.message)
+		if not committed:
+			left = [p for _, p in porcelain_paths() if is_pushable(p)]
+			if left:
+				print(
+					f"[警告] 仍有 {len(left)} 项可提交文件未纳入（见上方列表）。"
+					"GitHub 上不会包含这些改动。",
+					flush=True,
+				)
 
 	head = local_head()
 	print(f"[信息] 本地 HEAD: {head[:12]}…", flush=True)
