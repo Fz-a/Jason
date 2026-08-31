@@ -2,9 +2,11 @@
 
 import { gsap } from "gsap";
 import Image from "next/image";
+import Link from "next/link";
 import { Montserrat } from "next/font/google";
 import { useEffect, useRef, useState } from "react";
 import { HeroNameFlip } from "./components/HeroNameFlip";
+import { projects } from "./projects/project-data";
 
 const montserrat = Montserrat({
   subsets: ["latin"],
@@ -20,11 +22,15 @@ const navItems = [
 const socialLinks = [
   {
     label: "GitHub",
-    href: "https://github.com/brittnebaila",
+    href: "https://github.com/Fz-a",
   },
   {
-    label: "LinkedIn",
-    href: "https://www.linkedin.com/in/brittnedanielle/",
+    label: "Gitee",
+    href: "https://gitee.com/Fz_z",
+  },
+  {
+    label: "CSDN",
+    href: "https://blog.csdn.net/weixin_63844594",
   },
 ];
 
@@ -74,33 +80,6 @@ const projectsSubtitle = (
   </>
 );
 
-const experienceCards = [
-  {
-    title: "University",
-    summary:
-      "Electronic Information Engineering at Guangzhou Software Institute, top 5%. Led teams on smart wearables and ROS fire-warning systems—PCB, firmware, and pitch decks included. 20+ national and provincial awards.",
-    tags: ["Embedded", "PCB", "ROS", "Awards"],
-  },
-  {
-    title: "Work",
-    summary:
-      "Internships at Zongheng, Moore, and CVTE, now full-time on RTK, AGV, and AI devices—from schematic and layout to bring-up and structural checks.",
-    tags: ["RTK", "AGV", "Altium", "Prototyping"],
-  },
-  {
-    title: "Society",
-    summary:
-      "20+ volunteer sessions, Maker Faire and maker spaces, and campus roles in drone outreach and safety teams—bringing people closer to hardware.",
-    tags: ["Volunteering", "Maker", "Campus", "Outreach"],
-  },
-  {
-    title: "Skills",
-    summary:
-      "Altium, embedded development, ROS, Fusion 360, TouchDesigner, and AI-assisted workflows. I also share what I learn on GitHub and CSDN.",
-    tags: ["Hardware", "Firmware", "AI Tools", "Writing"],
-  },
-] as const;
-
 function GitHubIcon() {
   return (
     <svg
@@ -114,17 +93,43 @@ function GitHubIcon() {
   );
 }
 
-function LinkedInIcon() {
+function GiteeIcon() {
   return (
     <svg
       aria-hidden="true"
       viewBox="0 0 24 24"
-      className="h-4 w-4"
+      className="h-[1.05rem] w-[1.05rem]"
       fill="currentColor"
     >
-      <path d="M6.94 8.5a1.72 1.72 0 1 1 0-3.44 1.72 1.72 0 0 1 0 3.44ZM8.5 18.5H5.38V9.63H8.5v8.87ZM18.62 18.5H15.5v-4.32c0-1.03-.02-2.36-1.44-2.36-1.44 0-1.66 1.13-1.66 2.29v4.39H9.28V9.63h2.99v1.21h.04c.42-.79 1.43-1.62 2.95-1.62 3.15 0 3.73 2.08 3.73 4.79v4.49ZM20.18 2H3.82A1.8 1.8 0 0 0 2 3.79v16.42C2 21.2 2.8 22 3.79 22h16.39A1.8 1.8 0 0 0 22 20.21V3.79A1.8 1.8 0 0 0 20.18 2Z" />
+      <path d="M11.984 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.016 0zm6.09 5.333c.328 0 .593.266.592.593v1.482a.594.594 0 0 1-.593.592H9.777c-.982 0-1.778.796-1.778 1.778v5.63c0 .327.266.592.593.592h5.63c.982 0 1.778-.796 1.778-1.778v-.296a.593.593 0 0 0-.592-.593h-4.15a.592.592 0 0 1-.592-.592v-1.482a.593.593 0 0 1 .593-.592h6.815c.327 0 .593.265.593.592v3.408a4 4 0 0 1-4 4H5.926a.593.593 0 0 1-.593-.593V9.778a4.444 4.444 0 0 1 4.445-4.444h8.296Z" />
     </svg>
   );
+}
+
+function CSDNIcon() {
+  return (
+    <svg
+      aria-hidden="true"
+      viewBox="0 0 24 24"
+      className="h-[1.05rem] w-[1.05rem]"
+      fill="currentColor"
+    >
+      <path d="M4.693 13.638c-.497.568-1.363.63-1.712.63-.648 0-1.144-.164-1.474-.488-.313-.307-.478-.76-.489-1.346-.025-1.358.744-2.762 2.074-2.762.635 0 1.124.455 1.311.644a.337.337 0 0 0 .282.099.38.38 0 0 0 .241-.159c.068-.087.135-.237.138-.401s-.057-.344-.243-.49a2.642 2.642 0 0 0-1.668-.591c-.819 0-1.627.376-2.218 1.033-.621.691-.953 1.63-.935 2.646.015.815.282 1.5.773 1.982.528.518 1.3.791 2.235.791 1.097 0 1.776-.325 2.154-.597a.584.584 0 0 0 .24-.456.702.702 0 0 0-.208-.497c-.23-.248-.448-.101-.503-.037ZM9.663 11.488a7.471 7.471 0 0 0-.698-.248c-.157-.048-.309-.091-.45-.131-.922-.26-1.027-.5-1.017-.68.022-.363.515-.853 1.352-.792.607.045 1.015.509 1.205.781.149.214.371.135.434.095a.602.602 0 0 0 .309-.514.626.626 0 0 0-.209-.488 2.654 2.654 0 0 0-3.347-.273c-.456.323-.744.772-.77 1.202-.064 1.061 1.015 1.366 1.803 1.588.214.061.429.127.667.202 1.14.357 1.173.717 1.092 1.267-.082.556-.696.834-1.685.761-1.029-.076-1.464-.61-1.612-.901-.05-.098-.205-.248-.413-.156-.514.229-.473.731-.26.993.339.416 1.15 1.035 2.667 1.035 1.734 0 2.255-.875 2.378-1.64.092-.572-.022-1.028-.348-1.396-.236-.267-.592-.495-1.101-.706ZM16.44 9.323c-.598-.431-1.393-.61-2.36-.532-.712.058-1.274.243-1.335.263l-.006.002a.437.437 0 0 0-.297.379l-.47 5.201a.337.337 0 0 0 .247.35l.072.02.066.018.086.021a7.914 7.914 0 0 0 1.64.183c.972 0 1.765-.23 2.36-.684.764-.583 1.141-1.5 1.118-2.725-.021-1.135-.398-1.974-1.121-2.495Zm-.662 4.461c-.836.639-2.09.562-2.677.481a.128.128 0 0 1-.109-.137l.397-4.248a.113.113 0 0 1 .086-.1c.999-.241 1.777-.168 2.312.218.189.137.348.331.471.568.176.339.277.765.286 1.234.017.916-.24 1.583-.765 1.984ZM23.967 10.41a1.92 1.92 0 0 0-.432-.919c-.399-.465-1.029-.689-1.848-.689-.734 0-1.372.228-1.947.799.007-.086.019-.159.018-.223s-.017-.116-.066-.163c-.048-.045-.077-.067-.127-.077-.05-.01-.122-.008-.256-.006a.587.587 0 0 0-.589.54s-.325 3.874-.428 5.165a.308.308 0 0 0 .073.228.36.36 0 0 0 .26.131h.387a.224.224 0 0 0 .226-.205l.273-2.929.014-.147a1.902 1.902 0 0 1 .082-.412c.014-.045.03-.092.047-.14.245-.694.803-1.72 1.971-1.694.84.018 1.449.455 1.385 1.114-.101 1.034-.266 3.1-.358 4.14-.019.209.182.273.252.273h.304a.442.442 0 0 0 .444-.404s.185-2.127.294-3.352l.048-.532a1.959 1.959 0 0 0-.026-.5Z" />
+    </svg>
+  );
+}
+
+function SocialIcon({ label }: { label: string }) {
+  switch (label) {
+    case "GitHub":
+      return <GitHubIcon />;
+    case "Gitee":
+      return <GiteeIcon />;
+    case "CSDN":
+      return <CSDNIcon />;
+    default:
+      return null;
+  }
 }
 
 function EmailIcon() {
@@ -158,6 +163,8 @@ function LocationIcon() {
   );
 }
 
+const NAV_SCROLL_OFFSET = 72;
+
 export default function Home() {
   const [activeSection, setActiveSection] = useState("home");
   const [aboutLang, setAboutLang] = useState<AboutLang>("en");
@@ -165,6 +172,37 @@ export default function Home() {
   const cueDotRef = useRef<HTMLSpanElement>(null);
   const cuePebbleRef = useRef<HTMLSpanElement>(null);
   const cueTextRef = useRef<HTMLSpanElement>(null);
+
+  const scrollToSection = (sectionId: string) => {
+    const target = document.getElementById(sectionId);
+    if (!target) return;
+
+    const scrollRoot = document.scrollingElement ?? document.documentElement;
+    const top =
+      target.getBoundingClientRect().top +
+      scrollRoot.scrollTop -
+      NAV_SCROLL_OFFSET;
+
+    scrollRoot.scrollTo({ top: Math.max(0, top), behavior: "smooth" });
+    window.history.replaceState(null, "", `#${sectionId}`);
+    setActiveSection(sectionId);
+  };
+
+  const handleNavClick = (
+    event: React.MouseEvent<HTMLAnchorElement>,
+    href: string
+  ) => {
+    if (!href.startsWith("#")) return;
+    event.preventDefault();
+    scrollToSection(href.slice(1));
+  };
+
+  useEffect(() => {
+    const hash = window.location.hash.slice(1);
+    if (!hash || !document.getElementById(hash)) return;
+    const timer = window.setTimeout(() => scrollToSection(hash), 100);
+    return () => window.clearTimeout(timer);
+  }, []);
 
   useEffect(() => {
     const homeSection = document.getElementById("home");
@@ -296,17 +334,18 @@ export default function Home() {
 
   return (
     <main
-      className={`${montserrat.className} min-h-screen overflow-x-hidden bg-[#F7F1E8] text-[#162b26]`}
+      className={`${montserrat.className} min-h-screen bg-[#F7F1E8] text-[#162b26]`}
     >
-      <header className="fixed inset-x-0 top-0 z-50 px-4 pt-4 sm:px-6 sm:pt-5 lg:px-8">
-        <div className="mx-auto flex w-fit items-center justify-center rounded-full border border-[#0F4C45]/15 bg-[#F7F1E8]/92 p-1.5 shadow-[0_14px_40px_rgba(22,43,38,0.08)] backdrop-blur-md">
+      <header className="pointer-events-none fixed inset-x-0 top-0 z-50 px-4 pt-4 sm:px-6 sm:pt-5 lg:px-8">
+        <div className="pointer-events-auto mx-auto flex w-fit items-center justify-center rounded-full border border-[#0F4C45]/15 bg-[#F7F1E8]/92 p-1.5 shadow-[0_14px_40px_rgba(22,43,38,0.08)] backdrop-blur-md">
           <nav aria-label="Primary">
             <ul className="flex items-center gap-1">
               {navItems.map((item) => (
                 <li key={item.href}>
                   <a
                     href={item.href}
-                    className={`block rounded-full px-4 py-2 text-[0.8rem] font-semibold transition sm:px-4.5 sm:py-2.5 sm:text-[0.83rem] lg:px-5 lg:py-2.5 lg:text-[0.88rem] ${
+                    onClick={(event) => handleNavClick(event, item.href)}
+                    className={`block cursor-pointer rounded-full px-4 py-2 text-[0.8rem] font-semibold transition sm:px-4.5 sm:py-2.5 sm:text-[0.83rem] lg:px-5 lg:py-2.5 lg:text-[0.88rem] ${
                       activeSection === item.href.slice(1)
                         ? "bg-[#043439] text-white shadow-[0_10px_24px_rgba(4,52,57,0.22)]"
                         : "text-[#0F4C45] hover:bg-[#0F4C45]/8"
@@ -358,7 +397,8 @@ export default function Home() {
 
               <a
                 href="#contact"
-                className="rounded-full border border-[#0F4C45] px-6 py-2.5 text-sm font-semibold text-[#0F4C45] transition hover:bg-[#0F4C45] hover:text-white lg:px-7 lg:py-3 lg:text-[0.92rem]"
+                onClick={(event) => handleNavClick(event, "#contact")}
+                className="cursor-pointer rounded-full border border-[#0F4C45] px-6 py-2.5 text-sm font-semibold text-[#0F4C45] transition hover:bg-[#0F4C45] hover:text-white lg:px-7 lg:py-3 lg:text-[0.92rem]"
               >
                 Contact Me
               </a>
@@ -372,23 +412,27 @@ export default function Home() {
                   target="_blank"
                   rel="noreferrer"
                   aria-label={link.label}
-                  className="flex h-9 w-9 items-center justify-center rounded-full border border-[#0F4C45]/15 bg-[#F7F1E8] text-[#0F4C45] transition hover:-translate-y-0.5 hover:border-[#0F4C45]/25 hover:bg-[#0F4C45] hover:text-white"
+                  className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-full border border-[#0F4C45]/15 bg-[#F7F1E8] text-[#0F4C45] transition hover:-translate-y-0.5 hover:border-[#0F4C45]/25 hover:bg-[#0F4C45] hover:text-white"
                 >
-                  {link.label === "GitHub" ? <GitHubIcon /> : <LinkedInIcon />}
+                  <SocialIcon label={link.label} />
                 </a>
               ))}
             </div>
           </div>
 
           <div className="flex items-center justify-center">
-            <Image
-              src="/avatar2.png"
-              alt="Jason Chen"
-              width={1500}
-              height={1414}
-              priority
-              className="h-auto w-full max-w-[300px] object-contain drop-shadow-xl transition-transform sm:max-w-[380px] md:max-w-[460px] lg:max-w-[560px] xl:max-w-[620px]"
-            />
+            <div className="relative aspect-square w-full max-w-[300px] overflow-hidden rounded-full bg-white drop-shadow-xl sm:max-w-[380px] md:max-w-[460px] lg:max-w-[560px] xl:max-w-[620px]">
+              <div className="absolute inset-x-0 bottom-0 flex justify-center">
+                <Image
+                  src="/avatar2.png"
+                  alt="Jason Chen"
+                  width={1024}
+                  height={1024}
+                  priority
+                  className="aspect-square w-[90%] object-cover object-[center_18%]"
+                />
+              </div>
+            </div>
           </div>
         </div>
 
@@ -396,7 +440,8 @@ export default function Home() {
           <a
             ref={scrollCueRef}
             href="#about"
-            className="pointer-events-auto flex flex-col items-center gap-2 text-[0.6rem] font-semibold uppercase tracking-[0.28em] text-[#0F4C45]/72 transition"
+            onClick={(event) => handleNavClick(event, "#about")}
+            className="pointer-events-auto flex cursor-pointer flex-col items-center gap-2 text-[0.6rem] font-semibold uppercase tracking-[0.28em] text-[#0F4C45]/72 transition"
           >
             <span className="relative flex h-10 w-8 items-start justify-center">
               <span className="absolute top-0 h-6 w-6 rounded-full bg-[#0F4C45]" />
@@ -483,28 +528,41 @@ export default function Home() {
           </div>
 
           <div className="mt-8 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4 lg:mt-10 lg:gap-4 xl:gap-4">
-            {experienceCards.map((card) => (
-              <article
-                key={card.title}
-                className="group block w-full rounded-[1.05rem] border border-[#0F4C45]/12 bg-[#F7F1E8] p-3.5 text-center shadow-[0_14px_28px_rgba(22,43,38,0.05)] transition duration-200 hover:-translate-y-1 hover:border-[#0F4C45]/22 hover:shadow-[0_18px_34px_rgba(22,43,38,0.08)] sm:p-4"
+            {projects.map((project) => (
+              <Link
+                key={project.slug}
+                href={`/projects/${project.slug}/`}
+                className="group block w-full cursor-pointer rounded-[1.05rem] border border-[#0F4C45]/12 bg-[#F7F1E8] p-3.5 text-center shadow-[0_14px_28px_rgba(22,43,38,0.05)] transition duration-200 hover:-translate-y-1 hover:border-[#0F4C45]/22 hover:shadow-[0_18px_34px_rgba(22,43,38,0.08)] sm:p-4"
               >
                 <div className="mb-3 overflow-hidden rounded-[0.9rem] bg-[#EEF3EE]">
-                  <div className="relative flex h-[120px] items-center justify-center sm:h-[140px] xl:h-[155px]">
-                    <span className="text-[2rem] font-extrabold tracking-tight text-[#0F4C45]/28 transition-colors duration-200 group-hover:text-[#0F4C45]/42 sm:text-[2.35rem]">
-                      {card.title}
-                    </span>
+                  <div className="relative h-[120px] sm:h-[140px] xl:h-[155px]">
+                    {project.cardImage ? (
+                      <Image
+                        src={project.cardImage.src}
+                        alt={project.cardImage.alt}
+                        fill
+                        sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 25vw"
+                        className="object-cover transition-transform duration-300 group-hover:scale-[1.02]"
+                      />
+                    ) : (
+                      <div className="flex h-full items-center justify-center px-4 text-center">
+                        <span className="text-[2rem] font-extrabold tracking-tight text-[#0F4C45]/28 transition-colors duration-200 group-hover:text-[#0F4C45]/42 sm:text-[2.35rem]">
+                          {project.shortTitle}
+                        </span>
+                      </div>
+                    )}
                   </div>
                 </div>
 
                 <h3 className="text-[0.95rem] font-extrabold tracking-tight text-[#162b26] transition-colors duration-200 group-hover:text-[#0F4C45] sm:text-[1rem]">
-                  {card.title}
+                  {project.title}
                 </h3>
                 <p className="mt-2 text-[0.72rem] leading-5 text-[#3E514D] sm:text-[0.76rem]">
-                  {card.summary}
+                  {project.cardSummary}
                 </p>
 
                 <div className="mt-3 flex flex-wrap justify-center gap-1.5">
-                  {card.tags.map((tag) => (
+                  {project.tags.map((tag) => (
                     <span
                       key={tag}
                       className="rounded-full border border-[#0F4C45]/15 bg-[#F7F1E8] px-2 py-1 text-[0.62rem] font-semibold text-[#0F4C45] sm:text-[0.66rem]"
@@ -513,7 +571,7 @@ export default function Home() {
                     </span>
                   ))}
                 </div>
-              </article>
+              </Link>
             ))}
           </div>
         </div>
@@ -595,25 +653,18 @@ export default function Home() {
                   </p>
 
                   <div className="mt-3 flex items-center gap-2.5">
-                    <a
-                      href="https://github.com/brittnebaila"
-                      target="_blank"
-                      rel="noreferrer"
-                      aria-label="GitHub"
-                      className="flex h-9 w-9 items-center justify-center rounded-full border border-[#0F4C45]/12 bg-[#F7F1E8] text-[#0F4C45] transition hover:-translate-y-0.5 hover:bg-[#0F4C45] hover:text-white"
-                    >
-                      <GitHubIcon />
-                    </a>
-
-                    <a
-                      href="https://www.linkedin.com/in/brittnedanielle/"
-                      target="_blank"
-                      rel="noreferrer"
-                      aria-label="LinkedIn"
-                      className="flex h-9 w-9 items-center justify-center rounded-full border border-[#0F4C45]/12 bg-[#F7F1E8] text-[#0F4C45] transition hover:-translate-y-0.5 hover:bg-[#0F4C45] hover:text-white"
-                    >
-                      <LinkedInIcon />
-                    </a>
+                    {socialLinks.map((link) => (
+                      <a
+                        key={link.label}
+                        href={link.href}
+                        target="_blank"
+                        rel="noreferrer"
+                        aria-label={link.label}
+                        className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-full border border-[#0F4C45]/12 bg-[#F7F1E8] text-[#0F4C45] transition hover:-translate-y-0.5 hover:bg-[#0F4C45] hover:text-white"
+                      >
+                        <SocialIcon label={link.label} />
+                      </a>
+                    ))}
                   </div>
                 </div>
               </div>
