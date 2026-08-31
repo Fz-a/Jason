@@ -69,8 +69,8 @@ export const projects: ProjectDetail[] = [
 		cardSummary:
 			"Electronic Information Engineering at Guangzhou Software Institute, top 5%. Led teams on smart wearables and ROS fire-warning systems—PCB, firmware, and pitch decks included. 20+ national and provincial awards.",
 		cardImage: {
-			src: "/experience/university/smart-apparel.webp",
-			alt: "Smart apparel team project",
+			src: "/experience/university/awards.webp",
+			alt: "National and provincial competition awards with STM32 and deep-learning prototypes",
 			width: 1600,
 			height: 900,
 		},
@@ -160,8 +160,8 @@ export const projects: ProjectDetail[] = [
 		cardSummary:
 			"Internships at Zongheng, Moore, and CVTE, now full-time on RTK, AGV, and AI devices—from schematic and layout to bring-up and structural checks.",
 		cardImage: {
-			src: "/experience/work/agv-remote.webp",
-			alt: "AGV remote control hardware",
+			src: "/experience/work/team.webp",
+			alt: "Engineering team gathering after project delivery",
 			width: 1600,
 			height: 900,
 		},
@@ -241,8 +241,8 @@ export const projects: ProjectDetail[] = [
 		cardSummary:
 			"20+ volunteer sessions, Maker Faire and maker spaces, and campus roles in drone outreach and safety teams—bringing people closer to hardware.",
 		cardImage: {
-			src: "/experience/society/maker-faire.webp",
-			alt: "Maker Faire outreach",
+			src: "/experience/society/moto-camp.webp",
+			alt: "MOTO CAMP booth — community outreach and hands-on demos",
 			width: 1600,
 			height: 900,
 		},
@@ -321,8 +321,8 @@ export const projects: ProjectDetail[] = [
 		cardSummary:
 			"Altium, embedded development, ROS, Fusion 360, TouchDesigner, and AI-assisted workflows. I also share what I learn on GitHub and CSDN.",
 		cardImage: {
-			src: "/experience/skills/mapping.webp",
-			alt: "Technical tooling and workflows",
+			src: "/experience/skills/hardware-stack.webp",
+			alt: "Embedded STM32 and deep-learning prototypes — hardware and AI toolchain",
 			width: 1600,
 			height: 900,
 		},

@@ -599,7 +599,7 @@ export default function Home() {
 
             <div className="mt-6 flex flex-wrap gap-2.5">
               <a
-                href="mailto:brittnebaila@gmail.com"
+                href="mailto:2260032001@student.must.edu.mo"
                 className="rounded-full bg-[#043439] px-5 py-2 text-[0.82rem] font-semibold text-white transition hover:opacity-90 lg:px-6 lg:py-2.5 lg:text-[0.88rem]"
               >
                 Email Me
@@ -624,10 +624,10 @@ export default function Home() {
                     Email
                   </p>
                   <a
-                    href="mailto:brittnebaila@gmail.com"
+                    href="mailto:2260032001@student.must.edu.mo"
                     className="mt-1.5 inline-block text-[0.9rem] font-semibold text-[#162b26] transition hover:text-[#0F4C45] sm:text-[0.95rem]"
                   >
-                    brittnebaila@gmail.com
+                    2260032001@student.must.edu.mo
                   </a>
                   </div>
                 </div>
@@ -642,7 +642,7 @@ export default function Home() {
                     Location
                   </p>
                   <p className="mt-1.5 text-[0.9rem] font-semibold sm:text-[0.95rem]">
-                    Bellevue, WA
+                    Foshan, Guangdong
                   </p>
                   </div>
                 </div>
