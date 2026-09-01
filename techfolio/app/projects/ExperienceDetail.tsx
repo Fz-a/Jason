@@ -1,6 +1,61 @@
 import Image from "next/image";
 import type { ProjectDetail, ProjectDetailBlock, ProjectImage } from "./project-data";
-import { UniversityShowcase } from "./UniversityShowcase";
+import { societyShowcases } from "./society-showcases";
+import {
+  universityDepartmentShowcases,
+  universityProjectShowcases,
+} from "./university-showcases";
+import {
+  ShowcaseInlineFeed,
+  UniversityShowcase,
+} from "./UniversityShowcase";
+import { ventureShowcases } from "./venture-showcases";
+import { WorkInternships } from "./WorkInternships";
+import { workCompanyIntro, workShowcases } from "./work-showcases";
+
+function WorkCompanyIntro() {
+  const { kicker, title, body, image } = workCompanyIntro;
+
+  return (
+    <section className="mt-8 overflow-hidden rounded-[1.25rem] border border-[#0F4C45]/12 bg-[#DDE7DE] shadow-[0_12px_28px_rgba(22,43,38,0.05)]">
+      <div className="grid grid-cols-1 md:grid-cols-[1.05fr_0.95fr]">
+        <div className="relative min-h-[220px] bg-[#F7F1E8] md:min-h-full">
+          <Image
+            src={image.src}
+            alt={image.alt}
+            width={image.width}
+            height={image.height}
+            className="h-full w-full object-cover"
+            priority
+          />
+        </div>
+        <div className="flex flex-col justify-center p-6 sm:p-8">
+          <p className="text-[0.64rem] font-semibold uppercase tracking-[0.24em] text-[#0F4C45]">
+            Full-time · {kicker}
+          </p>
+          <h2 className="mt-2 text-[1.35rem] font-extrabold tracking-tight text-[#162b26] sm:text-[1.5rem]">
+            {title}
+          </h2>
+          <div className="mt-4 space-y-3">
+            {body.map((paragraph) => (
+              <p
+                key={paragraph.slice(0, 32)}
+                className="text-[0.88rem] leading-6 text-[#3E514D] sm:text-[0.92rem] sm:leading-7"
+              >
+                {paragraph}
+              </p>
+            ))}
+          </div>
+          {image.caption ? (
+            <p className="mt-5 text-[0.7rem] leading-5 text-[#6A7A76]">
+              {image.caption}
+            </p>
+          ) : null}
+        </div>
+      </div>
+    </section>
+  );
+}
 
 function ProjectImageFigure({
   image,
@@ -180,6 +235,9 @@ function BlockRenderer({ block }: { block: ProjectDetailBlock }) {
 
 export function ExperienceDetail({ project }: { project: ProjectDetail }) {
   const isUniversity = project.slug === "university";
+  const isWork = project.slug === "work";
+  const isSociety = project.slug === "society";
+  const isVenture = project.slug === "venture";
 
   return (
     <>
@@ -209,7 +267,47 @@ export function ExperienceDetail({ project }: { project: ProjectDetail }) {
       </div>
 
       {isUniversity ? (
-        <UniversityShowcase />
+        <>
+          <p className="mt-8 text-[0.64rem] font-semibold uppercase tracking-[0.24em] text-[#0F4C45]">
+            Campus projects
+          </p>
+          <UniversityShowcase
+            items={universityProjectShowcases}
+            sectionLabel="University"
+            className="mt-4"
+          />
+          <p className="mt-10 text-[0.64rem] font-semibold uppercase tracking-[0.24em] text-[#0F4C45]">
+            Campus departments
+          </p>
+          <UniversityShowcase
+            items={universityDepartmentShowcases}
+            sectionLabel="University"
+            className="mt-4"
+          />
+        </>
+      ) : isWork ? (
+        <>
+          <WorkCompanyIntro />
+          <p className="mt-8 text-[0.64rem] font-semibold uppercase tracking-[0.24em] text-[#0F4C45]">
+            Three projects at Zongheng
+          </p>
+          <UniversityShowcase
+            items={workShowcases}
+            sectionLabel="Work"
+            className="mt-4"
+          />
+          <WorkInternships />
+        </>
+      ) : isSociety ? (
+        <ShowcaseInlineFeed
+          items={societyShowcases}
+          sectionLabel="Society"
+        />
+      ) : isVenture ? (
+        <ShowcaseInlineFeed
+          items={ventureShowcases}
+          sectionLabel="Venture"
+        />
       ) : (
         <div className="mt-8 space-y-8">
           {project.blocks.map((block, index) => (

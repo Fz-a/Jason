@@ -69,8 +69,13 @@ function Spread({ spread }: { spread: ShowcaseSpread }) {
           ) : null}
           <DocImage
             image={spread.image}
-            className="mx-auto mt-9 max-w-[420px]"
-            frameClassName="bg-white"
+            className={`mx-auto mt-9 ${spread.image.width / spread.image.height > 1.2 ? "max-w-none" : "max-w-[420px]"}`}
+            frameClassName="overflow-hidden rounded-[1rem] bg-[#F5F5F3]"
+            imgClassName={
+              spread.image.width / spread.image.height > 1.2
+                ? "h-auto w-full object-cover"
+                : "h-auto w-full object-contain"
+            }
           />
         </section>
       );
@@ -151,8 +156,8 @@ function Spread({ spread }: { spread: ShowcaseSpread }) {
             className={spread.heading || spread.body ? "mt-7" : ""}
             frameClassName={
               spread.imageTone === "dark"
-                ? "overflow-hidden rounded-[1rem] bg-[#111] ring-1 ring-black/[0.08]"
-                : "overflow-hidden rounded-[1rem] bg-[#F5F5F3] ring-1 ring-black/[0.04]"
+                ? "overflow-hidden rounded-[1.15rem] bg-[#111] ring-1 ring-black/[0.08]"
+                : "overflow-hidden rounded-[1.15rem] bg-[#F5F5F3] ring-1 ring-black/[0.04]"
             }
             priority
           />
@@ -187,6 +192,7 @@ function Spread({ spread }: { spread: ShowcaseSpread }) {
 
     case "duo": {
       const soft = spread.tone === "soft";
+      const cover = spread.mediaFit === "cover";
 
       if (soft) {
         return (
@@ -210,40 +216,48 @@ function Spread({ spread }: { spread: ShowcaseSpread }) {
             </div>
 
             <div className="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5">
-              {spread.images.map((image, index) => (
-                <article
-                  key={image.src + (image.caption ?? "")}
-                  className="flex flex-col overflow-hidden rounded-[1.15rem] bg-white shadow-[0_18px_40px_rgba(22,43,38,0.07)] ring-1 ring-black/[0.04]"
-                >
-                  <div className="flex items-center justify-between px-4 pt-4 sm:px-5 sm:pt-5">
-                    <p className="text-[0.62rem] font-semibold uppercase tracking-[0.22em] text-[#8A9692]">
-                      {index === 0 ? "Edge" : "Cloud"}
-                    </p>
-                    <p className="text-[0.62rem] font-medium tracking-[0.08em] text-[#B0BAB6]">
-                      {String(index + 1).padStart(2, "0")}
-                    </p>
-                  </div>
-                  <div className="flex aspect-[4/3] items-center justify-center px-4 py-3 sm:px-5">
-                    <Image
-                      src={image.src}
-                      alt={image.alt}
-                      width={image.width}
-                      height={image.height}
-                      className="max-h-full w-full object-contain"
-                    />
-                  </div>
-                  {image.caption ? (
-                    <div className="border-t border-black/[0.05] px-4 py-3.5 sm:px-5">
-                      <p className="text-[0.78rem] font-medium leading-5 tracking-[0.01em] text-[#3E4A46]">
-                        {image.caption.replace(/^\w+\s*—\s*/, "")}
+              {spread.images.map((image, index) => {
+                const [label, detail] = (image.caption ?? "")
+                  .split(/\s*—\s*/)
+                  .map((part) => part.trim());
+                return (
+                  <article
+                    key={image.src + (image.caption ?? "")}
+                    className="flex flex-col overflow-hidden rounded-[1.15rem] bg-white shadow-[0_18px_40px_rgba(22,43,38,0.07)] ring-1 ring-black/[0.04]"
+                  >
+                    <div className="flex items-center justify-between px-4 pt-4 sm:px-5 sm:pt-5">
+                      <p className="text-[0.62rem] font-semibold uppercase tracking-[0.22em] text-[#8A9692]">
+                        {label || `Panel ${index + 1}`}
                       </p>
-                      <p className="mt-0.5 text-[0.64rem] tracking-[0.04em] text-[#8A9692]">
-                        {index === 0 ? "On-device compute" : "Live messaging"}
+                      <p className="text-[0.62rem] font-medium tracking-[0.08em] text-[#B0BAB6]">
+                        {String(index + 1).padStart(2, "0")}
                       </p>
                     </div>
-                  ) : null}
-                </article>
-              ))}
+                    <div
+                      className={`relative ${cover ? "aspect-[4/5] sm:aspect-[3/4]" : "flex aspect-[4/3] items-center justify-center px-4 py-3 sm:px-5"}`}
+                    >
+                      <Image
+                        src={image.src}
+                        alt={image.alt}
+                        width={image.width}
+                        height={image.height}
+                        className={
+                          cover
+                            ? "h-full w-full object-cover"
+                            : "max-h-full w-full object-contain"
+                        }
+                      />
+                    </div>
+                    {detail || image.caption ? (
+                      <div className="border-t border-black/[0.05] px-4 py-3.5 sm:px-5">
+                        <p className="text-[0.78rem] font-medium leading-5 tracking-[0.01em] text-[#3E4A46]">
+                          {detail || image.caption}
+                        </p>
+                      </div>
+                    ) : null}
+                  </article>
+                );
+              })}
             </div>
           </section>
         );
@@ -276,6 +290,68 @@ function Spread({ spread }: { spread: ShowcaseSpread }) {
                 frameClassName="rounded-sm bg-white ring-1 ring-black/[0.04]"
               />
             ))}
+          </div>
+        </section>
+      );
+    }
+
+    case "quad": {
+      const cover = spread.mediaFit !== "contain";
+      return (
+        <section className="border-b border-black/[0.06] bg-[#EEF0ED] px-5 py-14 sm:px-9 sm:py-16">
+          <div className="mx-auto max-w-[34rem] text-center">
+            <Eyebrow>{spread.eyebrow}</Eyebrow>
+            <h3 className="mt-3 text-[1.55rem] font-semibold tracking-[-0.03em] text-[#111] sm:text-[1.75rem]">
+              {spread.heading}
+            </h3>
+            <div className="mt-4 space-y-2.5 text-[0.88rem] leading-7 text-[#5A6561]">
+              {spread.body.map((paragraph) => (
+                <p key={paragraph}>{paragraph}</p>
+              ))}
+            </div>
+          </div>
+
+          <div className="mt-10 grid grid-cols-2 gap-3 sm:gap-4">
+            {spread.images.map((image, index) => {
+              const [label, detail] = (image.caption ?? "")
+                .split(/\s*—\s*/)
+                .map((part) => part.trim());
+              return (
+                <article
+                  key={image.src + (image.caption ?? "")}
+                  className="flex flex-col overflow-hidden rounded-[1.05rem] bg-white shadow-[0_14px_32px_rgba(22,43,38,0.06)] ring-1 ring-black/[0.04]"
+                >
+                  <div className="flex items-center justify-between px-3 pt-3 sm:px-4 sm:pt-4">
+                    <p className="text-[0.58rem] font-semibold uppercase tracking-[0.18em] text-[#8A9692]">
+                      {label || `0${index + 1}`}
+                    </p>
+                    <p className="text-[0.58rem] font-medium tracking-[0.08em] text-[#B0BAB6]">
+                      {String(index + 1).padStart(2, "0")}
+                    </p>
+                  </div>
+                  <div className={`relative ${cover ? "aspect-[4/5]" : "aspect-[4/3]"}`}>
+                    <Image
+                      src={image.src}
+                      alt={image.alt}
+                      width={image.width}
+                      height={image.height}
+                      className={
+                        cover
+                          ? "h-full w-full object-cover"
+                          : "h-full w-full object-contain p-2"
+                      }
+                    />
+                  </div>
+                  {detail ? (
+                    <div className="border-t border-black/[0.05] px-3 py-2.5 sm:px-4 sm:py-3">
+                      <p className="text-[0.72rem] font-medium leading-4 tracking-[0.01em] text-[#3E4A46]">
+                        {detail}
+                      </p>
+                    </div>
+                  ) : null}
+                </article>
+              );
+            })}
           </div>
         </section>
       );
@@ -392,12 +468,100 @@ function Spread({ spread }: { spread: ShowcaseSpread }) {
       );
     }
 
+    case "cinema-hero":
+      return (
+        <section className="bg-white">
+          <div className="px-6 pb-6 pt-12 text-center sm:px-10 sm:pb-8 sm:pt-14">
+            <p className="text-[0.7rem] font-medium tracking-[0.08em] text-[#5C5C5C]">
+              {spread.kicker}
+            </p>
+            <h2 className="mt-2 whitespace-pre-line text-[2rem] font-medium leading-[1.1] tracking-[-0.03em] text-[#171a20] sm:text-[2.5rem]">
+              {spread.title}
+            </h2>
+            <p className="mx-auto mt-3 max-w-[26rem] text-[0.92rem] font-normal leading-6 text-[#5C5C5C]">
+              {spread.subtitle}
+            </p>
+          </div>
+          <div className="relative aspect-[16/10] w-full bg-[#F4F4F4]">
+            <Image
+              src={spread.image.src}
+              alt={spread.image.alt}
+              width={spread.image.width}
+              height={spread.image.height}
+              priority
+              quality={95}
+              sizes="(max-width: 720px) 100vw, 720px"
+              className="h-full w-full object-cover"
+            />
+          </div>
+        </section>
+      );
+
+    case "quote-band":
+      return (
+        <section className="bg-white px-8 py-12 text-center sm:px-12 sm:py-14">
+          <p className="mx-auto max-w-[28rem] text-[1.15rem] font-medium leading-8 tracking-[-0.02em] text-[#171a20]">
+            {spread.quote}
+          </p>
+          <p className="mt-4 text-[0.7rem] font-medium tracking-[0.12em] text-[#8E8E8E]">
+            {spread.meta}
+          </p>
+        </section>
+      );
+
+    case "mosaic":
+      return (
+        <section className="bg-white">
+          <div className="px-6 pb-6 pt-12 text-center sm:px-10 sm:pb-8 sm:pt-14">
+            <p className="text-[0.7rem] font-medium tracking-[0.08em] text-[#5C5C5C]">
+              {spread.eyebrow}
+            </p>
+            <h3 className="mt-2 text-[1.75rem] font-medium tracking-[-0.03em] text-[#171a20] sm:text-[2.1rem]">
+              {spread.heading}
+            </h3>
+            <div className="mx-auto mt-3 max-w-[28rem] space-y-2 text-[0.92rem] leading-6 text-[#5C5C5C]">
+              {spread.body.map((paragraph) => (
+                <p key={paragraph}>{paragraph}</p>
+              ))}
+            </div>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2">
+            {[spread.feature, spread.side].map((image) => (
+              <figure key={image.src + (image.caption ?? "")} className="relative">
+                <div className="relative aspect-[4/5] bg-[#F4F4F4] sm:aspect-[3/4]">
+                  <Image
+                    src={image.src}
+                    alt={image.alt}
+                    width={image.width}
+                    height={image.height}
+                    quality={95}
+                    sizes="(max-width: 720px) 100vw, 360px"
+                    className="h-full w-full object-cover"
+                  />
+                </div>
+                {image.caption ? (
+                  <figcaption className="absolute bottom-3 left-3 rounded bg-white/90 px-2.5 py-1 text-[0.65rem] font-medium tracking-[0.06em] text-[#171a20]">
+                    {image.caption}
+                  </figcaption>
+                ) : null}
+              </figure>
+            ))}
+          </div>
+        </section>
+      );
+
     default:
       return null;
   }
 }
 
-function ShowcaseDocument({ item }: { item: UniversityShowcase }) {
+function ShowcaseDocument({
+  item,
+  sectionLabel = "University",
+}: {
+  item: UniversityShowcase;
+  sectionLabel?: string;
+}) {
   return (
     <article className="bg-white text-[#111] shadow-[0_24px_80px_rgba(0,0,0,0.28)]">
       <div className="flex items-center justify-between border-b border-black/[0.06] px-6 py-3.5 sm:px-8">
@@ -405,7 +569,7 @@ function ShowcaseDocument({ item }: { item: UniversityShowcase }) {
           Product Brief
         </p>
         <p className="text-[0.62rem] font-medium tracking-[0.1em] text-[#8A9692]">
-          University
+          {sectionLabel}
         </p>
       </div>
       {item.spreads.map((spread, index) => (
@@ -420,11 +584,352 @@ function ShowcaseDocument({ item }: { item: UniversityShowcase }) {
   );
 }
 
-export function UniversityShowcase() {
+/** Scrollable page feed — theme-matched, no modal cards. */
+export function ShowcaseInlineFeed({
+  items,
+  sectionLabel = "Brief",
+  className = "mt-8",
+}: {
+  items: UniversityShowcase[];
+  sectionLabel?: string;
+  className?: string;
+}) {
+  return (
+    <div className={`${className} space-y-6 sm:space-y-8`}>
+      {items.map((item, index) => (
+        <ThemeStorySection
+          key={item.id}
+          item={item}
+          index={index}
+          sectionLabel={sectionLabel}
+        />
+      ))}
+    </div>
+  );
+}
+
+function ThemeStorySection({
+  item,
+  index,
+  sectionLabel,
+}: {
+  item: UniversityShowcase;
+  index: number;
+  sectionLabel: string;
+}) {
+  const hero = item.spreads.find((s) => s.type === "product-hero");
+  const heroImage =
+    hero && hero.type === "product-hero" ? hero.image : undefined;
+
+  return (
+    <section className="overflow-hidden rounded-[1.25rem] border border-[#0F4C45]/12 bg-[#DDE7DE] shadow-[0_12px_28px_rgba(22,43,38,0.05)]">
+      <div className="border-b border-[#0F4C45]/10 px-5 py-4 sm:px-7 sm:py-5">
+        <p className="text-[0.62rem] font-semibold uppercase tracking-[0.24em] text-[#0F4C45]">
+          {sectionLabel} · {String(index + 1).padStart(2, "0")}
+        </p>
+        <h2 className="mt-2 text-[1.35rem] font-extrabold tracking-tight text-[#162b26] sm:text-[1.55rem]">
+          {item.title}
+        </h2>
+        <p className="mt-1.5 text-[0.86rem] leading-6 text-[#4D5D59]">
+          {item.subtitle}
+        </p>
+      </div>
+
+      {heroImage ? (
+        <div className="border-b border-[#0F4C45]/10 bg-[#F7F1E8]">
+          <Image
+            src={heroImage.src}
+            alt={heroImage.alt}
+            width={heroImage.width}
+            height={heroImage.height}
+            className="h-auto w-full object-cover"
+          />
+          {heroImage.caption ? (
+            <p className="px-5 py-3 text-[0.72rem] leading-5 text-[#6A7A76] sm:px-7">
+              {heroImage.caption}
+            </p>
+          ) : null}
+        </div>
+      ) : null}
+
+      <div className="space-y-0 px-5 py-2 sm:px-7 sm:py-3">
+        {item.spreads.map((spread, spreadIndex) => (
+          <ThemeSpread
+            key={`${spread.type}-${spreadIndex}`}
+            spread={spread}
+            skipHeroImage
+          />
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function ThemeSpread({
+  spread,
+  skipHeroImage = false,
+}: {
+  spread: ShowcaseSpread;
+  skipHeroImage?: boolean;
+}) {
+  switch (spread.type) {
+    case "product-hero":
+      if (skipHeroImage) {
+        return spread.subtitle ? (
+          <div className="border-b border-[#0F4C45]/08 py-5 last:border-0">
+            <p className="max-w-[40rem] text-[0.9rem] leading-7 text-[#3E514D]">
+              {spread.subtitle}
+            </p>
+          </div>
+        ) : null;
+      }
+      return null;
+
+    case "prose":
+      return (
+        <div className="border-b border-[#0F4C45]/08 py-5 last:border-0">
+          {spread.eyebrow ? (
+            <p className="text-[0.62rem] font-semibold uppercase tracking-[0.22em] text-[#0F4C45]">
+              {spread.eyebrow}
+            </p>
+          ) : null}
+          <h3
+            className={`text-[1.08rem] font-extrabold tracking-tight text-[#162b26] sm:text-[1.15rem] ${
+              spread.eyebrow ? "mt-2" : ""
+            }`}
+          >
+            {spread.heading}
+          </h3>
+          <div className="mt-3 max-w-[40rem] space-y-3 text-[0.9rem] leading-7 text-[#3E514D]">
+            {spread.body.map((paragraph) => (
+              <p key={paragraph}>{paragraph}</p>
+            ))}
+          </div>
+        </div>
+      );
+
+    case "feature-list":
+      return (
+        <div className="border-b border-[#0F4C45]/08 py-5 last:border-0">
+          <h3 className="text-[1.08rem] font-extrabold tracking-tight text-[#162b26] sm:text-[1.15rem]">
+            {spread.heading}
+          </h3>
+          <ul className="mt-3 space-y-2">
+            {spread.items.map((line) => (
+              <li
+                key={line}
+                className="flex gap-2.5 text-[0.88rem] leading-6 text-[#3E514D]"
+              >
+                <span className="mt-[0.55em] h-1 w-1 shrink-0 rounded-full bg-[#0F4C45]/5" />
+                <span>{line}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      );
+
+    case "duo":
+      return (
+        <div className="border-b border-[#0F4C45]/08 py-5 last:border-0">
+          {spread.eyebrow ? (
+            <p className="text-[0.62rem] font-semibold uppercase tracking-[0.22em] text-[#0F4C45]">
+              {spread.eyebrow}
+            </p>
+          ) : null}
+          {spread.heading ? (
+            <h3
+              className={`text-[1.08rem] font-extrabold tracking-tight text-[#162b26] sm:text-[1.15rem] ${
+                spread.eyebrow ? "mt-2" : ""
+              }`}
+            >
+              {spread.heading}
+            </h3>
+          ) : null}
+          {spread.body?.length ? (
+            <div className="mt-3 max-w-[40rem] space-y-2 text-[0.9rem] leading-7 text-[#3E514D]">
+              {spread.body.map((paragraph) => (
+                <p key={paragraph}>{paragraph}</p>
+              ))}
+            </div>
+          ) : null}
+          <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
+            {spread.images.map((image) => (
+              <figure
+                key={image.src}
+                className="overflow-hidden rounded-[0.85rem] border border-[#0F4C45]/10 bg-[#F7F1E8]"
+              >
+                <Image
+                  src={image.src}
+                  alt={image.alt}
+                  width={image.width}
+                  height={image.height}
+                  className="h-auto w-full object-cover"
+                />
+                {image.caption ? (
+                  <figcaption className="px-3 py-2.5 text-[0.72rem] text-[#6A7A76]">
+                    {image.caption}
+                  </figcaption>
+                ) : null}
+              </figure>
+            ))}
+          </div>
+        </div>
+      );
+
+    case "image-full":
+      return (
+        <div className="border-b border-[#0F4C45]/08 py-5 last:border-0">
+          {spread.eyebrow ? (
+            <p className="text-[0.62rem] font-semibold uppercase tracking-[0.22em] text-[#0F4C45]">
+              {spread.eyebrow}
+            </p>
+          ) : null}
+          {spread.heading ? (
+            <h3
+              className={`text-[1.08rem] font-extrabold tracking-tight text-[#162b26] sm:text-[1.15rem] ${
+                spread.eyebrow ? "mt-2" : ""
+              }`}
+            >
+              {spread.heading}
+            </h3>
+          ) : null}
+          {spread.body?.length ? (
+            <div className="mt-3 max-w-[40rem] space-y-2 text-[0.9rem] leading-7 text-[#3E514D]">
+              {spread.body.map((paragraph) => (
+                <p key={paragraph}>{paragraph}</p>
+              ))}
+            </div>
+          ) : null}
+          <figure className="mt-4 overflow-hidden rounded-[0.85rem] border border-[#0F4C45]/10 bg-[#F7F1E8]">
+            <Image
+              src={spread.image.src}
+              alt={spread.image.alt}
+              width={spread.image.width}
+              height={spread.image.height}
+              className="h-auto w-full object-cover"
+            />
+            {spread.image.caption ? (
+              <figcaption className="px-3 py-2.5 text-[0.72rem] text-[#6A7A76]">
+                {spread.image.caption}
+              </figcaption>
+            ) : null}
+          </figure>
+        </div>
+      );
+
+    default:
+      return null;
+  }
+}
+
+function ShowcaseCard({
+  item,
+  featured = false,
+  index = 0,
+  onOpen,
+}: {
+  item: UniversityShowcase;
+  featured?: boolean;
+  index?: number;
+  onOpen: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onOpen}
+      style={{ animationDelay: `${index * 70}ms` }}
+      className={`group relative flex h-full cursor-pointer flex-col overflow-hidden rounded-[1.25rem] border border-[#0F4C45]/12 bg-[#DDE7DE] text-left shadow-[0_12px_28px_rgba(22,43,38,0.05)] transition duration-300 hover:-translate-y-0.5 hover:shadow-[0_20px_40px_rgba(22,43,38,0.12)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0F4C45] motion-safe:animate-[uniCardIn_0.55s_ease_both] ${
+        featured ? "min-h-[320px] sm:min-h-[380px]" : ""
+      }`}
+    >
+      <div
+        className={`relative overflow-hidden bg-[#F7F1E8] ${
+          featured ? "min-h-[220px] flex-1 sm:min-h-0" : "aspect-[16/10]"
+        }`}
+      >
+        <Image
+          src={item.cardImage.src}
+          alt={item.cardImage.alt}
+          width={item.cardImage.width}
+          height={item.cardImage.height}
+          className="h-full w-full object-cover transition duration-700 ease-out group-hover:scale-[1.04]"
+        />
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[rgba(10,28,24,0.72)] via-[rgba(10,28,24,0.12)] to-transparent opacity-0 transition duration-300 group-hover:opacity-100 group-focus-visible:opacity-100" />
+        {item.preview?.length ? (
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 translate-y-3 p-4 opacity-0 transition duration-300 group-hover:translate-y-0 group-hover:opacity-100 group-focus-visible:translate-y-0 group-focus-visible:opacity-100 sm:p-5">
+            <ul className="space-y-1.5">
+              {item.preview.map((line) => (
+                <li
+                  key={line}
+                  className="flex gap-2 text-[0.74rem] leading-5 text-white/92 sm:text-[0.78rem]"
+                >
+                  <span className="mt-[0.45em] h-1 w-1 shrink-0 rounded-full bg-white/75" />
+                  <span>{line}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ) : null}
+      </div>
+
+      <div
+        className={`relative z-[1] border-t border-[#0F4C45]/08 bg-[#DDE7DE] ${
+          featured ? "p-5 sm:p-6" : "p-4 sm:p-5"
+        }`}
+      >
+        <div className="flex items-center justify-between gap-3">
+          <p className="text-[0.64rem] font-semibold uppercase tracking-[0.2em] text-[#0F4C45]">
+            Open brief
+          </p>
+          <span
+            aria-hidden
+            className="text-[0.85rem] text-[#0F4C45] transition duration-300 group-hover:translate-x-0.5"
+          >
+            →
+          </span>
+        </div>
+        <h2
+          className={`mt-2 font-extrabold leading-snug tracking-tight text-[#162b26] ${
+            featured
+              ? "text-[1.18rem] sm:text-[1.28rem]"
+              : "text-[1.02rem] sm:text-[1.08rem]"
+          }`}
+        >
+          {item.title}
+        </h2>
+        <p
+          className={`mt-2 leading-5 text-[#4D5D59] ${
+            featured ? "text-[0.84rem]" : "text-[0.78rem]"
+          }`}
+        >
+          {item.subtitle}
+        </p>
+      </div>
+    </button>
+  );
+}
+
+export function UniversityShowcase({
+  items = universityShowcases,
+  sectionLabel = "University",
+  className = "mt-8",
+  layout = "grid",
+  columns = 3,
+}: {
+  items?: UniversityShowcase[];
+  sectionLabel?: string;
+  className?: string;
+  layout?: "grid" | "bento";
+  /** Grid column count on sm+ when layout is grid. Use 3 with 2 items to left-align. */
+  columns?: 2 | 3;
+} = {}) {
   const [activeId, setActiveId] = useState<string | null>(null);
   const titleId = useId();
-  const active =
-    universityShowcases.find((item) => item.id === activeId) ?? null;
+  const active = items.find((item) => item.id === activeId) ?? null;
+  const isBento = layout === "bento" && items.length >= 3;
+  const [featured, ...rest] = items;
+  const gridCols =
+    columns === 2 ? "sm:grid-cols-2" : "sm:grid-cols-3";
 
   useEffect(() => {
     if (!active) return;
@@ -445,37 +950,41 @@ export function UniversityShowcase() {
 
   return (
     <>
-      <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-3 sm:gap-5">
-        {universityShowcases.map((item) => (
-          <button
-            key={item.id}
-            type="button"
-            onClick={() => setActiveId(item.id)}
-            className="group cursor-pointer overflow-hidden rounded-[1.25rem] border border-[#0F4C45]/12 bg-[#DDE7DE] text-left shadow-[0_12px_28px_rgba(22,43,38,0.05)] transition hover:-translate-y-0.5 hover:shadow-[0_18px_36px_rgba(22,43,38,0.1)]"
-          >
-            <div className="relative aspect-[4/3] overflow-hidden bg-[#F7F1E8]">
-              <Image
-                src={item.cardImage.src}
-                alt={item.cardImage.alt}
-                width={item.cardImage.width}
-                height={item.cardImage.height}
-                className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]"
-              />
-            </div>
-            <div className="p-4 sm:p-5">
-              <p className="text-[0.64rem] font-semibold uppercase tracking-[0.2em] text-[#0F4C45]">
-                Open brief
-              </p>
-              <h2 className="mt-2 text-[1.02rem] font-extrabold leading-snug tracking-tight text-[#162b26] sm:text-[1.08rem]">
-                {item.title}
-              </h2>
-              <p className="mt-2 text-[0.78rem] leading-5 text-[#4D5D59]">
-                {item.subtitle}
-              </p>
-            </div>
-          </button>
-        ))}
-      </div>
+      {isBento ? (
+        <div
+          className={`${className} grid grid-cols-1 gap-4 lg:grid-cols-2 lg:grid-rows-2 lg:gap-4`}
+        >
+          <div className="lg:row-span-2">
+            <ShowcaseCard
+              item={featured}
+              featured
+              index={0}
+              onOpen={() => setActiveId(featured.id)}
+            />
+          </div>
+          {rest.map((item, index) => (
+            <ShowcaseCard
+              key={item.id}
+              item={item}
+              index={index + 1}
+              onOpen={() => setActiveId(item.id)}
+            />
+          ))}
+        </div>
+      ) : (
+        <div
+          className={`${className} grid grid-cols-1 gap-4 ${gridCols} sm:gap-5`}
+        >
+          {items.map((item, index) => (
+            <ShowcaseCard
+              key={item.id}
+              item={item}
+              index={index}
+              onOpen={() => setActiveId(item.id)}
+            />
+          ))}
+        </div>
+      )}
 
       {active ? (
         <div
@@ -506,7 +1015,7 @@ export function UniversityShowcase() {
             </div>
 
             <div className="overflow-y-auto overscroll-contain rounded-[0.35rem] shadow-[0_30px_90px_rgba(0,0,0,0.35)]">
-              <ShowcaseDocument item={active} />
+              <ShowcaseDocument item={active} sectionLabel={sectionLabel} />
             </div>
           </div>
         </div>

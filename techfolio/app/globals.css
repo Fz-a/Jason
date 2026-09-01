@@ -186,4 +186,19 @@ button,
 	.hero-name-roll__glow {
 		display: none;
 	}
+
+	.motion-safe\:animate-\[uniCardIn_0\.55s_ease_both\] {
+		animation: none !important;
+	}
+}
+
+@keyframes uniCardIn {
+	from {
+		opacity: 0;
+		transform: translate3d(0, 14px, 0);
+	}
+	to {
+		opacity: 1;
+		transform: translate3d(0, 0, 0);
+	}
 }
