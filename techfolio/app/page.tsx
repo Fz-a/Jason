@@ -72,10 +72,12 @@ const projectsTitle = "Mind and Hand.";
 const projectsSubtitle = (
   <>
     Knowing and building in equal measure —
-    <br />
+    <br className="hidden sm:block" />
+    <span className="sm:hidden"> </span>
     guided by systems thinking, driven by hands-on iteration, and bound by one
     rule:
-    <br />
+    <br className="hidden sm:block" />
+    <span className="sm:hidden"> </span>
     understanding only matters when it survives contact with real hardware.
   </>
 );
@@ -336,61 +338,63 @@ export default function Home() {
     <main
       className={`${montserrat.className} min-h-screen bg-[#F7F1E8] text-[#162b26]`}
     >
-      <header className="pointer-events-none fixed inset-x-0 top-0 z-50 px-4 pt-4 sm:px-6 sm:pt-5 lg:px-8">
-        <div className="pointer-events-auto mx-auto flex w-fit items-center justify-center rounded-full border border-[#0F4C45]/15 bg-[#F7F1E8]/92 p-1.5 shadow-[0_14px_40px_rgba(22,43,38,0.08)] backdrop-blur-md">
-          <nav aria-label="Primary">
-            <ul className="flex items-center gap-1">
-              {navItems.map((item) => (
-                <li key={item.href}>
-                  <a
-                    href={item.href}
-                    onClick={(event) => handleNavClick(event, item.href)}
-                    className={`block cursor-pointer rounded-full px-4 py-2 text-[0.8rem] font-semibold transition sm:px-4.5 sm:py-2.5 sm:text-[0.83rem] lg:px-5 lg:py-2.5 lg:text-[0.88rem] ${
-                      activeSection === item.href.slice(1)
-                        ? "bg-[#043439] text-white shadow-[0_10px_24px_rgba(4,52,57,0.22)]"
-                        : "text-[#0F4C45] hover:bg-[#0F4C45]/8"
-                    }`}
-                  >
-                    {item.label}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </nav>
+      <header className="pointer-events-none fixed inset-x-0 top-0 z-50 safe-pt px-3 sm:px-6 sm:pt-5 lg:px-8">
+        <div className="pointer-events-auto mx-auto flex max-w-[calc(100vw-1.5rem)] justify-center sm:max-w-none">
+          <div className="nav-scroll max-w-full overflow-x-auto rounded-full border border-[#0F4C45]/15 bg-[#F7F1E8]/92 p-1 shadow-[0_14px_40px_rgba(22,43,38,0.08)] backdrop-blur-md sm:p-1.5">
+            <nav aria-label="Primary">
+              <ul className="flex w-max items-center gap-0.5 sm:gap-1">
+                {navItems.map((item) => (
+                  <li key={item.href}>
+                    <a
+                      href={item.href}
+                      onClick={(event) => handleNavClick(event, item.href)}
+                      className={`block cursor-pointer rounded-full px-3 py-1.5 text-[0.72rem] font-semibold transition sm:px-4.5 sm:py-2.5 sm:text-[0.83rem] lg:px-5 lg:py-2.5 lg:text-[0.88rem] ${
+                        activeSection === item.href.slice(1)
+                          ? "bg-[#043439] text-white shadow-[0_10px_24px_rgba(4,52,57,0.22)]"
+                          : "text-[#0F4C45] hover:bg-[#0F4C45]/8"
+                      }`}
+                    >
+                      {item.label}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          </div>
         </div>
       </header>
 
       <section
         id="home"
-        className="relative min-h-screen scroll-mt-10 bg-[#F7F1E8] sm:scroll-mt-14"
+        className="relative min-h-[100svh] scroll-mt-10 bg-[#F7F1E8] sm:min-h-screen sm:scroll-mt-14"
       >
-        <div className="mx-auto grid min-h-[calc(100vh-5.5rem)] w-full max-w-[1160px] grid-cols-1 items-center gap-8 px-6 pb-8 pt-20 sm:px-8 sm:py-10 md:px-10 md:py-10 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)] lg:gap-8 lg:px-12 lg:py-10 xl:max-w-[1220px] xl:gap-10 xl:px-14">
-          <div className="mx-auto w-full max-w-[420px] text-left">
-            <div className="mb-3 text-[0.68rem] font-semibold uppercase tracking-[0.28em] text-[#0F4C45] sm:text-[0.74rem] lg:text-[0.8rem]">
+        <div className="mx-auto grid min-h-[calc(100svh-5rem)] w-full max-w-[1160px] grid-cols-1 items-center gap-6 px-5 pb-24 pt-[4.75rem] sm:min-h-[calc(100vh-5.5rem)] sm:gap-8 sm:px-8 sm:py-10 md:px-10 md:py-10 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)] lg:gap-8 lg:px-12 lg:py-10 xl:max-w-[1220px] xl:gap-10 xl:px-14">
+          <div className="order-2 mx-auto w-full max-w-[420px] text-left lg:order-1">
+            <div className="mb-3 text-[0.65rem] font-semibold uppercase tracking-[0.24em] text-[#0F4C45] sm:text-[0.74rem] sm:tracking-[0.28em] lg:text-[0.8rem]">
               <p>Electronic Engineer</p>
-              <p className="mt-1 tracking-[0.22em]">
+              <p className="mt-1 tracking-[0.18em] sm:tracking-[0.22em]">
                 AI · Robotics · Intelligent Hardware
               </p>
             </div>
 
-            <h1 className="text-[2.15rem] font-extrabold leading-[0.95] tracking-tight sm:text-[2.9rem] md:text-[3.5rem] lg:text-[3.9rem] xl:text-[4.35rem]">
+            <h1 className="text-[1.95rem] font-extrabold leading-[0.95] tracking-tight sm:text-[2.9rem] md:text-[3.5rem] lg:text-[3.9rem] xl:text-[4.35rem]">
               <span className="block">Hello</span>
               <span className="hero-name-greeting">
                 I am <HeroNameFlip />
               </span>
             </h1>
 
-            <p className="mt-5 max-w-[28rem] text-[0.96rem] leading-7 text-[#3E514D] lg:text-[1rem] lg:leading-[1.9rem]">
+            <p className="mt-4 max-w-[28rem] text-[0.92rem] leading-7 text-[#3E514D] sm:mt-5 sm:text-[0.96rem] lg:text-[1rem] lg:leading-[1.9rem]">
               I turn ideas into real-world products through hardware, software,
               AI, and robotics.
             </p>
 
-            <div className="mt-7 flex flex-wrap gap-3">
+            <div className="mt-6 flex flex-wrap gap-2.5 sm:mt-7 sm:gap-3">
               <a
                 href="/Brittne%20Valdivia%20-%202026%20SWE%20Resume.docx"
                 target="_blank"
                 rel="noreferrer"
-                className="rounded-full bg-[#043439] px-6 py-2.5 text-sm font-semibold text-white transition hover:opacity-90 lg:px-7 lg:py-3 lg:text-[0.92rem]"
+                className="rounded-full bg-[#043439] px-5 py-2.5 text-sm font-semibold text-white transition hover:opacity-90 sm:px-6 lg:px-7 lg:py-3 lg:text-[0.92rem]"
               >
                 Download Resume
               </a>
@@ -398,7 +402,7 @@ export default function Home() {
               <a
                 href="#contact"
                 onClick={(event) => handleNavClick(event, "#contact")}
-                className="cursor-pointer rounded-full border border-[#0F4C45] px-6 py-2.5 text-sm font-semibold text-[#0F4C45] transition hover:bg-[#0F4C45] hover:text-white lg:px-7 lg:py-3 lg:text-[0.92rem]"
+                className="cursor-pointer rounded-full border border-[#0F4C45] px-5 py-2.5 text-sm font-semibold text-[#0F4C45] transition hover:bg-[#0F4C45] hover:text-white sm:px-6 lg:px-7 lg:py-3 lg:text-[0.92rem]"
               >
                 Contact Me
               </a>
@@ -420,8 +424,8 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="flex items-center justify-center">
-            <div className="relative aspect-square w-full max-w-[300px] overflow-hidden rounded-full bg-white drop-shadow-xl sm:max-w-[380px] md:max-w-[460px] lg:max-w-[560px] xl:max-w-[620px]">
+          <div className="order-1 flex items-center justify-center lg:order-2">
+            <div className="relative aspect-square w-full max-w-[220px] overflow-hidden rounded-full bg-white drop-shadow-xl sm:max-w-[380px] md:max-w-[460px] lg:max-w-[560px] xl:max-w-[620px]">
               <div className="absolute inset-x-0 bottom-0 flex justify-center">
                 <Image
                   src="/avatar2.png"
@@ -436,7 +440,7 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="pointer-events-none absolute inset-x-0 bottom-12 flex justify-center sm:bottom-16">
+        <div className="pointer-events-none absolute inset-x-0 bottom-8 flex justify-center sm:bottom-16">
           <a
             ref={scrollCueRef}
             href="#about"
@@ -518,7 +522,7 @@ export default function Home() {
               Projects
             </p>
 
-            <h2 className="mt-4 whitespace-nowrap text-[2rem] font-extrabold leading-[0.96] tracking-tight sm:text-[2.5rem] lg:text-[3rem]">
+            <h2 className="mt-4 text-[1.85rem] font-extrabold leading-[0.96] tracking-tight sm:whitespace-nowrap sm:text-[2.5rem] lg:text-[3rem]">
               {projectsTitle}
             </h2>
 
@@ -527,15 +531,15 @@ export default function Home() {
             </p>
           </div>
 
-          <div className="mt-8 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4 lg:mt-10 lg:gap-4 xl:gap-4">
+          <div className="mt-8 grid grid-cols-1 gap-3.5 sm:gap-4 md:grid-cols-2 xl:grid-cols-4 lg:mt-10 lg:gap-4 xl:gap-4">
             {projects.map((project) => (
               <Link
                 key={project.slug}
                 href={`/projects/${project.slug}/`}
-                className="group block w-full cursor-pointer rounded-[1.05rem] border border-[#0F4C45]/12 bg-[#F7F1E8] p-3.5 text-center shadow-[0_14px_28px_rgba(22,43,38,0.05)] transition duration-200 hover:-translate-y-1 hover:border-[#0F4C45]/22 hover:shadow-[0_18px_34px_rgba(22,43,38,0.08)] sm:p-4"
+                className="group block w-full cursor-pointer rounded-[1.05rem] border border-[#0F4C45]/12 bg-[#F7F1E8] p-3 text-left shadow-[0_14px_28px_rgba(22,43,38,0.05)] transition duration-200 hover:-translate-y-1 hover:border-[#0F4C45]/22 hover:shadow-[0_18px_34px_rgba(22,43,38,0.08)] sm:p-4 sm:text-center"
               >
                 <div className="mb-3 overflow-hidden rounded-[0.9rem] bg-[#EEF3EE]">
-                  <div className="relative h-[120px] sm:h-[140px] xl:h-[155px]">
+                  <div className="relative h-[160px] sm:h-[140px] xl:h-[155px]">
                     {project.cardImage ? (
                       <Image
                         src={project.cardImage.src}
@@ -554,14 +558,14 @@ export default function Home() {
                   </div>
                 </div>
 
-                <h3 className="text-[0.95rem] font-extrabold tracking-tight text-[#162b26] transition-colors duration-200 group-hover:text-[#0F4C45] sm:text-[1rem]">
+                <h3 className="text-[1rem] font-extrabold tracking-tight text-[#162b26] transition-colors duration-200 group-hover:text-[#0F4C45] sm:text-[1rem]">
                   {project.title}
                 </h3>
-                <p className="mt-2 text-[0.72rem] leading-5 text-[#3E514D] sm:text-[0.76rem]">
+                <p className="mt-2 text-[0.78rem] leading-5 text-[#3E514D] sm:text-[0.76rem]">
                   {project.cardSummary}
                 </p>
 
-                <div className="mt-3 flex flex-wrap justify-center gap-1.5">
+                <div className="mt-3 flex flex-wrap justify-start gap-1.5 sm:justify-center">
                   {project.tags.map((tag) => (
                     <span
                       key={tag}

@@ -53,15 +53,15 @@ export default async function ProjectDetailPage({
     <main
       className={`${montserrat.className} min-h-screen bg-[#F7F1E8] text-[#162b26]`}
     >
-      <div className="sticky top-0 z-50">
-        <div className="mx-auto w-full max-w-[980px] px-4 sm:px-6 md:px-8 lg:px-10">
-          <div className="pt-4 sm:pt-5">
+      <div className="sticky top-0 z-50 safe-pt">
+        <div className="mx-auto w-full max-w-[980px] px-3 sm:px-6 md:px-8 lg:px-10">
+          <div className="pt-3 sm:pt-5">
             <div className="flex justify-center">
-              <div className="mx-auto flex w-fit flex-wrap items-center justify-center gap-1 rounded-full border border-[#0F4C45]/12 bg-[#F7F1E8] p-1.5 shadow-[0_12px_28px_rgba(22,43,38,0.06)]">
+              <div className="nav-scroll mx-auto flex w-max max-w-[calc(100vw-1.5rem)] items-center gap-0.5 overflow-x-auto rounded-full border border-[#0F4C45]/12 bg-[#F7F1E8]/95 p-1 shadow-[0_12px_28px_rgba(22,43,38,0.06)] backdrop-blur-md sm:gap-1 sm:p-1.5">
                 <Link
                   href="/"
                   aria-label="Home"
-                  className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full text-[#0F4C45] transition hover:bg-[#0F4C45]/8"
+                  className="flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-full text-[#0F4C45] transition hover:bg-[#0F4C45]/8 sm:h-10 sm:w-10"
                 >
                   <HomeIcon />
                 </Link>
@@ -69,7 +69,7 @@ export default async function ProjectDetailPage({
                   <Link
                     key={navProject.slug}
                     href={`/projects/${navProject.slug}/`}
-                    className={`cursor-pointer rounded-full px-3.5 py-2 text-[0.72rem] font-semibold transition sm:px-4 sm:text-[0.78rem] ${
+                    className={`shrink-0 cursor-pointer rounded-full px-2.5 py-1.5 text-[0.68rem] font-semibold transition sm:px-4 sm:py-2 sm:text-[0.78rem] ${
                       navProject.slug === project.slug
                         ? "bg-[#043439] text-white shadow-[0_10px_24px_rgba(4,52,57,0.2)]"
                         : "text-[#0F4C45] hover:bg-[#0F4C45]/8"
@@ -84,7 +84,7 @@ export default async function ProjectDetailPage({
         </div>
       </div>
 
-      <div className="mx-auto w-full max-w-[980px] px-4 py-6 sm:px-6 sm:py-8 md:px-8 lg:px-10 lg:py-9">
+      <div className="mx-auto w-full max-w-[980px] px-4 py-5 sm:px-6 sm:py-8 md:px-8 lg:px-10 lg:py-9">
         {project.links?.length ? (
           <div className="flex flex-wrap gap-3">
             {project.links.map((link) => (
