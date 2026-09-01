@@ -854,22 +854,7 @@ function ShowcaseCard({
           height={item.cardImage.height}
           className="h-full w-full object-cover transition duration-700 ease-out group-hover:scale-[1.04]"
         />
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[rgba(10,28,24,0.72)] via-[rgba(10,28,24,0.12)] to-transparent opacity-0 transition duration-300 group-hover:opacity-100 group-focus-visible:opacity-100" />
-        {item.preview?.length ? (
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 translate-y-3 p-4 opacity-0 transition duration-300 group-hover:translate-y-0 group-hover:opacity-100 group-focus-visible:translate-y-0 group-focus-visible:opacity-100 sm:p-5">
-            <ul className="space-y-1.5">
-              {item.preview.map((line) => (
-                <li
-                  key={line}
-                  className="flex gap-2 text-[0.74rem] leading-5 text-white/92 sm:text-[0.78rem]"
-                >
-                  <span className="mt-[0.45em] h-1 w-1 shrink-0 rounded-full bg-white/75" />
-                  <span>{line}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        ) : null}
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[rgba(10,28,24,0.55)] via-[rgba(10,28,24,0.08)] to-transparent opacity-0 transition duration-300 group-hover:opacity-100 group-focus-visible:opacity-100" />
       </div>
 
       <div
