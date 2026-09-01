@@ -1,5 +1,6 @@
 import Image from "next/image";
 import type { ProjectDetail, ProjectDetailBlock, ProjectImage } from "./project-data";
+import { UniversityShowcase } from "./UniversityShowcase";
 
 function ProjectImageFigure({
   image,
@@ -178,6 +179,8 @@ function BlockRenderer({ block }: { block: ProjectDetailBlock }) {
 }
 
 export function ExperienceDetail({ project }: { project: ProjectDetail }) {
+  const isUniversity = project.slug === "university";
+
   return (
     <>
       <header className="mt-7 max-w-[720px]">
@@ -205,11 +208,15 @@ export function ExperienceDetail({ project }: { project: ProjectDetail }) {
         ))}
       </div>
 
-      <div className="mt-8 space-y-8">
-        {project.blocks.map((block, index) => (
-          <BlockRenderer key={`${block.type}-${index}`} block={block} />
-        ))}
-      </div>
+      {isUniversity ? (
+        <UniversityShowcase />
+      ) : (
+        <div className="mt-8 space-y-8">
+          {project.blocks.map((block, index) => (
+            <BlockRenderer key={`${block.type}-${index}`} block={block} />
+          ))}
+        </div>
+      )}
     </>
   );
 }

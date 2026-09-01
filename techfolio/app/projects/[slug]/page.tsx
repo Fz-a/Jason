@@ -1,9 +1,33 @@
-import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Montserrat } from "next/font/google";
 import { ExperienceDetail } from "../ExperienceDetail";
 import { getProjectBySlug, projects } from "../project-data";
+
+function HomeIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      aria-hidden="true"
+      className="h-[1.05rem] w-[1.05rem]"
+    >
+      <path
+        d="M3.5 10.8 12 3.8l8.5 7v9.4a1.3 1.3 0 0 1-1.3 1.3H5.8a1.3 1.3 0 0 1-1.3-1.3v-9.4Z"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M9.2 21.5v-6.2h5.6v6.2"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
 
 const montserrat = Montserrat({
   subsets: ["latin"],
@@ -39,13 +63,7 @@ export default async function ProjectDetailPage({
                   aria-label="Home"
                   className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full text-[#0F4C45] transition hover:bg-[#0F4C45]/8"
                 >
-                  <Image
-                    src="/home.png"
-                    alt=""
-                    width={18}
-                    height={18}
-                    className="h-[1.05rem] w-[1.05rem] object-contain"
-                  />
+                  <HomeIcon />
                 </Link>
                 {projects.map((navProject) => (
                   <Link

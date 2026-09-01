@@ -65,91 +65,17 @@ export const projects: ProjectDetail[] = [
 		title: "University",
 		shortTitle: "University",
 		summary:
-			"Electronic Information Engineering at Guangzhou Software Institute — top 5% of my major, hands-on team projects, and 20+ national and provincial awards across embedded systems, PCB design, and robotics.",
+			"Three long-form briefs from campus work — Smart Clothes for Elderly, Early Fire Warning System, and the Robotman team. Click a card to open the centered folio.",
 		cardSummary:
-			"Electronic Information Engineering at Guangzhou Software Institute, top 5%. Led teams on smart wearables and ROS fire-warning systems—PCB, firmware, and pitch decks included. 20+ national and provincial awards.",
+			"Campus projects in long-form briefs: smart wearables, ROS fire warning, and the Robotman team—open each card for the full story.",
 		cardImage: {
-			src: "/experience/university/awards.webp",
-			alt: "National and provincial competition awards with STM32 and deep-learning prototypes",
+			src: "/experience/university/team-model.webp",
+			alt: "University team with smart-city model project",
 			width: 1600,
 			height: 900,
 		},
-		tags: ["Embedded", "PCB", "ROS", "Awards"],
-		blocks: [
-			{
-				type: "text",
-				title: "Academic Foundation",
-				body: [
-					"I studied Electronic Information Engineering at Guangzhou Software Institute with a 3.3 GPA, ranking in the top 5% of my major.",
-					"Core coursework included circuit analysis, analog electronics, digital logic, embedded systems, and signal processing — building the theoretical base I later applied in competition and industry projects.",
-				],
-			},
-			{
-				type: "split-list-image",
-				title: "Team Projects",
-				intro:
-					"Beyond coursework, I led student teams on full-stack hardware projects from concept through demo:",
-				items: [
-					"Elderly-friendly smart apparel — embedded sensing, firmware, and user-centered design",
-					"ROS-based early fire-warning system — sensor fusion, edge alerts, and system integration",
-					"PCB schematic and layout, bring-up, and cross-disciplinary coordination",
-					"Pitch decks, documentation, and competition submissions",
-				],
-				image: {
-					src: "/experience/university/smart-apparel.webp",
-					alt: "Elderly-friendly smart apparel project",
-					width: 1600,
-					height: 900,
-					caption: "Smart apparel prototype — embedded sensing and firmware integration.",
-				},
-			},
-			{
-				type: "two-column",
-				left: {
-					title: "Fire-Warning System",
-					body: [
-						"Our ROS-based early fire-warning system combined distributed sensing with edge alerts, pushing me to think about reliability, latency, and how software middleware meets real hardware constraints.",
-					],
-				},
-				right: {
-					title: "Campus Recognition",
-					body: [
-						"I served as drone workstation outreach lead and helped teams earn 20+ national and provincial awards — experience that shaped how I communicate technical work to judges and non-engineers alike.",
-					],
-				},
-			},
-			{
-				type: "figure",
-				image: {
-					src: "/experience/university/fire-warning.webp",
-					alt: "ROS-based early fire-warning system",
-					width: 1600,
-					height: 900,
-					caption: "Early fire-warning system — ROS middleware and sensor integration.",
-				},
-			},
-			{
-				type: "gallery",
-				title: "Competition & Exhibition",
-				columns: 2,
-				images: [
-					{
-						src: "/experience/university/expo.webp",
-						alt: "Project exhibition and competition presentation",
-						width: 1600,
-						height: 900,
-						caption: "Competition demo and exhibition setup.",
-					},
-					{
-						src: "/experience/university/smart-apparel.webp",
-						alt: "Smart apparel hardware prototype",
-						width: 1600,
-						height: 900,
-						caption: "Wearable hardware bring-up and iteration.",
-					},
-				],
-			},
-		],
+		tags: ["Wearable", "ROS", "Team", "Competitions"],
+		blocks: [],
 	},
 	{
 		slug: "work",
