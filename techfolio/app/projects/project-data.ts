@@ -99,7 +99,7 @@ export const projects: ProjectDetail[] = [
 		title: "Society",
 		shortTitle: "Society",
 		summary:
-			"Volunteering, maker meetings, and exhibitions — scroll the page; no cards to open. Exhibition product photos for the helmet live under Venture.",
+			"Volunteering, maker meetings, and exhibitions — scroll the page; no cards to open. Helmet exhibition stills live under MAKE.",
 		cardSummary:
 			"Volunteer work, maker meetings (星火 / 柴火), and exhibitions — scroll down.",
 		cardImage: {
@@ -112,20 +112,20 @@ export const projects: ProjectDetail[] = [
 		blocks: [],
 	},
 	{
-		slug: "venture",
-		title: "Venture",
-		shortTitle: "Venture",
+		slug: "make",
+		title: "MAKE",
+		shortTitle: "MAKE",
 		summary:
-			"Smart Helmet — scroll the full venture brief, including exhibition and booth moments for the product.",
+			"Things I invent and build myself — Smart Helmet first, with DIY electronics projects to follow. Scroll the full MAKE brief.",
 		cardSummary:
-			"Smart Helmet venture — full scroll brief with exhibition / booth stills.",
+			"MAKE — Smart Helmet and upcoming DIY electronics builds from the workbench.",
 		cardImage: {
 			src: "/experience/society/maker-faire.webp",
-			alt: "Smart helmet venture exhibition demo",
+			alt: "MAKE — smart helmet exhibition demo",
 			width: 1600,
 			height: 900,
 		},
-		tags: ["Helmet", "Wearable", "Startup", "Hardware"],
+		tags: ["Helmet", "DIY", "Electronics", "Hardware"],
 		blocks: [],
 	},
 ];

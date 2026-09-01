@@ -1,5 +1,6 @@
 import Image from "next/image";
 import type { ProjectDetail, ProjectDetailBlock, ProjectImage } from "./project-data";
+import { makeShowcases } from "./make-showcases";
 import { societyShowcases } from "./society-showcases";
 import {
   universityDepartmentShowcases,
@@ -9,7 +10,6 @@ import {
   ShowcaseInlineFeed,
   UniversityShowcase,
 } from "./UniversityShowcase";
-import { ventureShowcases } from "./venture-showcases";
 import { WorkInternships } from "./WorkInternships";
 import { workCompanyIntro, workShowcases } from "./work-showcases";
 
@@ -237,7 +237,7 @@ export function ExperienceDetail({ project }: { project: ProjectDetail }) {
   const isUniversity = project.slug === "university";
   const isWork = project.slug === "work";
   const isSociety = project.slug === "society";
-  const isVenture = project.slug === "venture";
+  const isMake = project.slug === "make";
 
   return (
     <>
@@ -303,10 +303,10 @@ export function ExperienceDetail({ project }: { project: ProjectDetail }) {
           items={societyShowcases}
           sectionLabel="Society"
         />
-      ) : isVenture ? (
+      ) : isMake ? (
         <ShowcaseInlineFeed
-          items={ventureShowcases}
-          sectionLabel="Venture"
+          items={makeShowcases}
+          sectionLabel="MAKE"
         />
       ) : (
         <div className="mt-8 space-y-8">

@@ -6,6 +6,7 @@ import Link from "next/link";
 import { Montserrat } from "next/font/google";
 import { useEffect, useRef, useState } from "react";
 import { HeroNameFlip } from "./components/HeroNameFlip";
+import { HomeScrollPreloader } from "./components/HomeScrollPreloader";
 import { projects } from "./projects/project-data";
 
 const montserrat = Montserrat({
@@ -338,6 +339,7 @@ export default function Home() {
     <main
       className={`${montserrat.className} min-h-screen bg-[#F7F1E8] text-[#162b26]`}
     >
+      <HomeScrollPreloader />
       <header className="pointer-events-none fixed inset-x-0 top-0 z-50 safe-pt px-3 sm:px-6 sm:pt-5 lg:px-8">
         <div className="pointer-events-auto mx-auto flex max-w-[calc(100vw-1.5rem)] justify-center sm:max-w-none">
           <div className="nav-scroll max-w-full overflow-x-auto rounded-full border border-[#0F4C45]/15 bg-[#F7F1E8]/92 p-1 shadow-[0_14px_40px_rgba(22,43,38,0.08)] backdrop-blur-md sm:p-1.5">
@@ -391,7 +393,8 @@ export default function Home() {
 
             <div className="mt-6 flex flex-wrap gap-2.5 sm:mt-7 sm:gap-3">
               <a
-                href="/Brittne%20Valdivia%20-%202026%20SWE%20Resume.docx"
+                href="/Jason-Chen-Resume.pdf"
+                download="Jason-Chen-Resume.pdf"
                 target="_blank"
                 rel="noreferrer"
                 className="rounded-full bg-[#043439] px-5 py-2.5 text-sm font-semibold text-white transition hover:opacity-90 sm:px-6 lg:px-7 lg:py-3 lg:text-[0.92rem]"
@@ -596,9 +599,9 @@ export default function Home() {
             </h2>
 
             <p className="mt-4 max-w-[31rem] text-[0.88rem] leading-6.5 text-[#3E514D] lg:text-[0.94rem] lg:leading-[1.72rem]">
-              I’m always interested in opportunities involving front-end
-              development, user-focused design, accessibility, and creative
-              digital problem-solving.
+              I’m always interested in opportunities involving intelligent
+              hardware, embedded systems, robotics, and hands-on making — and in
+              conversations that help those ideas grow.
             </p>
 
             <div className="mt-6 flex flex-wrap gap-2.5">
@@ -624,15 +627,21 @@ export default function Home() {
                   </span>
 
                   <div>
-                  <p className="text-[0.66rem] font-semibold uppercase tracking-[0.22em] text-[#6B7B77]">
-                    Email
-                  </p>
-                  <a
-                    href="mailto:2260032001@student.must.edu.mo"
-                    className="mt-1.5 inline-block text-[0.9rem] font-semibold text-[#162b26] transition hover:text-[#0F4C45] sm:text-[0.95rem]"
-                  >
-                    2260032001@student.must.edu.mo
-                  </a>
+                    <p className="text-[0.66rem] font-semibold uppercase tracking-[0.22em] text-[#6B7B77]">
+                      Email
+                    </p>
+                    <a
+                      href="mailto:2260032001@student.must.edu.mo"
+                      className="mt-1.5 block text-[0.9rem] font-semibold text-[#162b26] transition hover:text-[#0F4C45] sm:text-[0.95rem]"
+                    >
+                      2260032001@student.must.edu.mo
+                    </a>
+                    <a
+                      href="mailto:1106467336@qq.com"
+                      className="mt-1.5 block text-[0.9rem] font-semibold text-[#162b26] transition hover:text-[#0F4C45] sm:text-[0.95rem]"
+                    >
+                      1106467336@qq.com
+                    </a>
                   </div>
                 </div>
 

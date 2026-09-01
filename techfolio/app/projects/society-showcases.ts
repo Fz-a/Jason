@@ -2,7 +2,7 @@ import type { UniversityShowcase } from "./university-showcases";
 
 export type SocietyShowcase = UniversityShowcase;
 
-/** Society = volunteering + maker meetings + exhibitions (text). Exhibition photos live under Venture. */
+/** Society = volunteering + maker meetings + exhibitions (text). Helmet exhibition photos live under MAKE. */
 export const societyShowcases: SocietyShowcase[] = [
 	{
 		id: "volunteering",
@@ -111,7 +111,7 @@ export const societyShowcases: SocietyShowcase[] = [
 				heading: "Exhibitions & art shows",
 				body: [
 					"I also go to art exhibitions and public shows — watching how work is staged for non-specialist audiences, and how a piece holds attention in a room.",
-					"Photo documentation for this thread will come later; the venture / helmet exhibition stills live under Venture.",
+					"Photo documentation for this thread will come later; helmet exhibition stills live under MAKE.",
 				],
 			},
 			{
@@ -120,7 +120,7 @@ export const societyShowcases: SocietyShowcase[] = [
 				items: [
 					"Attend art and public exhibitions",
 					"Study how work is framed for general audiences",
-					"Keep society activity separate from the venture product story",
+					"Keep society activity separate from the MAKE product story",
 				],
 			},
 		],
