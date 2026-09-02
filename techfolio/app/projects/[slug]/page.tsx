@@ -2,7 +2,12 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Montserrat } from "next/font/google";
 import { ExperienceDetail } from "../ExperienceDetail";
-import { getProjectBySlug, projects } from "../project-data";
+import { ProjectContinue } from "../ProjectContinue";
+import {
+  getNextProject,
+  getProjectBySlug,
+  projects,
+} from "../project-data";
 
 function HomeIcon() {
   return (
@@ -48,6 +53,8 @@ export default async function ProjectDetailPage({
   if (!project) {
     notFound();
   }
+
+  const next = getNextProject(project.slug);
 
   return (
     <main
@@ -102,6 +109,7 @@ export default async function ProjectDetailPage({
         ) : null}
 
         <ExperienceDetail project={project} />
+        <ProjectContinue next={next} />
       </div>
 
       <footer className="border-t border-[#0F4C45]/10 bg-[#F7F1E8]">

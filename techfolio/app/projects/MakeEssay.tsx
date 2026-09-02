@@ -184,10 +184,6 @@ export function MakeEssay() {
 
 					return null;
 				})}
-
-				<p className="mt-12 border-t border-[#0F4C45]/10 pt-8 text-center text-[0.64rem] font-medium tracking-[0.18em] text-[#8A9692]">
-					End of MAKE
-				</p>
 			</div>
 		</div>
 	);

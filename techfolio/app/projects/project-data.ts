@@ -133,3 +133,10 @@ export const projects: ProjectDetail[] = [
 export function getProjectBySlug(slug: string) {
 	return projects.find((project) => project.slug === slug);
 }
+
+/** Sequential chapter order: University → Work → Society → MAKE → home */
+export function getNextProject(slug: string) {
+	const index = projects.findIndex((project) => project.slug === slug);
+	if (index < 0 || index >= projects.length - 1) return null;
+	return projects[index + 1] ?? null;
+}

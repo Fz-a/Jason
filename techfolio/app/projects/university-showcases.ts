@@ -514,10 +514,10 @@ export const universityDepartmentShowcases: UniversityShowcase[] = [
 			"Coordination with instructors and peers",
 		],
 		cardImage: {
-			src: "/experience/society/volunteer.webp",
-			alt: "National Defense Education cadre campus service",
-			width: 1600,
-			height: 900,
+			src: "/experience/university/defense/team-group.webp",
+			alt: "国防教育教导队 group portrait on campus steps",
+			width: 1024,
+			height: 768,
 		},
 		spreads: [
 			{
@@ -527,11 +527,11 @@ export const universityDepartmentShowcases: UniversityShowcase[] = [
 				subtitle:
 					"National Defense Education Teaching Team — campus duty, drills, and ceremony support with the cadre.",
 				image: {
-					src: "/experience/society/volunteer.webp",
-					alt: "Defense education team campus activity",
-					width: 1600,
-					height: 900,
-					caption: "Campus duty — defense education cadre.",
+					src: "/experience/university/defense/team-group.webp",
+					alt: "国防教育教导队 full team with flag",
+					width: 1024,
+					height: 768,
+					caption: "Team portrait — campus steps",
 				},
 			},
 			{
@@ -542,6 +542,60 @@ export const universityDepartmentShowcases: UniversityShowcase[] = [
 					"In the National Defense Education Teaching Team I took part in organized campus service — drills, ceremony support, and day-to-day coordination with the team.",
 					"The role taught discipline, clear communication under schedule pressure, and how to work as one unit with instructors and classmates.",
 				],
+			},
+			{
+				type: "split",
+				heading: "Recognition",
+				imageSide: "right",
+				body: [
+					"Formal moments with the cadre — certificates, shared standards, and showing up when the schedule is public.",
+				],
+				image: {
+					src: "/experience/university/defense/certificate.webp",
+					alt: "Holding an award certificate in the yellow cadre vest",
+					width: 1024,
+					height: 768,
+					caption: "Certificate — yellow vest duty",
+				},
+			},
+			{
+				type: "duo",
+				eyebrow: "03 · On duty",
+				heading: "Documenting and speaking",
+				body: [
+					"Field documentation and classroom briefings — two sides of the same team rhythm.",
+				],
+				images: [
+					{
+						src: "/experience/university/defense/photographer.webp",
+						alt: "Documenting a campus activity with a DSLR",
+						width: 1024,
+						height: 683,
+						caption: "Field — documenting the day",
+					},
+					{
+						src: "/experience/university/defense/presentation.webp",
+						alt: "Presenting to the team with a microphone",
+						width: 1024,
+						height: 682,
+						caption: "Briefing — speaking for the team",
+					},
+				],
+			},
+			{
+				type: "image-full",
+				eyebrow: "04 · Cadre",
+				heading: "Together off-duty",
+				body: [
+					"The quieter frame after the drills — the same people, still one unit.",
+				],
+				image: {
+					src: "/experience/university/defense/team-cake.webp",
+					alt: "Team celebration with cake and shared gesture",
+					width: 1024,
+					height: 682,
+					caption: "Cadre — celebration indoors",
+				},
 			},
 			{
 				type: "feature-list",
@@ -564,10 +618,10 @@ export const universityDepartmentShowcases: UniversityShowcase[] = [
 			"Making UAVs approachable on campus",
 		],
 		cardImage: {
-			src: "/experience/university/team-model.webp",
-			alt: "Drone workstation outreach activity",
-			width: 1600,
-			height: 900,
+			src: "/experience/university/drone/workshop.webp",
+			alt: "Students assembling a drone at the workstation bench",
+			width: 1024,
+			height: 768,
 		},
 		spreads: [
 			{
@@ -575,13 +629,13 @@ export const universityDepartmentShowcases: UniversityShowcase[] = [
 				kicker: "01 · Department",
 				title: "无人机工作站",
 				subtitle:
-					"Drone workstation — publicity, safety-minded demos, and campus outreach around UAVs.",
+					"Drone workstation — bench builds, safety-minded demos, and campus outreach around UAVs.",
 				image: {
-					src: "/experience/university/team-model.webp",
-					alt: "Drone workstation public engagement",
-					width: 1600,
-					height: 900,
-					caption: "Outreach — drone workstation presence.",
+					src: "/experience/university/drone/workshop.webp",
+					alt: "Team soldering and assembling a quadcopter on the blue bench",
+					width: 1024,
+					height: 768,
+					caption: "Bench — drone build in progress",
 				},
 			},
 			{
@@ -592,6 +646,51 @@ export const universityDepartmentShowcases: UniversityShowcase[] = [
 					"At the drone workstation I helped with publicity and public-facing work — introducing flight safety, demos, and how the team presents robotics to a wider campus audience.",
 					"It connected engineering practice with outreach: explain carefully, keep people safe, and make UAVs approachable without dumbing them down.",
 				],
+			},
+			{
+				type: "split",
+				heading: "Hands on the airframe",
+				imageSide: "right",
+				body: [
+					"Close work on the frame — soldering, wiring, and the quiet focus of a shared workbench.",
+				],
+				image: {
+					src: "/experience/university/drone/soldering-close.webp",
+					alt: "Close-up of soldering a drone power board",
+					width: 1024,
+					height: 1024,
+					caption: "Detail — soldering the board",
+				},
+			},
+			{
+				type: "split",
+				heading: "Speaking for the station",
+				imageSide: "left",
+				body: [
+					"Public-facing briefings for the drone industry–academia center — turning bench work into a clear story for classmates and visitors.",
+				],
+				image: {
+					src: "/experience/university/drone/presentation.webp",
+					alt: "Presenting drone workstation materials at the podium",
+					width: 1024,
+					height: 768,
+					caption: "Briefing — workstation presentation",
+				},
+			},
+			{
+				type: "image-full",
+				eyebrow: "03 · Team",
+				heading: "The people behind the frames",
+				body: [
+					"The workstation is a crew first — then the drones.",
+				],
+				image: {
+					src: "/experience/university/drone/team.webp",
+					alt: "Drone workstation team group photo in the classroom",
+					width: 1024,
+					height: 768,
+					caption: "Team — workstation crew",
+				},
 			},
 			{
 				type: "feature-list",
