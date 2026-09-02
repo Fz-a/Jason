@@ -1,15 +1,12 @@
 import Image from "next/image";
 import type { ProjectDetail, ProjectDetailBlock, ProjectImage } from "./project-data";
-import { makeShowcases } from "./make-showcases";
-import { societyShowcases } from "./society-showcases";
+import { MakeEssay } from "./MakeEssay";
+import { SocietyEssay } from "./SocietyEssay";
 import {
   universityDepartmentShowcases,
   universityProjectShowcases,
 } from "./university-showcases";
-import {
-  ShowcaseInlineFeed,
-  UniversityShowcase,
-} from "./UniversityShowcase";
+import { UniversityShowcase } from "./UniversityShowcase";
 import { WorkInternships } from "./WorkInternships";
 import { workCompanyIntro, workShowcases } from "./work-showcases";
 
@@ -299,15 +296,9 @@ export function ExperienceDetail({ project }: { project: ProjectDetail }) {
           <WorkInternships />
         </>
       ) : isSociety ? (
-        <ShowcaseInlineFeed
-          items={societyShowcases}
-          sectionLabel="Society"
-        />
+        <SocietyEssay />
       ) : isMake ? (
-        <ShowcaseInlineFeed
-          items={makeShowcases}
-          sectionLabel="MAKE"
-        />
+        <MakeEssay />
       ) : (
         <div className="mt-8 space-y-8">
           {project.blocks.map((block, index) => (

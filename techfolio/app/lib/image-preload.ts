@@ -1,6 +1,6 @@
-import { makeShowcases } from "../projects/make-showcases";
+import { makeEssay } from "../projects/make-essay";
 import { projects } from "../projects/project-data";
-import { societyShowcases } from "../projects/society-showcases";
+import { societyEssay } from "../projects/society-essay";
 import {
 	universityAllShowcases,
 	type UniversityShowcase,
@@ -39,6 +39,32 @@ function collectShowcaseHeroes(items: UniversityShowcase[], limitPerItem = 2) {
 	return urls;
 }
 
+function collectSocietyEssayUrls() {
+	const urls: string[] = [];
+	for (const block of societyEssay) {
+		if (block.type === "chapter" && block.image) {
+			pushUnique(urls, block.image.src);
+		}
+		if (block.type === "duo-exhibit") {
+			for (const image of block.images) pushUnique(urls, image.src);
+		}
+	}
+	return urls;
+}
+
+function collectMakeEssayUrls() {
+	const urls: string[] = [];
+	for (const block of makeEssay) {
+		if (block.type === "helmet") {
+			for (const image of block.images) pushUnique(urls, image.src);
+		}
+		if (block.type === "diy-wall") {
+			for (const item of block.items) pushUnique(urls, item.image.src);
+		}
+	}
+	return urls;
+}
+
 /** Homepage project cards — warm these first while scrolling. */
 export function getHomeCardImageUrls(): string[] {
 	const urls: string[] = [];
@@ -64,10 +90,10 @@ export function getDetailWarmImageUrls(): string[] {
 	for (const src of collectShowcaseHeroes(workShowcases, 2)) {
 		pushUnique(urls, src);
 	}
-	for (const src of collectShowcaseHeroes(societyShowcases, 2)) {
+	for (const src of collectSocietyEssayUrls()) {
 		pushUnique(urls, src);
 	}
-	for (const src of collectShowcaseHeroes(makeShowcases, 3)) {
+	for (const src of collectMakeEssayUrls()) {
 		pushUnique(urls, src);
 	}
 	for (const item of workInternships) {
@@ -82,12 +108,7 @@ export function getDetailDeepImageUrls(): string[] {
 	const urls: string[] = [];
 	const warm = new Set(getDetailWarmImageUrls());
 
-	const pools = [
-		...universityAllShowcases,
-		...workShowcases,
-		...societyShowcases,
-		...makeShowcases,
-	];
+	const pools = [...universityAllShowcases, ...workShowcases];
 
 	for (const item of pools) {
 		for (const spread of item.spreads) {

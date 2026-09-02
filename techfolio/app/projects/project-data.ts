@@ -99,16 +99,16 @@ export const projects: ProjectDetail[] = [
 		title: "Society",
 		shortTitle: "Society",
 		summary:
-			"Volunteering, maker meetings, and exhibitions — scroll the page; no cards to open. Helmet exhibition stills live under MAKE.",
+			"One continuous scroll — volunteering (certificate, service, 抗疫), Jia Lichuan’s Xinghuo HUBDAY, Chaihuo Fab Lab, then low-altitude UAV and robot exhibitions.",
 		cardSummary:
-			"Volunteer work, maker meetings (星火 / 柴火), and exhibitions — scroll down.",
+			"Volunteer service, Xinghuo & Chaihuo, low-altitude UAV and robot exhibitions — one Society scroll.",
 		cardImage: {
-			src: "/experience/society/chaihuo.webp",
-			alt: "Chaihuo maker community exchange",
-			width: 1600,
+			src: "/experience/society/volunteer-guide.webp",
+			alt: "Campus volunteering",
+			width: 1200,
 			height: 900,
 		},
-		tags: ["Volunteer", "Maker", "Exhibition"],
+		tags: ["Volunteer", "Xinghuo", "Chaihuo", "Exhibition"],
 		blocks: [],
 	},
 	{
@@ -116,11 +116,11 @@ export const projects: ProjectDetail[] = [
 		title: "MAKE",
 		shortTitle: "MAKE",
 		summary:
-			"Things I invent and build myself — Smart Helmet first, with DIY electronics projects to follow. Scroll the full MAKE brief.",
+			"Smart Helmet first — exhibition and booth — then nine DIY builds in a modular editorial collage.",
 		cardSummary:
-			"MAKE — Smart Helmet and upcoming DIY electronics builds from the workbench.",
+			"MAKE — Smart Helmet plus nine DIY electronics from the workbench.",
 		cardImage: {
-			src: "/experience/society/maker-faire.webp",
+			src: "/experience/make/helmet-show.webp",
 			alt: "MAKE — smart helmet exhibition demo",
 			width: 1600,
 			height: 900,
