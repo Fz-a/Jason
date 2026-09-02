@@ -7,13 +7,11 @@ export type MakeImage = {
 	fit?: "cover" | "contain";
 };
 
-export type MakeDiySlot = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
-
 export type MakeDiyItem = {
 	id: string;
-	slot: MakeDiySlot;
 	title: string;
 	titleZh: string;
+	year: string;
 	image: MakeImage;
 };
 
@@ -31,7 +29,7 @@ export type MakeEssayBlock =
 			titleZh: string;
 			pull: string;
 			body: string[];
-			images: [MakeImage, MakeImage];
+			images: MakeImage[];
 	  }
 	| {
 			type: "diy-wall";
@@ -48,7 +46,7 @@ export const makeEssay: MakeEssayBlock[] = [
 		kicker: "MAKE · Workbench",
 		title: "Things I invent and build myself",
 		lede:
-			"Helmet first — from bench prototype to public show and roadside booth. Then nine builds from the same desk, arranged like a mood board.",
+			"Helmet first — from bench prototype to public show and roadside booth. Then nine builds from the same desk, shown one by one.",
 	},
 	{
 		type: "helmet",
@@ -62,18 +60,25 @@ export const makeEssay: MakeEssayBlock[] = [
 		],
 		images: [
 			{
-				src: "/experience/make/helmet-show.webp",
-				alt: "Smart helmet exhibition / maker faire demo",
-				width: 1600,
-				height: 900,
-				caption: "Helmet showcase — exhibition floor",
+				src: "/experience/make/helmet-product.webp",
+				alt: "Three smart helmets with LED visor displays lined up on a table",
+				width: 1024,
+				height: 767,
+				caption: "LED visor prototypes",
 			},
 			{
-				src: "/experience/make/helmet-booth.webp",
-				alt: "Smart helmet booth outreach",
-				width: 1600,
-				height: 900,
-				caption: "Helmet booth — roadside / outreach",
+				src: "/experience/make/helmet-booth-camp.webp",
+				alt: "MOTO CAMP booth — talking with visitors at the stall",
+				width: 767,
+				height: 1024,
+				caption: "MOTO CAMP — visitor conversation",
+			},
+			{
+				src: "/experience/make/helmet-booth-crew.webp",
+				alt: "Smart helmet roadside booth with crew and bubble wand",
+				width: 1024,
+				height: 767,
+				caption: "Roadside stall — crew",
 			},
 		],
 	},
@@ -83,114 +88,114 @@ export const makeEssay: MakeEssayBlock[] = [
 		title: "Built on the desk",
 		titleZh: "桌面造物",
 		lede:
-			"Nine builds arranged like an editor's spread — staggered on the surface, aligned underneath by baseline and proportion.",
+			"Nine builds in a quiet gallery — drag or tap through each piece, framed the way a product shot deserves.",
 		items: [
 			{
 				id: "night-light",
-				slot: 1,
 				title: "Snowflake Night Light",
 				titleZh: "雪花小夜灯",
+				year: "2024",
 				image: {
 					src: "/experience/make/night-light.webp",
 					alt: "DIY snowflake LED night light",
-					width: 1200,
-					height: 1200,
+					width: 1024,
+					height: 1024,
 				},
 			},
 			{
 				id: "heart-domes",
-				slot: 2,
 				title: "Heart Dome Lights",
 				titleZh: "心形玻璃罩小夜灯",
+				year: "2024",
 				image: {
 					src: "/experience/make/heart-domes.webp",
 					alt: "Three heart-shaped LED night lights under glass domes",
-					width: 1600,
-					height: 900,
+					width: 1024,
+					height: 767,
 				},
 			},
 			{
 				id: "stereo-display",
-				slot: 3,
 				title: "Hologram Visualizer",
 				titleZh: "立体频谱显示",
+				year: "2025",
 				image: {
 					src: "/experience/make/stereo-display.webp",
 					alt: "Pseudo-holographic cube with audio spectrum",
-					width: 900,
-					height: 1200,
+					width: 772,
+					height: 895,
 				},
 			},
 			{
 				id: "anime-pcb",
-				slot: 4,
 				title: "Anime PCB Art",
 				titleZh: "动漫灯板",
+				year: "2025",
 				image: {
 					src: "/experience/make/anime-pcb.webp",
 					alt: "Backlit anime illustration PCB panel",
-					width: 900,
-					height: 1400,
+					width: 711,
+					height: 844,
 				},
 			},
 			{
 				id: "kb-acrylic",
-				slot: 5,
 				title: "Acrylic Keyboard",
 				titleZh: "亚克力机械键盘",
+				year: "2025",
 				image: {
 					src: "/experience/make/kb-acrylic.webp",
 					alt: "Clear acrylic mechanical keyboard with OLED and red backlight",
-					width: 1400,
-					height: 900,
+					width: 1008,
+					height: 501,
 				},
 			},
 			{
 				id: "balance-triangle",
-				slot: 6,
 				title: "Self-Balancing Triangle",
 				titleZh: "自平衡三角",
+				year: "2024",
 				image: {
 					src: "/experience/make/balance-triangle.webp",
 					alt: "Self-balancing Reuleaux triangle with ESP32",
-					width: 1000,
-					height: 1400,
+					width: 1024,
+					height: 905,
 				},
 			},
 			{
 				id: "esp-audio",
-				slot: 7,
 				title: "ESP32 Audio Proto",
 				titleZh: "ESP32 音频板",
+				year: "2024",
 				image: {
 					src: "/experience/make/esp-audio-board.webp",
 					alt: "Live ESP32 audio prototype with blue LED glow",
-					width: 1200,
-					height: 900,
+					width: 1024,
+					height: 767,
 				},
 			},
 			{
 				id: "pov-ring",
-				slot: 8,
 				title: "POV Display",
 				titleZh: "旋转 POV 显示",
+				year: "2025",
 				image: {
 					src: "/experience/make/pov-ring.webp",
 					alt: "3D-printed persistence-of-vision ring display",
-					width: 1400,
-					height: 900,
+					width: 589,
+					height: 665,
 				},
 			},
 			{
 				id: "keyboard",
-				slot: 9,
 				title: "Shin-chan Numpad",
 				titleZh: "蜡笔小新数字键盘",
+				year: "2025",
 				image: {
 					src: "/experience/make/keyboard.webp",
 					alt: "Custom Crayon Shin-chan mechanical numpad",
-					width: 1200,
-					height: 900,
+					width: 576,
+					height: 1024,
 				},
 			},
 		],

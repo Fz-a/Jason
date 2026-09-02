@@ -1,8 +1,7 @@
 import Image from "next/image";
+import { DiyCarousel } from "./DiyCarousel";
 import {
 	makeEssay,
-	type MakeDiyItem,
-	type MakeDiySlot,
 	type MakeEssayBlock,
 	type MakeImage,
 } from "./make-essay";
@@ -11,10 +10,12 @@ function FrameImage({
 	image,
 	priority = false,
 	className = "",
+	frameClassName = "bg-[#E8EDE8]",
 }: {
 	image: MakeImage;
 	priority?: boolean;
 	className?: string;
+	frameClassName?: string;
 }) {
 	const contain = image.fit === "contain";
 
@@ -22,7 +23,7 @@ function FrameImage({
 		<figure className={className}>
 			<div
 				className={`overflow-hidden ${
-					contain ? "bg-[#F7F1E8] p-3 sm:p-4" : "bg-[#E8EDE8]"
+					contain ? `bg-[#F7F1E8] p-3 sm:p-4 ${frameClassName}` : frameClassName
 				}`}
 			>
 				<Image
@@ -37,7 +38,7 @@ function FrameImage({
 				/>
 			</div>
 			{image.caption ? (
-				<figcaption className="mt-2.5 text-[0.72rem] leading-5 tracking-[0.02em] text-[#6A7A76]">
+				<figcaption className="mt-2.5 text-[0.7rem] leading-5 tracking-[0.03em] text-[#7A8A86]">
 					{image.caption}
 				</figcaption>
 			) : null}
@@ -50,138 +51,76 @@ function HelmetBlock({
 }: {
 	block: Extract<MakeEssayBlock, { type: "helmet" }>;
 }) {
+	const [product, camp, crew] = block.images;
+
 	return (
 		<article className="border-t border-[#0F4C45]/10 pt-10 sm:pt-14">
-			<div className="flex items-baseline gap-3">
-				<span className="font-mono text-[0.72rem] font-semibold tracking-[0.2em] text-[#0F4C45]/7">
-					{block.num}
-				</span>
-				<div>
-					<h2 className="text-[1.45rem] font-extrabold tracking-tight text-[#162b26] sm:text-[1.7rem]">
-						{block.title}
-					</h2>
-					<p className="mt-1 text-[0.82rem] tracking-[0.04em] text-[#6A7A76]">
-						{block.titleZh}
-					</p>
-				</div>
-			</div>
-
-			<p className="mt-6 max-w-[30rem] border-l-2 border-[#0F4C45]/35 pl-4 text-[1.02rem] font-medium leading-8 text-[#162b26] sm:text-[1.08rem] sm:leading-8">
-				{block.pull}
-			</p>
-
-			<div className="mt-6 max-w-[42rem] space-y-4 text-[0.92rem] leading-7 text-[#3E514D] sm:text-[0.95rem] sm:leading-[1.8rem]">
-				{block.body.map((paragraph) => (
-					<p key={paragraph.slice(0, 48)}>{paragraph}</p>
-				))}
-			</div>
-
-			<div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5">
-				<FrameImage image={block.images[0]} priority />
-				<FrameImage image={block.images[1]} className="sm:mt-10" />
-			</div>
-		</article>
-	);
-}
-
-/** 24×16 modular grid on a φ canvas — staggered collage with shared baselines. */
-const MODULAR_SLOTS: Record<
-	MakeDiySlot,
-	{
-		col: [number, number];
-		row: [number, number];
-		z: number;
-		/** Inner cream frame — flex alignment + mat padding */
-		frameClass?: string;
-		/** Per-photo scale within its mat */
-		imageClass?: string;
-	}
-> = {
-	1: { col: [1, 7], row: [6, 12], z: 2 },
-	2: { col: [5, 12], row: [8, 13], z: 3 },
-	3: { col: [10, 16], row: [4, 12], z: 2 },
-	4: { col: [14, 20], row: [2, 14], z: 4 },
-	5: { col: [18, 25], row: [7, 13], z: 2 },
-	6: { col: [2, 8], row: [11, 17], z: 5 },
-	7: { col: [6, 13], row: [13, 17], z: 3 },
-	/** Tall mat — image ~80% width, cream band below */
-	8: {
-		col: [11, 21],
-		row: [11, 17],
-		z: 3,
-		frameClass: "items-start justify-center px-1 pt-2.5 sm:pt-3.5",
-		imageClass: "h-auto w-[80%] object-contain object-top",
-	},
-	9: { col: [19, 25], row: [12, 17], z: 4 },
-};
-
-const COLLAGE_GRID = {
-	display: "grid",
-	gridTemplateColumns: "repeat(24, minmax(0, 1fr))",
-	gridTemplateRows: "repeat(16, minmax(0, 1fr))",
-	gap: "6px",
-	aspectRatio: "1.618 / 1",
-} as const;
-
-function CollageTile({ item }: { item: MakeDiyItem }) {
-	const slot = MODULAR_SLOTS[item.slot];
-	const frameAlign = slot.frameClass ?? "items-end justify-center";
-	const imageClass =
-		slot.imageClass ??
-		"max-h-full max-w-full object-contain";
-
-	return (
-		<figure
-			className="group relative min-h-0 min-w-0"
-			style={{
-				gridColumn: `${slot.col[0]} / ${slot.col[1]}`,
-				gridRow: `${slot.row[0]} / ${slot.row[1]}`,
-				zIndex: slot.z,
-			}}
-		>
-			<div
-				className={`relative flex h-full min-h-0 w-full flex-col bg-[#F7F1E8] p-1 sm:p-1.5 ${frameAlign}`}
-			>
-				<Image
-					src={item.image.src}
-					alt={item.image.alt}
-					width={item.image.width}
-					height={item.image.height}
-					sizes={
-						item.slot === 8
-							? "(max-width: 1024px) 28vw, 220px"
-							: "(max-width: 1024px) 22vw, 150px"
-					}
-					className={`${imageClass} transition-transform duration-700 ease-out group-hover:scale-[1.015]`}
-				/>
-				<figcaption className="pointer-events-none absolute inset-x-0 bottom-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
-					<div className="bg-gradient-to-t from-[#162b26]/78 to-transparent px-2 pb-2 pt-7 text-center">
-						<p className="text-[0.56rem] tracking-[0.06em] text-[#F7F1E8]/75">
-							{item.titleZh}
-						</p>
-						<p className="text-[0.68rem] font-semibold leading-tight text-[#F7F1E8]">
-							{item.title}
-						</p>
+			{/* Intro: classic left copy / right product */}
+			<div className="grid grid-cols-1 items-start gap-10 lg:grid-cols-12 lg:gap-12">
+				<div className="lg:col-span-5">
+					<div className="flex items-baseline gap-3">
+						<span className="font-mono text-[0.72rem] font-semibold tracking-[0.2em] text-[#0F4C45]/7">
+							{block.num}
+						</span>
+						<div>
+							<h2 className="text-[1.4rem] font-extrabold tracking-tight text-[#162b26] sm:text-[1.6rem]">
+								{block.title}
+							</h2>
+							<p className="mt-1 text-[0.8rem] tracking-[0.04em] text-[#6A7A76]">
+								{block.titleZh}
+							</p>
+						</div>
 					</div>
-				</figcaption>
-			</div>
-		</figure>
-	);
-}
 
-function MobileTile({ item }: { item: MakeDiyItem }) {
-	return (
-		<figure className="overflow-hidden bg-[#F7F1E8]">
-			<div className="flex aspect-[4/5] items-center justify-center p-2">
-				<Image
-					src={item.image.src}
-					alt={item.image.alt}
-					width={item.image.width}
-					height={item.image.height}
-					className="max-h-full max-w-full object-contain"
-				/>
+					<p className="mt-7 max-w-[26rem] text-[1rem] font-medium leading-8 text-[#162b26] sm:text-[1.05rem] sm:leading-8">
+						{block.pull}
+					</p>
+
+					<div className="mt-5 max-w-[28rem] space-y-3.5 text-[0.9rem] leading-7 text-[#3E514D] sm:text-[0.92rem] sm:leading-[1.75rem]">
+						{block.body.map((paragraph) => (
+							<p key={paragraph.slice(0, 48)}>{paragraph}</p>
+						))}
+					</div>
+				</div>
+
+				{product ? (
+					<div className="lg:col-span-7 lg:pt-1">
+						<FrameImage
+							image={product}
+							priority
+							className="mx-auto max-w-[28rem] lg:ml-auto lg:mr-0 lg:max-w-[32rem]"
+							frameClassName="bg-[#E4EBE5]"
+						/>
+					</div>
+				) : null}
 			</div>
-		</figure>
+
+			{/* Booth pair — quiet magazine row */}
+			{(camp || crew) && (
+				<div className="mt-14 border-t border-[#0F4C45]/08 pt-10 sm:mt-16 sm:pt-12">
+					<p className="font-mono text-[0.62rem] font-semibold tracking-[0.22em] text-[#8A9692]">
+						Booth
+					</p>
+
+					<div className="mt-6 grid grid-cols-1 items-end gap-8 sm:mt-8 sm:grid-cols-12 sm:gap-10">
+						{camp ? (
+							<FrameImage
+								image={camp}
+								className="sm:col-span-5"
+								frameClassName="bg-[#E4EBE5]"
+							/>
+						) : null}
+						{crew ? (
+							<FrameImage
+								image={crew}
+								className="sm:col-span-7 sm:pb-8"
+								frameClassName="bg-[#E4EBE5]"
+							/>
+						) : null}
+					</div>
+				</div>
+			)}
+		</article>
 	);
 }
 
@@ -190,8 +129,6 @@ function DiyWallBlock({
 }: {
 	block: Extract<MakeEssayBlock, { type: "diy-wall" }>;
 }) {
-	const sorted = [...block.items].sort((a, b) => a.slot - b.slot);
-
 	return (
 		<article className="border-t border-[#0F4C45]/10 pt-10 sm:pt-14">
 			<header className="mx-auto max-w-[32rem] text-center">
@@ -209,18 +146,8 @@ function DiyWallBlock({
 				</p>
 			</header>
 
-			<div className="mx-auto mt-10 grid max-w-[21rem] grid-cols-3 gap-2 sm:hidden">
-				{sorted.map((item) => (
-					<MobileTile key={item.id} item={item} />
-				))}
-			</div>
-
-			<div className="relative mx-auto mt-12 hidden w-full max-w-[52rem] sm:block">
-				<div className="w-full" style={COLLAGE_GRID}>
-					{sorted.map((item) => (
-						<CollageTile key={item.id} item={item} />
-					))}
-				</div>
+			<div className="mx-auto mt-10 max-w-[56rem]">
+				<DiyCarousel items={block.items} />
 			</div>
 		</article>
 	);

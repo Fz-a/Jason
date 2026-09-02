@@ -116,11 +116,11 @@ export const projects: ProjectDetail[] = [
 		title: "MAKE",
 		shortTitle: "MAKE",
 		summary:
-			"Smart Helmet first — exhibition and booth — then nine DIY builds in a modular editorial collage.",
+			"Smart Helmet first — exhibition and booth — then nine DIY builds in a product carousel.",
 		cardSummary:
 			"MAKE — Smart Helmet plus nine DIY electronics from the workbench.",
 		cardImage: {
-			src: "/experience/make/helmet-show.webp",
+			src: "/experience/make/helmet-product.webp",
 			alt: "MAKE — smart helmet exhibition demo",
 			width: 1600,
 			height: 900,
