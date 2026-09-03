@@ -2,12 +2,11 @@
 
 import { gsap } from "gsap";
 import Image from "next/image";
-import Link from "next/link";
 import { Montserrat } from "next/font/google";
 import { useEffect, useRef, useState } from "react";
-import { HeroNameFlip } from "./components/HeroNameFlip";
 import { HomeScrollPreloader } from "./components/HomeScrollPreloader";
-import { projects } from "./projects/project-data";
+import { JourneyHub } from "./components/JourneyHub";
+import { HeroNameFlip } from "./components/HeroNameFlip";
 
 const montserrat = Montserrat({
   subsets: ["latin"],
@@ -16,7 +15,6 @@ const montserrat = Montserrat({
 const navItems = [
   { label: "Home", href: "#home" },
   { label: "About", href: "#about" },
-  { label: "Projects", href: "#projects" },
   { label: "Contact", href: "#contact" },
 ];
 
@@ -34,54 +32,6 @@ const socialLinks = [
     href: "https://blog.csdn.net/weixin_63844594",
   },
 ];
-
-const aboutTitle = "Exploration, immersion, and execution.";
-
-const aboutContent = {
-  en: {
-    paragraphs: [
-      "During my undergraduate studies in Electronic Information Engineering at Guangzhou Software Institute, I ranked in the top 5% of my major with a 3.3 GPA. Beyond coursework in circuit analysis, analog electronics, and embedded systems, I led student teams on projects from elderly-friendly smart apparel to ROS-based early fire-warning systems—handling embedded hardware, PCB design, firmware, and cross-disciplinary coordination. Our teams earned more than 20 national and provincial awards.",
-      "Through internships, I gradually moved closer to real product development. At Guangzhou Zongheng Intelligent Technology, I independently designed a 2.4G remote for an AGV payload vehicle and contributed to smart greenhouse hardware. At Shenzhen Moore Creative Technology, I worked on software-hardware interaction systems using TouchDesigner and sensor integration. At Guangzhou CVTE, I focused on display PCB layout in Altium Designer, including high-speed routing and impedance matching.",
-      "After graduating, I joined Guangzhou Zongheng Intelligent Technology as an electronics engineer, working on RTK high-precision positioning modules, AGV mobile platforms, and AI interaction devices. My work spans schematic and PCB design, prototyping, debugging, and structural validation with Fusion 360 and 3D printing, often carrying products from requirements through functional prototypes. This industry experience strengthened my execution and system integration skills, and clarified my next step: pursuing graduate study in intelligent hardware under faculty mentorship.",
-    ],
-  },
-  zhHans: {
-    paragraphs: [
-      "本科就读于广州软件学院电子信息工程专业，GPA 3.3，专业排名前 5%。除电路分析、模拟电子技术、嵌入式系统等课程学习外，我带领团队完成适老化智能服饰、基于 ROS 的早期火灾预警系统等项目，负责嵌入式硬件、PCB 设计、固件开发与跨学科协调。还曾担任无人机工作站宣传负责人，团队累计获 20 余项国家级、省级奖项。",
-      "通过实习，我逐步接近真实产品开发。在广州纵横智能技术有限公司，独立完成 AGV 载重小车 2.4G 遥控器设计，并参与智慧农业大棚硬件开发。在深圳摩尔创展科技有限公司，使用 TouchDesigner 及传感器集成，参与软硬件交互系统研发。在广州视源电子科技股份有限公司，专注 Altium Designer 显示屏电路板 Layout，掌握高速线、阻抗匹配及 SMT 规范。",
-      "毕业后入职广州纵横智能技术有限公司担任电子工程师，参与 RTK 高精度定位模块、AGV 移动平台及 AI 交互设备等研发。工作涵盖原理图与 PCB 设计、器件选型、打样调试，以及 Fusion 360 与 3D 打印的结构验证，常负责从需求到可用原型的完整流程。这段产业经历强化了执行力与系统集成能力，也让我更明确下一步：在导师指导下攻读研究生，在智能硬件方向建立更扎实的科研基础。",
-    ],
-  },
-  zhHant: {
-    paragraphs: [
-      "本科就讀於廣州軟件學院電子信息工程專業，GPA 3.3，專業排名前 5%。除電路分析、模擬電子技術、嵌入式系統等課程學習外，我帶領團隊完成適老化智能服飾、基於 ROS 的早期火災預警系統等項目，負責嵌入式硬件、PCB 設計、固件開發與跨學科協調。還曾擔任無人機工作站宣傳負責人，團隊累計獲 20 餘項國家級、省級獎項。",
-      "通過實習，我逐步接近真實產品開發。在廣州縱橫智能技術有限公司，獨立完成 AGV 載重小車 2.4G 遙控器設計，並參與智慧農業大棚硬件開發。在深圳摩爾創展科技有限公司，使用 TouchDesigner 及傳感器集成，參與軟硬件交互系統研發。在廣州視源電子科技股份有限公司，專注 Altium Designer 顯示屏電路板 Layout，掌握高速線、阻抗匹配及 SMT 規範。",
-      "畢業後入職廣州縱橫智能技術有限公司擔任電子工程師，參與 RTK 高精度定位模組、AGV 移動平台及 AI 交互設備等研發。工作涵蓋原理圖與 PCB 設計、器件選型、打樣調試，以及 Fusion 360 與 3D 打印的結構驗證，常負責從需求到可用原型的完整流程。這段產業經歷強化了執行力與系統集成能力，也讓我更明確下一步：在導師指導下攻讀研究生，在智能硬件方向建立更紮實的科研基礎。",
-    ],
-  },
-} as const;
-
-type AboutLang = keyof typeof aboutContent;
-
-const aboutLangOptions: { id: AboutLang; label: string }[] = [
-  { id: "en", label: "EN" },
-  { id: "zhHant", label: "繁" },
-  { id: "zhHans", label: "简" },
-];
-
-const projectsTitle = "Mind and Hand.";
-const projectsSubtitle = (
-  <>
-    Knowing and building in equal measure —
-    <br className="hidden sm:block" />
-    <span className="sm:hidden"> </span>
-    guided by systems thinking, driven by hands-on iteration, and bound by one
-    rule:
-    <br className="hidden sm:block" />
-    <span className="sm:hidden"> </span>
-    understanding only matters when it survives contact with real hardware.
-  </>
-);
 
 function GitHubIcon() {
   return (
@@ -170,10 +120,8 @@ const NAV_SCROLL_OFFSET = 72;
 
 export default function Home() {
   const [activeSection, setActiveSection] = useState("home");
-  const [aboutLang, setAboutLang] = useState<AboutLang>("en");
   const scrollCueRef = useRef<HTMLAnchorElement>(null);
   const cueDotRef = useRef<HTMLSpanElement>(null);
-  const cuePebbleRef = useRef<HTMLSpanElement>(null);
   const cueTextRef = useRef<HTMLSpanElement>(null);
 
   const scrollToSection = (sectionId: string) => {
@@ -210,12 +158,10 @@ export default function Home() {
   useEffect(() => {
     const homeSection = document.getElementById("home");
     const aboutSection = document.getElementById("about");
-    const projectsSection = document.getElementById("projects");
     const contactSection = document.getElementById("contact");
 
     const cue = scrollCueRef.current;
     const cueDot = cueDotRef.current;
-    const cuePebble = cuePebbleRef.current;
     const cueText = cueTextRef.current;
     const animations: gsap.core.Animation[] = [];
     let cueHidden = false;
@@ -234,11 +180,6 @@ export default function Home() {
         return;
       }
 
-      if (projectsSection && scrollMarker >= projectsSection.offsetTop) {
-        setActiveSection("projects");
-        return;
-      }
-
       if (aboutSection && scrollMarker >= aboutSection.offsetTop) {
         setActiveSection("about");
         return;
@@ -249,12 +190,12 @@ export default function Home() {
       }
     };
 
-    if (cue && cueDot && cuePebble && cueText) {
+    if (cue && cueDot && cueText) {
       gsap.set(cue, { autoAlpha: 1, y: 0, scale: 1 });
 
       animations.push(
         gsap.to(cue, {
-          y: -8,
+          y: -6,
           duration: 1.8,
           repeat: -1,
           yoyo: true,
@@ -264,23 +205,12 @@ export default function Home() {
 
       animations.push(
         gsap.to(cueDot, {
-          y: 11,
+          scaleY: 0.65,
+          transformOrigin: "top center",
           duration: 1.15,
           repeat: -1,
           yoyo: true,
           ease: "power1.inOut",
-        })
-      );
-
-      animations.push(
-        gsap.to(cuePebble, {
-          x: 4,
-          y: 2,
-          rotation: 10,
-          duration: 1.6,
-          repeat: -1,
-          yoyo: true,
-          ease: "sine.inOut",
         })
       );
 
@@ -448,17 +378,12 @@ export default function Home() {
             ref={scrollCueRef}
             href="#about"
             onClick={(event) => handleNavClick(event, "#about")}
-            className="pointer-events-auto flex cursor-pointer flex-col items-center gap-2 text-[0.6rem] font-semibold uppercase tracking-[0.28em] text-[#0F4C45]/72 transition"
+            className="pointer-events-auto flex cursor-pointer flex-col items-center gap-2.5 text-[0.6rem] font-semibold uppercase tracking-[0.28em] text-[#0F4C45]/72 transition"
           >
-            <span className="relative flex h-10 w-8 items-start justify-center">
-              <span className="absolute top-0 h-6 w-6 rounded-full bg-[#0F4C45]" />
-              <span className="absolute top-[0.8rem] h-4.5 w-4.5 rounded-full bg-[#F7F1E8]" />
-              <span className="absolute bottom-[0.15rem] h-4.5 w-4.5 rotate-45 rounded-[0.25rem] bg-[#0F4C45]" />
-              <span
-                ref={cueDotRef}
-                className="absolute bottom-0 h-2 w-2 rounded-full bg-[#0F4C45]/20 blur-[1px]"
-              />
-            </span>
+            <span
+              ref={cueDotRef}
+              className="block h-8 w-px bg-[#0F4C45]/35"
+            />
             <span ref={cueTextRef}>Scroll</span>
           </a>
         </div>
@@ -466,121 +391,10 @@ export default function Home() {
 
       <section
         id="about"
-        className="scroll-mt-10 bg-[#F7F1E8] pb-16 pt-7 sm:scroll-mt-14 sm:pb-20 sm:pt-9 lg:pb-24 lg:pt-12"
+        className="scroll-mt-10 bg-[#F7F1E8] pb-16 pt-8 sm:scroll-mt-14 sm:pb-20 sm:pt-10 lg:pb-24 lg:pt-14"
       >
-        <div className="mx-auto flex w-full max-w-[1100px] justify-center px-6 sm:px-8 md:px-10 lg:px-12 xl:max-w-[1160px] xl:px-14">
-          <div className="relative w-full max-w-[860px] rounded-[1.15rem] border border-[#0F4C45]/12 bg-[#DDE7DE] p-5 text-center shadow-[0_16px_34px_rgba(22,43,38,0.06)] sm:p-6 lg:p-7">
-            <div
-              className="absolute right-4 top-4 sm:right-5 sm:top-5 lg:right-6 lg:top-6"
-              role="group"
-              aria-label="About language"
-            >
-              <div className="inline-flex rounded-full border border-[#0F4C45]/15 bg-[#F7F1E8]/90 p-0.5 text-[0.62rem] font-semibold shadow-sm backdrop-blur-sm sm:text-[0.68rem]">
-                {aboutLangOptions.map((option) => (
-                  <button
-                    key={option.id}
-                    type="button"
-                    onClick={() => setAboutLang(option.id)}
-                    aria-pressed={aboutLang === option.id}
-                    className={`rounded-full px-2 py-1 transition sm:px-2.5 ${
-                      aboutLang === option.id
-                        ? "bg-[#043439] text-white shadow-[0_6px_14px_rgba(4,52,57,0.18)]"
-                        : "text-[#0F4C45] hover:bg-[#0F4C45]/8"
-                    }`}
-                  >
-                    {option.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <p className="text-[0.68rem] font-semibold uppercase tracking-[0.26em] text-[#0F4C45] sm:text-[0.74rem] lg:text-[0.78rem]">
-              About
-            </p>
-
-            <h2 className="mx-auto mt-3.5 max-w-[12ch] text-[1.75rem] font-extrabold leading-[0.97] tracking-tight sm:text-[2.15rem] lg:text-[2.55rem]">
-              {aboutTitle}
-            </h2>
-
-            <div
-              className={`mt-5 space-y-4 text-[0.88rem] leading-6.5 text-[#3E514D] lg:text-[0.94rem] lg:leading-[1.72rem] ${
-                aboutLang !== "en" ? "about-section-card__body--zh" : ""
-              }`}
-            >
-              {aboutContent[aboutLang].paragraphs.map((paragraph, index) => (
-                <p key={index}>{paragraph}</p>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section
-        id="projects"
-        className="scroll-mt-10 bg-[#DDE7DE] pb-20 pt-10 sm:scroll-mt-14 sm:pb-24 sm:pt-12 lg:pb-28 lg:pt-16"
-      >
-        <div className="mx-auto w-full max-w-[1060px] px-6 sm:px-8 md:px-10 lg:px-10 xl:max-w-[1320px] xl:px-12">
-          <div className="max-w-[780px]">
-            <p className="text-[0.72rem] font-semibold uppercase tracking-[0.28em] text-[#0F4C45] sm:text-[0.78rem] lg:text-[0.82rem]">
-              Projects
-            </p>
-
-            <h2 className="mt-4 text-[1.85rem] font-extrabold leading-[0.96] tracking-tight sm:whitespace-nowrap sm:text-[2.5rem] lg:text-[3rem]">
-              {projectsTitle}
-            </h2>
-
-            <p className="mt-5 text-[0.95rem] leading-7 text-[#3E514D] lg:text-[1rem] lg:leading-[1.85rem]">
-              {projectsSubtitle}
-            </p>
-          </div>
-
-          <div className="mt-8 grid grid-cols-1 gap-3.5 sm:gap-4 md:grid-cols-2 xl:grid-cols-4 lg:mt-10 lg:gap-4 xl:gap-4">
-            {projects.map((project) => (
-              <Link
-                key={project.slug}
-                href={`/projects/${project.slug}/`}
-                className="group block w-full cursor-pointer rounded-[1.05rem] border border-[#0F4C45]/12 bg-[#F7F1E8] p-3 text-left shadow-[0_14px_28px_rgba(22,43,38,0.05)] transition duration-200 hover:-translate-y-1 hover:border-[#0F4C45]/22 hover:shadow-[0_18px_34px_rgba(22,43,38,0.08)] sm:p-4 sm:text-center"
-              >
-                <div className="mb-3 overflow-hidden rounded-[0.9rem] bg-[#EEF3EE]">
-                  <div className="relative h-[160px] sm:h-[140px] xl:h-[155px]">
-                    {project.cardImage ? (
-                      <Image
-                        src={project.cardImage.src}
-                        alt={project.cardImage.alt}
-                        fill
-                        sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 25vw"
-                        className="object-cover transition-transform duration-300 group-hover:scale-[1.02]"
-                      />
-                    ) : (
-                      <div className="flex h-full items-center justify-center px-4 text-center">
-                        <span className="text-[2rem] font-extrabold tracking-tight text-[#0F4C45]/28 transition-colors duration-200 group-hover:text-[#0F4C45]/42 sm:text-[2.35rem]">
-                          {project.shortTitle}
-                        </span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                <h3 className="text-[1rem] font-extrabold tracking-tight text-[#162b26] transition-colors duration-200 group-hover:text-[#0F4C45] sm:text-[1rem]">
-                  {project.title}
-                </h3>
-                <p className="mt-2 text-[0.78rem] leading-5 text-[#3E514D] sm:text-[0.76rem]">
-                  {project.cardSummary}
-                </p>
-
-                <div className="mt-3 flex flex-wrap justify-start gap-1.5 sm:justify-center">
-                  {project.tags.map((tag) => (
-                    <span
-                      key={tag}
-                      className="rounded-full border border-[#0F4C45]/15 bg-[#F7F1E8] px-2 py-1 text-[0.62rem] font-semibold text-[#0F4C45] sm:text-[0.66rem]"
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-              </Link>
-            ))}
-          </div>
+        <div className="mx-auto w-full max-w-[1100px] px-6 sm:px-8 md:px-10 lg:px-12 xl:max-w-[1160px] xl:px-14">
+          <JourneyHub />
         </div>
       </section>
 

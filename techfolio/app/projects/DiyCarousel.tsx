@@ -17,6 +17,8 @@ import type { MakeDiyItem } from "./make-essay";
 const FRAME_ASPECT = 3 / 4;
 const GAP_PX = 22;
 const LOOP_SETS = 3;
+/** Slow marquee when the pointer is away */
+const AUTO_PX_PER_SEC = 22;
 
 function useVisibleCount() {
 	const [count, setCount] = useState(3);
@@ -38,7 +40,7 @@ function useVisibleCount() {
 
 function CarouselCard({ item }: { item: MakeDiyItem }) {
 	return (
-		<figure className="group flex min-w-0 flex-col">
+		<figure className="flex min-w-0 flex-col">
 			<div
 				className="relative flex w-full items-center justify-center overflow-hidden rounded-[1.15rem] bg-[#F4F1EC] sm:rounded-[1.35rem]"
 				style={{ aspectRatio: FRAME_ASPECT }}
@@ -50,7 +52,7 @@ function CarouselCard({ item }: { item: MakeDiyItem }) {
 					height={item.image.height}
 					sizes="(max-width: 640px) 82vw, (max-width: 1024px) 40vw, 260px"
 					draggable={false}
-					className="max-h-[82%] max-w-[82%] object-contain transition-transform duration-700 ease-out group-hover:scale-[1.03]"
+					className="max-h-[82%] max-w-[82%] object-contain"
 				/>
 			</div>
 			<figcaption className="mt-3 flex items-baseline justify-between gap-3 px-0.5">
@@ -77,11 +79,13 @@ export function DiyCarousel({ items }: { items: MakeDiyItem[] }) {
 	const viewportRef = useRef<HTMLDivElement>(null);
 	const trackRef = useRef<HTMLDivElement>(null);
 	const xRef = useRef(0);
-	const indexRef = useRef(n); // start in middle copy
+	const indexRef = useRef(n);
 	const stepRef = useRef(0);
 	const nRef = useRef(n);
 	const snapTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 	const wheelLock = useRef(false);
+	const pausedRef = useRef(false);
+	const draggingRef = useRef(false);
 
 	const dragRef = useRef<{
 		pointerId: number;
@@ -101,66 +105,58 @@ export function DiyCarousel({ items }: { items: MakeDiyItem[] }) {
 		return out;
 	}, [items]);
 
-	/** Keep logical index inside the middle copy [n, 2n). */
-	const normalizeIndex = useCallback((i: number) => {
-		if (nRef.current <= 0) return i;
+	const normalizeX = useCallback((x: number) => {
 		const len = nRef.current;
-		let next = i;
-		while (next < len) next += len;
-		while (next >= len * 2) next -= len;
+		const step = stepRef.current;
+		if (len <= 0 || step <= 0) return x;
+		const loop = len * step;
+		let next = x;
+		while (next <= -2 * loop) next += loop;
+		while (next > -loop) next -= loop;
 		return next;
 	}, []);
 
-	const applyX = useCallback((x: number, animate: boolean, onDone?: () => void) => {
-		const track = trackRef.current;
-		if (!track) return;
-		xRef.current = x;
-		if (animate) {
-			gsap.to(track, {
-				x,
-				duration: 0.88,
-				ease: "power3.out",
-				overwrite: "auto",
-				onComplete: onDone,
-			});
-		} else {
-			gsap.set(track, { x });
-			onDone?.();
-		}
-	}, []);
-
-	const jumpNormalize = useCallback(() => {
-		const len = nRef.current;
-		if (len <= 0) return;
-		const raw = indexRef.current;
-		const mid = normalizeIndex(raw);
-		if (mid === raw) return;
-		indexRef.current = mid;
-		const x = -mid * stepRef.current;
-		applyX(x, false);
-	}, [applyX, normalizeIndex]);
+	const setX = useCallback(
+		(x: number, animate: boolean, onDone?: () => void) => {
+			const track = trackRef.current;
+			if (!track) return;
+			const next = normalizeX(x);
+			xRef.current = next;
+			indexRef.current = Math.round(-next / (stepRef.current || 1));
+			if (animate) {
+				gsap.to(track, {
+					x: next,
+					duration: 0.75,
+					ease: "power3.out",
+					overwrite: "auto",
+					onComplete: onDone,
+				});
+			} else {
+				gsap.set(track, { x: next });
+				onDone?.();
+			}
+		},
+		[normalizeX],
+	);
 
 	const snapTo = useCallback(
 		(nextIndex: number, animate = true) => {
-			if (nRef.current <= 0) return;
-			indexRef.current = nextIndex;
-			const x = -nextIndex * stepRef.current;
-			applyX(x, animate, () => {
-				jumpNormalize();
-			});
+			if (nRef.current <= 0 || stepRef.current <= 0) return;
+			setX(-nextIndex * stepRef.current, animate);
 		},
-		[applyX, jumpNormalize],
+		[setX],
 	);
 
 	const snapNearest = useCallback(() => {
 		const step = stepRef.current || 1;
-		const nearest = Math.round(-xRef.current / step);
-		snapTo(nearest, true);
+		snapTo(Math.round(-xRef.current / step), true);
 	}, [snapTo]);
 
 	const stepBy = useCallback(
 		(dir: number) => {
-			snapTo(indexRef.current + dir, true);
+			const step = stepRef.current || 1;
+			const current = Math.round(-xRef.current / step);
+			snapTo(current + dir, true);
 		},
 		[snapTo],
 	);
@@ -174,20 +170,59 @@ export function DiyCarousel({ items }: { items: MakeDiyItem[] }) {
 			const nextW = (w - GAP_PX * (visible - 1)) / visible;
 			setCardWidth(nextW);
 			stepRef.current = nextW + GAP_PX;
-			indexRef.current = normalizeIndex(indexRef.current);
-			applyX(-indexRef.current * stepRef.current, false);
+			if (indexRef.current < n) indexRef.current = n;
+			setX(-indexRef.current * stepRef.current, false);
 		};
 		measure();
 		const ro = new ResizeObserver(measure);
 		ro.observe(el);
 		return () => ro.disconnect();
-	}, [visible, n, applyX, normalizeIndex]);
+	}, [visible, n, setX]);
+
+	/** Slow auto-scroll while idle; pause under cursor / drag. */
+	useEffect(() => {
+		if (n <= 1) return;
+		let raf = 0;
+		let last = performance.now();
+
+		const tick = (now: number) => {
+			const dt = Math.min(0.05, (now - last) / 1000);
+			last = now;
+
+			if (
+				!pausedRef.current &&
+				!draggingRef.current &&
+				stepRef.current > 0 &&
+				trackRef.current
+			) {
+				gsap.killTweensOf(trackRef.current);
+				setX(xRef.current - AUTO_PX_PER_SEC * dt, false);
+			}
+
+			raf = requestAnimationFrame(tick);
+		};
+
+		raf = requestAnimationFrame(tick);
+		return () => cancelAnimationFrame(raf);
+	}, [n, setX]);
 
 	useEffect(() => {
 		const shell = shellRef.current;
 		if (!shell || n <= 1) return;
 
+		const onEnter = () => {
+			pausedRef.current = true;
+			if (snapTimer.current) clearTimeout(snapTimer.current);
+			snapNearest();
+		};
+
+		const onLeave = () => {
+			pausedRef.current = false;
+			if (snapTimer.current) clearTimeout(snapTimer.current);
+		};
+
 		const onWheel = (e: WheelEvent) => {
+			if (!pausedRef.current) return;
 			e.preventDefault();
 			const dominant =
 				Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
@@ -198,26 +233,32 @@ export function DiyCarousel({ items }: { items: MakeDiyItem[] }) {
 				stepBy(dominant > 0 ? 1 : -1);
 				window.setTimeout(() => {
 					wheelLock.current = false;
-				}, 400);
+				}, 380);
 				return;
 			}
 			if (wheelLock.current) return;
 
-			applyX(xRef.current - dominant, false);
+			setX(xRef.current - dominant, false);
 			if (snapTimer.current) clearTimeout(snapTimer.current);
 			snapTimer.current = setTimeout(() => snapNearest(), 90);
 		};
 
+		shell.addEventListener("pointerenter", onEnter);
+		shell.addEventListener("pointerleave", onLeave);
 		shell.addEventListener("wheel", onWheel, { passive: false });
 		return () => {
+			shell.removeEventListener("pointerenter", onEnter);
+			shell.removeEventListener("pointerleave", onLeave);
 			shell.removeEventListener("wheel", onWheel);
 			if (snapTimer.current) clearTimeout(snapTimer.current);
 		};
-	}, [n, applyX, snapNearest, stepBy]);
+	}, [n, setX, snapNearest, stepBy]);
 
 	const onPointerDown = (e: ReactPointerEvent<HTMLDivElement>) => {
 		if (e.button !== 0 || n <= 1) return;
 		gsap.killTweensOf(trackRef.current);
+		pausedRef.current = true;
+		draggingRef.current = true;
 		dragRef.current = {
 			pointerId: e.pointerId,
 			startX: e.clientX,
@@ -230,20 +271,21 @@ export function DiyCarousel({ items }: { items: MakeDiyItem[] }) {
 	const onPointerMove = (e: ReactPointerEvent<HTMLDivElement>) => {
 		const drag = dragRef.current;
 		if (!drag || drag.pointerId !== e.pointerId) return;
-		applyX(drag.originX + (e.clientX - drag.startX), false);
+		setX(drag.originX + (e.clientX - drag.startX), false);
 	};
 
 	const endDrag = (e: ReactPointerEvent<HTMLDivElement>) => {
 		const drag = dragRef.current;
 		if (!drag || drag.pointerId !== e.pointerId) return;
 		dragRef.current = null;
+		draggingRef.current = false;
 		setDragging(false);
 		const dx = e.clientX - drag.startX;
 		const step = stepRef.current || 1;
 		const threshold = Math.max(40, step * 0.16);
 		let next = Math.round(-xRef.current / step);
-		if (dx <= -threshold) next = indexRef.current + 1;
-		else if (dx >= threshold) next = indexRef.current - 1;
+		if (dx <= -threshold) next += 1;
+		else if (dx >= threshold) next -= 1;
 		snapTo(next, true);
 		try {
 			e.currentTarget.releasePointerCapture(e.pointerId);

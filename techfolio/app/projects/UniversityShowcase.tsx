@@ -555,15 +555,19 @@ function Spread({ spread }: { spread: ShowcaseSpread }) {
   }
 }
 
-function ShowcaseDocument({
+export function ShowcaseDocument({
   item,
   sectionLabel = "University",
+  className = "",
 }: {
   item: UniversityShowcase;
   sectionLabel?: string;
+  className?: string;
 }) {
   return (
-    <article className="bg-white text-[#111] shadow-[0_24px_80px_rgba(0,0,0,0.28)]">
+    <article
+      className={`bg-white text-[#111] ${className || "shadow-[0_24px_80px_rgba(0,0,0,0.28)]"}`}
+    >
       <div className="flex items-center justify-between border-b border-black/[0.06] px-6 py-3.5 sm:px-8">
         <p className="text-[0.62rem] font-semibold uppercase tracking-[0.24em] text-[#8A9692]">
           Product Brief

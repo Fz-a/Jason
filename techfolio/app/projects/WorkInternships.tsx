@@ -2,16 +2,27 @@
 
 import Image from "next/image";
 import { useEffect, useId, useState } from "react";
-import { workInternships } from "./work-showcases";
+import { workCompanies, workInternships } from "./work-showcases";
 
+type CompanyBrief = (typeof workCompanies)[number];
 type Internship = (typeof workInternships)[number];
 
-function InternshipBrief({ item }: { item: Internship }) {
+export function InternshipBrief({
+  item,
+  className = "",
+}: {
+  item: CompanyBrief | Internship;
+  className?: string;
+}) {
+  const isFullTime = item.role === "Full-time";
+
   return (
-    <article className="bg-white text-[#111] shadow-[0_24px_80px_rgba(0,0,0,0.28)]">
+    <article
+      className={`bg-white text-[#111] ${className || "shadow-[0_24px_80px_rgba(0,0,0,0.28)]"}`}
+    >
       <div className="flex items-center justify-between border-b border-black/[0.06] px-6 py-3.5 sm:px-8">
         <p className="text-[0.62rem] font-semibold uppercase tracking-[0.24em] text-[#8A9692]">
-          Internship Brief
+          {isFullTime ? "Company Brief" : "Internship Brief"}
         </p>
         <p className="text-[0.62rem] font-medium tracking-[0.1em] text-[#8A9692]">
           Work

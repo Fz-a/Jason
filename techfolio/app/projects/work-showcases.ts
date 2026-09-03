@@ -323,3 +323,26 @@ export const workInternships = [
 		},
 	},
 ] as const;
+
+/** Full-time company + internships — used on the About journey Companies stage. */
+export const workCompanies = [
+	{
+		id: "zongheng",
+		role: "Full-time",
+		company: "Guangzhou Zongheng",
+		companyZh: "广州纵横智能科技",
+		summary:
+			"Electronics engineer on education robots, Beidou RTK, and industrial AGV remotes — boards, bring-up, and field results.",
+		highlights: [
+			"Education robots & IoT teaching fleets",
+			"Beidou RTK for farm machinery",
+			"Heavy-industry AGV remotes & bring-up",
+		],
+		brief: [
+			...workCompanyIntro.body,
+			"Day to day I own board bring-up, remotes, and the path from prototype to something that stays working in the field.",
+		],
+		image: workCompanyIntro.image,
+	},
+	...workInternships,
+] as const;
