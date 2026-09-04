@@ -7,16 +7,18 @@ import { useEffect, useRef, useState } from "react";
 import { HomeScrollPreloader } from "./components/HomeScrollPreloader";
 import { JourneyHub } from "./components/JourneyHub";
 import { HeroNameFlip } from "./components/HeroNameFlip";
+import { LangSwitch } from "./components/LangSwitch";
+import { useLocale } from "./lib/i18n";
 
 const montserrat = Montserrat({
   subsets: ["latin"],
 });
 
 const navItems = [
-  { label: "Home", href: "#home" },
-  { label: "About", href: "#about" },
-  { label: "Contact", href: "#contact" },
-];
+  { key: "nav.home", href: "#home" },
+  { key: "nav.about", href: "#about" },
+  { key: "nav.contact", href: "#contact" },
+] as const;
 
 const socialLinks = [
   {
@@ -119,6 +121,7 @@ function LocationIcon() {
 const NAV_SCROLL_OFFSET = 72;
 
 export default function Home() {
+  const { t } = useLocale();
   const [activeSection, setActiveSection] = useState("home");
   const scrollCueRef = useRef<HTMLAnchorElement>(null);
   const cueDotRef = useRef<HTMLSpanElement>(null);
@@ -271,8 +274,8 @@ export default function Home() {
     >
       <HomeScrollPreloader />
       <header className="pointer-events-none fixed inset-x-0 top-0 z-50 safe-pt px-3 sm:px-6 sm:pt-5 lg:px-8">
-        <div className="pointer-events-auto mx-auto flex max-w-[calc(100vw-1.5rem)] justify-center sm:max-w-none">
-          <div className="nav-scroll max-w-full overflow-x-auto rounded-full border border-[#0F4C45]/15 bg-[#F7F1E8]/92 p-1 shadow-[0_14px_40px_rgba(22,43,38,0.08)] backdrop-blur-md sm:p-1.5">
+        <div className="pointer-events-auto mx-auto flex max-w-[calc(100vw-1.5rem)] items-center justify-center gap-2 sm:max-w-none sm:gap-3">
+          <div className="nav-scroll max-w-[min(100%,calc(100vw-7.5rem))] overflow-x-auto rounded-full border border-[#0F4C45]/15 bg-[#F7F1E8]/92 p-1 shadow-[0_14px_40px_rgba(22,43,38,0.08)] backdrop-blur-md sm:max-w-none sm:p-1.5">
             <nav aria-label="Primary">
               <ul className="flex w-max items-center gap-0.5 sm:gap-1">
                 {navItems.map((item) => (
@@ -286,13 +289,14 @@ export default function Home() {
                           : "text-[#0F4C45] hover:bg-[#0F4C45]/8"
                       }`}
                     >
-                      {item.label}
+                      {t(item.key)}
                     </a>
                   </li>
                 ))}
               </ul>
             </nav>
           </div>
+          <LangSwitch className="shrink-0" />
         </div>
       </header>
 
@@ -303,22 +307,21 @@ export default function Home() {
         <div className="mx-auto grid min-h-[calc(100svh-5rem)] w-full max-w-[1160px] grid-cols-1 items-center gap-6 px-5 pb-24 pt-[4.75rem] sm:min-h-[calc(100vh-5.5rem)] sm:gap-8 sm:px-8 sm:py-10 md:px-10 md:py-10 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)] lg:gap-8 lg:px-12 lg:py-10 xl:max-w-[1220px] xl:gap-10 xl:px-14">
           <div className="order-2 mx-auto w-full max-w-[420px] text-left lg:order-1">
             <div className="mb-3 text-[0.65rem] font-semibold uppercase tracking-[0.24em] text-[#0F4C45] sm:text-[0.74rem] sm:tracking-[0.28em] lg:text-[0.8rem]">
-              <p>Electronic Engineer</p>
+              <p>{t("hero.role")}</p>
               <p className="mt-1 tracking-[0.18em] sm:tracking-[0.22em]">
-                AI · Robotics · Intelligent Hardware
+                {t("hero.tags")}
               </p>
             </div>
 
             <h1 className="text-[1.95rem] font-extrabold leading-[0.95] tracking-tight sm:text-[2.9rem] md:text-[3.5rem] lg:text-[3.9rem] xl:text-[4.35rem]">
-              <span className="block">Hello</span>
+              <span className="block">{t("hero.hello")}</span>
               <span className="hero-name-greeting">
-                I am <HeroNameFlip />
+                {t("hero.iam")} <HeroNameFlip />
               </span>
             </h1>
 
             <p className="mt-4 max-w-[28rem] text-[0.92rem] leading-7 text-[#3E514D] sm:mt-5 sm:text-[0.96rem] lg:text-[1rem] lg:leading-[1.9rem]">
-              I turn ideas into real-world products through hardware, software,
-              AI, and robotics.
+              {t("hero.blurb")}
             </p>
 
             <div className="mt-6 flex flex-wrap gap-2.5 sm:mt-7 sm:gap-3">
@@ -329,7 +332,7 @@ export default function Home() {
                 rel="noreferrer"
                 className="rounded-full bg-[#043439] px-5 py-2.5 text-sm font-semibold text-white transition hover:opacity-90 sm:px-6 lg:px-7 lg:py-3 lg:text-[0.92rem]"
               >
-                Download Resume
+                {t("hero.resume")}
               </a>
 
               <a
@@ -337,7 +340,7 @@ export default function Home() {
                 onClick={(event) => handleNavClick(event, "#contact")}
                 className="cursor-pointer rounded-full border border-[#0F4C45] px-5 py-2.5 text-sm font-semibold text-[#0F4C45] transition hover:bg-[#0F4C45] hover:text-white sm:px-6 lg:px-7 lg:py-3 lg:text-[0.92rem]"
               >
-                Contact Me
+                {t("hero.contact")}
               </a>
             </div>
 
@@ -384,7 +387,7 @@ export default function Home() {
               ref={cueDotRef}
               className="block h-8 w-px bg-[#0F4C45]/35"
             />
-            <span ref={cueTextRef}>Scroll</span>
+            <span ref={cueTextRef}>{t("hero.scroll")}</span>
           </a>
         </div>
       </section>
@@ -405,17 +408,15 @@ export default function Home() {
         <div className="mx-auto grid w-full max-w-[1100px] grid-cols-1 gap-8 px-6 sm:px-8 md:px-10 lg:grid-cols-[minmax(0,0.95fr)_minmax(260px,0.6fr)] lg:gap-12 lg:px-12 xl:max-w-[1160px] xl:gap-14 xl:px-14">
           <div className="max-w-[610px]">
             <p className="text-[0.68rem] font-semibold uppercase tracking-[0.26em] text-[#0F4C45] sm:text-[0.74rem] lg:text-[0.78rem]">
-              Contact
+              {t("contact.kicker")}
             </p>
 
-            <h2 className="mt-3.5 max-w-[10ch] text-[1.75rem] font-extrabold leading-[0.97] tracking-tight sm:text-[2.15rem] lg:text-[2.55rem]">
-              Let’s build something thoughtful.
+            <h2 className="mt-3.5 max-w-[12ch] text-[1.75rem] font-extrabold leading-[0.97] tracking-tight sm:text-[2.15rem] lg:text-[2.55rem]">
+              {t("contact.title")}
             </h2>
 
             <p className="mt-4 max-w-[31rem] text-[0.88rem] leading-6.5 text-[#3E514D] lg:text-[0.94rem] lg:leading-[1.72rem]">
-              I’m always interested in opportunities involving intelligent
-              hardware, embedded systems, robotics, and hands-on making — and in
-              conversations that help those ideas grow.
+              {t("contact.body")}
             </p>
 
             <div className="mt-6 flex flex-wrap gap-2.5">
@@ -423,7 +424,7 @@ export default function Home() {
                 href="mailto:2260032001@student.must.edu.mo"
                 className="rounded-full bg-[#043439] px-5 py-2 text-[0.82rem] font-semibold text-white transition hover:opacity-90 lg:px-6 lg:py-2.5 lg:text-[0.88rem]"
               >
-                Email Me
+                {t("contact.emailMe")}
               </a>
             </div>
           </div>
@@ -431,7 +432,7 @@ export default function Home() {
           <aside className="lg:pt-5">
             <div className="rounded-[1.15rem] border border-[#0F4C45]/12 bg-[#DDE7DE] p-4.5 shadow-[0_16px_34px_rgba(22,43,38,0.05)] sm:p-5">
               <p className="text-[0.68rem] font-semibold uppercase tracking-[0.24em] text-[#0F4C45] sm:text-[0.74rem]">
-                Connect
+                {t("contact.connect")}
               </p>
 
               <div className="mt-5 space-y-4 text-[#162b26]">
@@ -442,7 +443,7 @@ export default function Home() {
 
                   <div>
                     <p className="text-[0.66rem] font-semibold uppercase tracking-[0.22em] text-[#6B7B77]">
-                      Email
+                      {t("contact.email")}
                     </p>
                     <a
                       href="mailto:2260032001@student.must.edu.mo"
@@ -466,17 +467,17 @@ export default function Home() {
 
                   <div>
                   <p className="text-[0.66rem] font-semibold uppercase tracking-[0.22em] text-[#6B7B77]">
-                    Location
+                    {t("contact.locationLabel")}
                   </p>
                   <p className="mt-1.5 text-[0.9rem] font-semibold sm:text-[0.95rem]">
-                    Foshan, Guangdong
+                    {t("contact.city")}
                   </p>
                   </div>
                 </div>
 
                 <div className="border-t border-[#0F4C45]/10 pt-4">
                   <p className="text-[0.66rem] font-semibold uppercase tracking-[0.22em] text-[#6B7B77]">
-                    Profiles
+                    {t("contact.profiles")}
                   </p>
 
                   <div className="mt-3 flex items-center gap-2.5">
