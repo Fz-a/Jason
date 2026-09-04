@@ -2,15 +2,14 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useMemo, useState } from "react";
-import { BriefDocument } from "../components/BriefDocument";
+import { useEffect, useMemo, useState } from "react";
 import { briefFromShowcase } from "../lib/brief-from-legacy";
 import {
-	BLOCK_LABELS,
 	createEmptyBlock,
 	newBlockId,
 	type BriefBlock,
 	type BriefDoc,
+	type BriefImage,
 	type BriefStore,
 } from "../lib/brief-types";
 import { makeEssay } from "../projects/make-essay";
@@ -26,21 +25,53 @@ import mediaList from "../../content/media.json";
 type CatalogEntry = {
 	id: string;
 	title: string;
-	section: string;
-	source: "override" | "showcase" | "company" | "helmet" | "diy";
+	group: string;
+	source: "showcase" | "company" | "helmet" | "diy";
 };
 
-const WORK_PRODUCT_IDS = new Set(["zongheng-robot", "rtk", "agv"]);
-
-function buildCatalog(store: BriefStore): CatalogEntry[] {
+function buildCatalog(): CatalogEntry[] {
 	const entries: CatalogEntry[] = [];
-
+	for (const item of workShowcases) {
+		entries.push({
+			id: item.id,
+			title: item.title,
+			group: "项目",
+			source: "showcase",
+		});
+	}
+	for (const item of universityProjectShowcases.filter((p) =>
+		["smart-clothes", "fire-warning"].includes(p.id),
+	)) {
+		entries.push({
+			id: item.id,
+			title: item.title,
+			group: "项目",
+			source: "showcase",
+		});
+	}
+	for (const company of workCompanies) {
+		entries.push({
+			id: company.id,
+			title: company.company,
+			group: "公司",
+			source: "company",
+		});
+	}
+	const helmet = makeEssay.find((b) => b.type === "helmet");
+	const diy = makeEssay.find((b) => b.type === "diy-wall");
+	if (helmet) {
+		entries.push({
+			id: "smart-helmet",
+			title: helmet.title,
+			group: "造物",
+			source: "helmet",
+		});
+	}
+	if (diy) {
+		entries.push({ id: "make-diy", title: "DIY", group: "造物", source: "diy" });
+	}
 	for (const item of [
-		...workShowcases,
-		...universityProjectShowcases.filter((p) =>
-			["smart-clothes", "fire-warning", "robotman"].includes(p.id),
-		),
-		...universityDepartmentShowcases,
+		...universityProjectShowcases.filter((p) => p.id === "robotman"),
 		...societyShowcases.filter((p) =>
 			["volunteering", "exhibitions"].includes(p.id),
 		),
@@ -48,60 +79,59 @@ function buildCatalog(store: BriefStore): CatalogEntry[] {
 		entries.push({
 			id: item.id,
 			title: item.title,
-			section: WORK_PRODUCT_IDS.has(item.id)
-				? "Work · Product"
-				: item.id === "robotman"
-					? "Society · Team"
-					: ["volunteering", "exhibitions"].includes(item.id)
-						? "Society"
-						: "University",
-			source: store[item.id] ? "override" : "showcase",
+			group: "社会",
+			source: "showcase",
 		});
 	}
-
-	for (const company of workCompanies) {
-		entries.push({
-			id: company.id,
-			title: company.company,
-			section: company.role,
-			source: store[company.id] ? "override" : "company",
-		});
-	}
-
-	const helmet = makeEssay.find((b) => b.type === "helmet");
-	const diy = makeEssay.find((b) => b.type === "diy-wall");
-	if (helmet) {
-		entries.push({
-			id: "smart-helmet",
-			title: helmet.title,
-			section: "MAKE · Venture",
-			source: store["smart-helmet"] ? "override" : "helmet",
-		});
-	}
-	if (diy) {
-		entries.push({
-			id: "make-diy",
-			title: "DIY",
-			section: "MAKE · Bench",
-			source: store["make-diy"] ? "override" : "diy",
-		});
-	}
-
+	entries.push({
+		id: "campus-depts",
+		title: "校园部门",
+		group: "社会",
+		source: "showcase",
+	});
 	return entries;
 }
 
-function docFromCatalog(entry: CatalogEntry, store: BriefStore): BriefDoc {
-	if (store[entry.id]) return structuredClone(store[entry.id]);
+function loadDoc(entry: CatalogEntry, store: BriefStore): BriefDoc {
+	if (store[entry.id]) return structuredClone(store[entry.id]!);
 
-	if (entry.source === "showcase" || entry.id) {
-		const item = [
-			...workShowcases,
-			...universityProjectShowcases,
-			...universityDepartmentShowcases,
-			...societyShowcases,
-		].find((s) => s.id === entry.id);
-		if (item) return briefFromShowcase(item, entry.section);
+	if (entry.id === "campus-depts") {
+		return {
+			id: "campus-depts",
+			title: "Campus Departments",
+			subtitle: "国防教育教导队 · 无人机工作站",
+			section: "Society · Departments",
+			blocks: [
+				{ id: newBlockId(), type: "kicker", text: "Society · Departments" },
+				{ id: newBlockId(), type: "heading", text: "Campus Departments" },
+				{
+					id: newBlockId(),
+					type: "subheading",
+					text: "国防教育教导队 · 无人机工作站",
+				},
+				...universityDepartmentShowcases.flatMap((dept): BriefBlock[] => [
+					{ id: newBlockId(), type: "heading", text: dept.title },
+					{ id: newBlockId(), type: "subheading", text: dept.subtitle },
+					{
+						id: newBlockId(),
+						type: "image",
+						image: { src: dept.cardImage.src, alt: dept.cardImage.alt },
+					},
+					...(dept.preview ?? []).map(
+						(text): BriefBlock => ({ id: newBlockId(), type: "text", text }),
+					),
+				]),
+			],
+		};
 	}
+
+	const item = [
+		...workShowcases,
+		...universityProjectShowcases,
+		...universityDepartmentShowcases,
+		...societyShowcases,
+	].find((s) => s.id === entry.id);
+	if (item) return briefFromShowcase(item, entry.group);
 
 	if (entry.source === "company") {
 		const company = workCompanies.find((c) => c.id === entry.id);
@@ -112,80 +142,42 @@ function docFromCatalog(entry: CatalogEntry, store: BriefStore): BriefDoc {
 				subtitle: company.companyZh,
 				section: company.role,
 				blocks: [
-					{ id: newBlockId(), type: "kicker", text: company.role },
 					{ id: newBlockId(), type: "heading", text: company.company },
-					{
-						id: newBlockId(),
-						type: "subheading",
-						text: company.companyZh,
-					},
+					{ id: newBlockId(), type: "subheading", text: company.companyZh },
 					{
 						id: newBlockId(),
 						type: "image",
-						image: {
-							src: company.image.src,
-							alt: company.image.alt,
-							caption:
-								"caption" in company.image
-									? String(company.image.caption ?? "")
-									: undefined,
-						},
+						image: { src: company.image.src, alt: company.image.alt },
 					},
 					...company.brief.map(
-						(text): BriefBlock => ({
-							id: newBlockId(),
-							type: "text",
-							text,
-						}),
+						(text): BriefBlock => ({ id: newBlockId(), type: "text", text }),
 					),
-					{
-						id: newBlockId(),
-						type: "list",
-						items: [...company.highlights],
-					},
 				],
 			};
 		}
 	}
 
 	if (entry.id === "smart-helmet") {
-		const helmet = makeEssay.find((b) => b.type === "helmet");
-		if (helmet) {
+		const h = makeEssay.find((b) => b.type === "helmet");
+		if (h) {
 			return {
 				id: "smart-helmet",
-				title: helmet.title,
-				subtitle: helmet.titleZh,
-				section: "MAKE · Venture",
+				title: h.title,
+				subtitle: h.titleZh,
+				section: "MAKE",
 				blocks: [
-					{ id: newBlockId(), type: "kicker", text: "MAKE · Venture" },
-					{ id: newBlockId(), type: "heading", text: helmet.title },
-					{
-						id: newBlockId(),
-						type: "subheading",
-						text: helmet.titleZh,
-					},
-					{ id: newBlockId(), type: "pull", text: helmet.pull },
-					...helmet.body.map(
-						(text): BriefBlock => ({
-							id: newBlockId(),
-							type: "text",
-							text,
-						}),
+					{ id: newBlockId(), type: "heading", text: h.title },
+					{ id: newBlockId(), type: "subheading", text: h.titleZh },
+					{ id: newBlockId(), type: "text", text: h.pull },
+					...h.body.map(
+						(text): BriefBlock => ({ id: newBlockId(), type: "text", text }),
 					),
 					{
 						id: newBlockId(),
 						type: "duo",
 						images: [
-							{
-								src: helmet.images[0].src,
-								alt: helmet.images[0].alt,
-								caption: helmet.images[0].caption,
-							},
-							{
-								src: helmet.images[1].src,
-								alt: helmet.images[1].alt,
-								caption: helmet.images[1].caption,
-							},
+							{ src: h.images[0].src, alt: h.images[0].alt },
+							{ src: h.images[1].src, alt: h.images[1].alt },
 						],
 					},
 				],
@@ -196,38 +188,26 @@ function docFromCatalog(entry: CatalogEntry, store: BriefStore): BriefDoc {
 	if (entry.id === "make-diy") {
 		const diy = makeEssay.find((b) => b.type === "diy-wall");
 		if (diy) {
-			const blocks: BriefBlock[] = [
-				{ id: newBlockId(), type: "kicker", text: "MAKE · DIY" },
-				{ id: newBlockId(), type: "heading", text: diy.title },
-				{ id: newBlockId(), type: "subheading", text: diy.titleZh },
-				{ id: newBlockId(), type: "text", text: diy.lede },
-			];
-			for (const item of diy.items) {
-				blocks.push({
-					id: newBlockId(),
-					type: "heading",
-					text: item.title,
-				});
-				blocks.push({
-					id: newBlockId(),
-					type: "subheading",
-					text: item.titleZh,
-				});
-				blocks.push({
-					id: newBlockId(),
-					type: "image",
-					image: {
-						src: item.image.src,
-						alt: item.image.alt,
-					},
-				});
-			}
 			return {
 				id: "make-diy",
 				title: diy.title,
 				subtitle: diy.titleZh,
-				section: "MAKE · Bench",
-				blocks,
+				section: "MAKE · DIY",
+				blocks: [
+					{ id: newBlockId(), type: "heading", text: diy.title },
+					{ id: newBlockId(), type: "subheading", text: diy.titleZh },
+					...diy.items.map(
+						(it): BriefBlock => ({
+							id: newBlockId(),
+							type: "image",
+							image: {
+								src: it.image.src,
+								alt: it.image.alt,
+								caption: it.titleZh,
+							},
+						}),
+					),
+				],
 			};
 		}
 	}
@@ -235,646 +215,552 @@ function docFromCatalog(entry: CatalogEntry, store: BriefStore): BriefDoc {
 	return {
 		id: entry.id,
 		title: entry.title,
-		section: entry.section,
 		blocks: [
-			{ id: newBlockId(), type: "kicker", text: entry.section },
 			{ id: newBlockId(), type: "heading", text: entry.title },
-			{
-				id: newBlockId(),
-				type: "text",
-				text: "Start writing this brief.",
-			},
+			{ id: newBlockId(), type: "text", text: "点这里改文字" },
 		],
 	};
 }
 
-function downloadJson(filename: string, data: unknown) {
+function downloadJson(data: unknown) {
 	const blob = new Blob([`${JSON.stringify(data, null, "\t")}\n`], {
 		type: "application/json",
 	});
 	const url = URL.createObjectURL(blob);
-	const anchor = document.createElement("a");
-	anchor.href = url;
-	anchor.download = filename;
-	anchor.click();
+	const a = document.createElement("a");
+	a.href = url;
+	a.download = "briefs.json";
+	a.click();
 	URL.revokeObjectURL(url);
 }
 
-function updateBlock(
+function patchBlock(
 	blocks: BriefBlock[],
-	blockId: string,
-	updater: (block: BriefBlock) => BriefBlock,
+	id: string,
+	fn: (b: BriefBlock) => BriefBlock,
 ): BriefBlock[] {
-	return blocks.map((block) => {
-		if (block.id === blockId) return updater(block);
-		if (block.type === "tabs") {
+	return blocks.map((b) => {
+		if (b.id === id) return fn(b);
+		if (b.type === "tabs") {
 			return {
-				...block,
-				tabs: block.tabs.map((tab) => ({
+				...b,
+				tabs: b.tabs.map((tab) => ({
 					...tab,
-					blocks: updateBlock(tab.blocks, blockId, updater),
+					blocks: patchBlock(tab.blocks, id, fn),
 				})),
 			};
 		}
-		return block;
+		return b;
 	});
 }
 
-function removeBlock(blocks: BriefBlock[], blockId: string): BriefBlock[] {
+function dropBlock(blocks: BriefBlock[], id: string): BriefBlock[] {
 	return blocks
-		.filter((block) => block.id !== blockId)
-		.map((block) => {
-			if (block.type !== "tabs") return block;
-			return {
-				...block,
-				tabs: block.tabs.map((tab) => ({
-					...tab,
-					blocks: removeBlock(tab.blocks, blockId),
-				})),
-			};
-		});
+		.filter((b) => b.id !== id)
+		.map((b) =>
+			b.type === "tabs"
+				? {
+						...b,
+						tabs: b.tabs.map((tab) => ({
+							...tab,
+							blocks: dropBlock(tab.blocks, id),
+						})),
+					}
+				: b,
+		);
 }
 
-function moveBlock(
-	blocks: BriefBlock[],
-	blockId: string,
-	dir: -1 | 1,
-): BriefBlock[] {
-	const index = blocks.findIndex((block) => block.id === blockId);
-	if (index >= 0) {
-		const next = index + dir;
-		if (next < 0 || next >= blocks.length) return blocks;
-		const copy = [...blocks];
-		const [item] = copy.splice(index, 1);
-		copy.splice(next, 0, item!);
-		return copy;
-	}
-	return blocks.map((block) => {
-		if (block.type !== "tabs") return block;
-		return {
-			...block,
-			tabs: block.tabs.map((tab) => ({
-				...tab,
-				blocks: moveBlock(tab.blocks, blockId, dir),
-			})),
-		};
-	});
-}
-
-export function StudioApp() {
-	const [store, setStore] = useState<BriefStore>(
-		() => structuredClone(seedBriefs) as BriefStore,
-	);
-	const catalog = useMemo(() => buildCatalog(store), [store]);
-	const [activeId, setActiveId] = useState(catalog[0]?.id ?? "zongheng-robot");
-	const [draft, setDraft] = useState<BriefDoc>(() =>
-		docFromCatalog(catalog[0]!, store),
-	);
-	const [mediaFilter, setMediaFilter] = useState("");
-	const [pickingFor, setPickingFor] = useState<string | null>(null);
-
-	const media = mediaList as string[];
-	const filteredMedia = useMemo(() => {
-		const q = mediaFilter.trim().toLowerCase();
-		if (!q) return media.slice(0, 48);
-		return media.filter((path) => path.toLowerCase().includes(q)).slice(0, 48);
-	}, [media, mediaFilter]);
-
-	const selectEntry = (id: string) => {
-		const entry = catalog.find((item) => item.id === id);
-		if (!entry) return;
-		setActiveId(id);
-		setDraft(docFromCatalog(entry, store));
-		setPickingFor(null);
-	};
-
-	const saveDraftToStore = () => {
-		setStore((prev) => ({ ...prev, [draft.id]: structuredClone(draft) }));
-	};
-
-	const exportStore = () => {
-		const next = { ...store, [draft.id]: draft };
-		setStore(next);
-		downloadJson("briefs.json", next);
-	};
-
-	const setBlocks = (blocks: BriefBlock[]) => {
-		setDraft((prev) => ({ ...prev, blocks }));
-	};
-
-	return (
-		<div className="min-h-screen bg-[#F3EEE6] text-[#162b26]">
-			<header className="sticky top-0 z-20 border-b border-[#0F4C45]/10 bg-[#F7F1E8]/95 backdrop-blur">
-				<div className="mx-auto flex max-w-[90rem] flex-wrap items-center justify-between gap-3 px-4 py-3 sm:px-6">
-					<div>
-						<p className="font-mono text-[0.58rem] tracking-[0.22em] text-[#0F4C45]/55">
-							CONTENT STUDIO
-						</p>
-						<h1 className="text-[1.05rem] font-semibold tracking-tight">
-							Briefs · images · copy · layout
-						</h1>
-					</div>
-					<div className="flex flex-wrap items-center gap-2">
-						<button
-							type="button"
-							onClick={saveDraftToStore}
-							className="rounded-full border border-[#0F4C45]/15 px-3.5 py-1.5 text-[0.78rem] font-semibold text-[#0F4C45] hover:bg-[#0F4C45]/08"
-						>
-							Apply
-						</button>
-						<button
-							type="button"
-							onClick={exportStore}
-							className="rounded-full bg-[#0F4C45] px-3.5 py-1.5 text-[0.78rem] font-semibold text-[#F7F1E8] hover:bg-[#0c3d37]"
-						>
-							Download briefs.json
-						</button>
-						<Link
-							href="/#about"
-							className="rounded-full px-3 py-1.5 text-[0.78rem] font-semibold text-[#5C6F6A] hover:text-[#0F4C45]"
-						>
-							← Site
-						</Link>
-					</div>
-				</div>
-				<p className="mx-auto max-w-[90rem] px-4 pb-3 text-[0.75rem] leading-5 text-[#6A7A76] sm:px-6">
-					Edit blocks on the left, preview on the right. Download{" "}
-					<code className="rounded bg-black/5 px-1">briefs.json</code> and replace{" "}
-					<code className="rounded bg-black/5 px-1">content/briefs.json</code>,
-					then refresh the site.
-				</p>
-			</header>
-
-			<div className="mx-auto grid max-w-[90rem] gap-4 px-4 py-4 lg:grid-cols-[14rem_minmax(0,1fr)_minmax(0,1.1fr)] sm:px-6">
-				<aside className="max-h-[calc(100vh-8rem)] overflow-y-auto rounded-xl border border-[#0F4C45]/10 bg-white/70 p-3">
-					<p className="mb-2 text-[0.62rem] font-semibold uppercase tracking-[0.18em] text-[#8A9692]">
-						Cards
-					</p>
-					<ul className="space-y-1">
-						{catalog.map((entry) => (
-							<li key={entry.id}>
-								<button
-									type="button"
-									onClick={() => selectEntry(entry.id)}
-									className={`w-full rounded-lg px-2.5 py-2 text-left transition-colors ${
-										activeId === entry.id
-											? "bg-[#0F4C45] text-[#F7F1E8]"
-											: "hover:bg-[#0F4C45]/06"
-									}`}
-								>
-									<span className="block text-[0.8rem] font-semibold">
-										{entry.title}
-									</span>
-									<span
-										className={`mt-0.5 block text-[0.62rem] ${
-											activeId === entry.id
-												? "text-white/70"
-												: "text-[#8A9692]"
-										}`}
-									>
-										{store[entry.id] ? "Editable override" : "From source"}
-									</span>
-								</button>
-							</li>
-						))}
-					</ul>
-				</aside>
-
-				<section className="max-h-[calc(100vh-8rem)] space-y-3 overflow-y-auto rounded-xl border border-[#0F4C45]/10 bg-white/80 p-4">
-					<div className="grid gap-2 sm:grid-cols-2">
-						<label className="block text-[0.72rem] font-semibold text-[#5C6F6A]">
-							Title
-							<input
-								value={draft.title}
-								onChange={(event) =>
-									setDraft((prev) => ({ ...prev, title: event.target.value }))
-								}
-								className="mt-1 w-full rounded-lg border border-[#0F4C45]/15 bg-white px-3 py-2 text-[0.9rem] text-[#162b26]"
-							/>
-						</label>
-						<label className="block text-[0.72rem] font-semibold text-[#5C6F6A]">
-							Subtitle
-							<input
-								value={draft.subtitle ?? ""}
-								onChange={(event) =>
-									setDraft((prev) => ({
-										...prev,
-										subtitle: event.target.value,
-									}))
-								}
-								className="mt-1 w-full rounded-lg border border-[#0F4C45]/15 bg-white px-3 py-2 text-[0.9rem] text-[#162b26]"
-							/>
-						</label>
-						<label className="block text-[0.72rem] font-semibold text-[#5C6F6A] sm:col-span-2">
-							Section label
-							<input
-								value={draft.section ?? ""}
-								onChange={(event) =>
-									setDraft((prev) => ({
-										...prev,
-										section: event.target.value,
-									}))
-								}
-								className="mt-1 w-full rounded-lg border border-[#0F4C45]/15 bg-white px-3 py-2 text-[0.9rem] text-[#162b26]"
-							/>
-						</label>
-					</div>
-
-					<div className="flex flex-wrap gap-1.5 border-y border-[#0F4C45]/08 py-3">
-						{(
-							Object.keys(BLOCK_LABELS) as BriefBlock["type"][]
-						).map((type) => (
-							<button
-								key={type}
-								type="button"
-								onClick={() =>
-									setBlocks([...draft.blocks, createEmptyBlock(type)])
-								}
-								className="rounded-full border border-[#0F4C45]/12 px-2.5 py-1 text-[0.68rem] font-semibold text-[#0F4C45] hover:bg-[#0F4C45]/08"
-							>
-								+ {BLOCK_LABELS[type]}
-							</button>
-						))}
-					</div>
-
-					<div className="space-y-3">
-						{draft.blocks.map((block, index) => (
-							<BlockEditor
-								key={block.id}
-								block={block}
-								index={index}
-								onChange={(next) =>
-									setBlocks(
-										updateBlock(draft.blocks, block.id, () => next),
-									)
-								}
-								onRemove={() => setBlocks(removeBlock(draft.blocks, block.id))}
-								onMove={(dir) =>
-									setBlocks(moveBlock(draft.blocks, block.id, dir))
-								}
-								onPickImage={(token) => setPickingFor(token)}
-								onNestedChange={(blocks) => setBlocks(blocks)}
-								allBlocks={draft.blocks}
-							/>
-						))}
-					</div>
-
-					{pickingFor ? (
-						<div className="rounded-xl border border-[#0F4C45]/15 bg-[#F7F1E8] p-3">
-							<div className="mb-2 flex items-center justify-between gap-2">
-								<p className="text-[0.72rem] font-semibold text-[#0F4C45]">
-									Pick image
-								</p>
-								<button
-									type="button"
-									onClick={() => setPickingFor(null)}
-									className="text-[0.72rem] font-semibold text-[#6A7A76]"
-								>
-									Close
-								</button>
-							</div>
-							<input
-								value={mediaFilter}
-								onChange={(event) => setMediaFilter(event.target.value)}
-								placeholder="Filter paths…"
-								className="mb-2 w-full rounded-lg border border-[#0F4C45]/15 bg-white px-3 py-2 text-[0.8rem]"
-							/>
-							<div className="grid max-h-64 grid-cols-3 gap-2 overflow-y-auto sm:grid-cols-4">
-								{filteredMedia.map((path) => (
-									<button
-										key={path}
-										type="button"
-										onClick={() => {
-											const [blockId, field] = pickingFor.split("::");
-											if (!blockId) return;
-											setBlocks(
-												updateBlock(draft.blocks, blockId, (block) => {
-													if (block.type === "image" && field === "src") {
-														return {
-															...block,
-															image: { ...block.image, src: path },
-														};
-													}
-													if (
-														block.type === "duo" &&
-														(field === "0" || field === "1")
-													) {
-														const images = [...block.images] as [
-															(typeof block.images)[0],
-															(typeof block.images)[0],
-														];
-														const idx = Number(field);
-														images[idx] = { ...images[idx], src: path };
-														return { ...block, images };
-													}
-													return block;
-												}),
-											);
-											setPickingFor(null);
-										}}
-										className="overflow-hidden rounded-md border border-[#0F4C45]/10 bg-white text-left hover:border-[#0F4C45]/35"
-									>
-										<div className="relative aspect-square">
-											<Image
-												src={path}
-												alt=""
-												fill
-												sizes="120px"
-												className="object-cover"
-											/>
-										</div>
-										<span className="block truncate px-1 py-1 text-[0.58rem] text-[#6A7A76]">
-											{path.split("/").pop()}
-										</span>
-									</button>
-								))}
-							</div>
-						</div>
-					) : null}
-				</section>
-
-				<section className="max-h-[calc(100vh-8rem)] overflow-y-auto rounded-xl border border-[#0F4C45]/10 bg-[#E8E2D8] p-3">
-					<p className="mb-2 px-1 text-[0.62rem] font-semibold uppercase tracking-[0.18em] text-[#8A9692]">
-						Live preview
-					</p>
-					<div className="overflow-hidden rounded-lg shadow-[0_20px_50px_rgba(22,43,38,0.12)]">
-						<BriefDocument doc={draft} />
-					</div>
-				</section>
-			</div>
-		</div>
-	);
-}
-
-function BlockEditor({
-	block,
-	index,
+/** Inline text that looks like preview until focused. */
+function LiveText({
+	value,
 	onChange,
-	onRemove,
-	onMove,
-	onPickImage,
-	onNestedChange,
-	allBlocks,
+	className,
+	multiline = false,
+	placeholder = "点这里编辑",
 }: {
-	block: BriefBlock;
-	index: number;
-	onChange: (block: BriefBlock) => void;
-	onRemove: () => void;
-	onMove: (dir: -1 | 1) => void;
-	onPickImage: (token: string) => void;
-	onNestedChange: (blocks: BriefBlock[]) => void;
-	allBlocks: BriefBlock[];
+	value: string;
+	onChange: (v: string) => void;
+	className: string;
+	multiline?: boolean;
+	placeholder?: string;
+}) {
+	if (multiline) {
+		return (
+			<textarea
+				value={value}
+				placeholder={placeholder}
+				rows={Math.max(2, value.split("\n").length + 1)}
+				onChange={(e) => onChange(e.target.value)}
+				className={`studio-live w-full resize-y rounded-md bg-transparent outline-none hover:bg-[#0F4C45]/[0.04] focus:bg-[#0F4C45]/[0.06] focus:ring-1 focus:ring-[#0F4C45]/25 ${className}`}
+			/>
+		);
+	}
+	return (
+		<input
+			value={value}
+			placeholder={placeholder}
+			onChange={(e) => onChange(e.target.value)}
+			className={`studio-live w-full rounded-md bg-transparent outline-none hover:bg-[#0F4C45]/[0.04] focus:bg-[#0F4C45]/[0.06] focus:ring-1 focus:ring-[#0F4C45]/25 ${className}`}
+		/>
+	);
+}
+
+function LiveImage({
+	image,
+	onPick,
+	onCaption,
+}: {
+	image: BriefImage;
+	onPick: () => void;
+	onCaption?: (v: string) => void;
 }) {
 	return (
-		<div className="rounded-xl border border-[#0F4C45]/12 bg-[#FBF8F3] p-3">
-			<div className="mb-2 flex items-center justify-between gap-2">
-				<p className="text-[0.68rem] font-semibold uppercase tracking-[0.14em] text-[#0F4C45]/70">
-					{index + 1}. {BLOCK_LABELS[block.type]}
-				</p>
-				<div className="flex gap-1">
-					<button
-						type="button"
-						onClick={() => onMove(-1)}
-						className="rounded px-2 py-0.5 text-[0.68rem] font-semibold text-[#5C6F6A] hover:bg-black/5"
-					>
-						↑
-					</button>
-					<button
-						type="button"
-						onClick={() => onMove(1)}
-						className="rounded px-2 py-0.5 text-[0.68rem] font-semibold text-[#5C6F6A] hover:bg-black/5"
-					>
-						↓
-					</button>
-					<button
-						type="button"
-						onClick={onRemove}
-						className="rounded px-2 py-0.5 text-[0.68rem] font-semibold text-[#9b4a3c] hover:bg-[#9b4a3c]/10"
-					>
-						Delete
-					</button>
-				</div>
-			</div>
+		<figure className="group/img relative overflow-hidden bg-[#F5F5F3]">
+			<button
+				type="button"
+				onClick={onPick}
+				className="relative block aspect-[4/3] w-full cursor-pointer"
+			>
+				<Image
+					src={image.src}
+					alt={image.alt || ""}
+					fill
+					sizes="420px"
+					className="object-cover"
+				/>
+				<span className="absolute inset-0 flex items-center justify-center bg-[#162b26]/0 text-[0.78rem] font-semibold text-white opacity-0 transition group-hover/img:bg-[#162b26]/35 group-hover/img:opacity-100">
+					换图
+				</span>
+			</button>
+			{onCaption ? (
+				<LiveText
+					value={image.caption ?? ""}
+					onChange={onCaption}
+					placeholder="图片说明"
+					className="px-3 py-2.5 text-center text-[0.74rem] text-[#8A9692]"
+				/>
+			) : image.caption ? (
+				<figcaption className="px-3 py-2.5 text-center text-[0.74rem] text-[#8A9692]">
+					{image.caption}
+				</figcaption>
+			) : null}
+		</figure>
+	);
+}
 
-			{block.type === "kicker" ||
-			block.type === "heading" ||
-			block.type === "subheading" ||
-			block.type === "pull" ||
-			block.type === "text" ? (
-				<textarea
+function BlockRow({
+	block,
+	onChange,
+	onRemove,
+	onPick,
+}: {
+	block: BriefBlock;
+	onChange: (b: BriefBlock) => void;
+	onRemove: () => void;
+	onPick: (field: string) => void;
+}) {
+	return (
+		<div className="group/block relative">
+			<button
+				type="button"
+				onClick={onRemove}
+				className="absolute -right-1 -top-1 z-[2] hidden h-6 w-6 items-center justify-center rounded-full bg-[#9b4a3c] text-[0.7rem] font-bold text-white shadow group-hover/block:flex"
+				title="删除这块"
+			>
+				×
+			</button>
+
+			{block.type === "kicker" ? (
+				<LiveText
 					value={block.text}
-					onChange={(event) =>
-						onChange({ ...block, text: event.target.value })
-					}
-					rows={block.type === "text" || block.type === "pull" ? 3 : 2}
-					className="w-full rounded-lg border border-[#0F4C45]/12 bg-white px-3 py-2 text-[0.88rem] leading-6"
+					onChange={(text) => onChange({ ...block, text })}
+					className="text-[0.68rem] font-semibold uppercase tracking-[0.24em] text-[#8A9692]"
 				/>
 			) : null}
-
+			{block.type === "heading" ? (
+				<LiveText
+					value={block.text}
+					onChange={(text) => onChange({ ...block, text })}
+					className="mt-4 text-[1.6rem] font-extrabold tracking-tight text-[#162b26]"
+				/>
+			) : null}
+			{block.type === "subheading" ? (
+				<LiveText
+					value={block.text}
+					onChange={(text) => onChange({ ...block, text })}
+					className="mt-1.5 text-[0.95rem] text-[#6A7A76]"
+				/>
+			) : null}
+			{block.type === "pull" ? (
+				<LiveText
+					value={block.text}
+					onChange={(text) => onChange({ ...block, text })}
+					multiline
+					className="mt-5 text-[1.02rem] font-medium leading-8 text-[#0F4C45]"
+				/>
+			) : null}
+			{block.type === "text" ? (
+				<LiveText
+					value={block.text}
+					onChange={(text) => onChange({ ...block, text })}
+					multiline
+					className="mt-3.5 text-[1rem] leading-8 text-[#333]"
+				/>
+			) : null}
 			{block.type === "list" ? (
-				<textarea
+				<LiveText
 					value={block.items.join("\n")}
-					onChange={(event) =>
+					onChange={(v) =>
 						onChange({
 							...block,
-							items: event.target.value.split("\n").filter(Boolean),
+							items: v.split("\n").filter(Boolean),
 						})
 					}
-					rows={4}
-					className="w-full rounded-lg border border-[#0F4C45]/12 bg-white px-3 py-2 text-[0.88rem] leading-6"
-					placeholder="One item per line"
+					multiline
+					placeholder={"每行一项"}
+					className="mt-4 text-[1rem] leading-8 text-[#333]"
 				/>
 			) : null}
-
 			{block.type === "image" ? (
-				<div className="space-y-2">
-					<div className="flex gap-2">
-						<input
-							value={block.image.src}
-							onChange={(event) =>
-								onChange({
-									...block,
-									image: { ...block.image, src: event.target.value },
-								})
-							}
-							className="min-w-0 flex-1 rounded-lg border border-[#0F4C45]/12 bg-white px-3 py-2 text-[0.8rem]"
-						/>
-						<button
-							type="button"
-							onClick={() => onPickImage(`${block.id}::src`)}
-							className="rounded-lg border border-[#0F4C45]/15 px-3 text-[0.72rem] font-semibold text-[#0F4C45]"
-						>
-							Browse
-						</button>
-					</div>
-					<input
-						value={block.image.alt}
-						onChange={(event) =>
+				<div className="mt-7">
+					<LiveImage
+						image={block.image}
+						onPick={() => onPick("src")}
+						onCaption={(caption) =>
 							onChange({
 								...block,
-								image: { ...block.image, alt: event.target.value },
+								image: { ...block.image, caption },
 							})
 						}
-						placeholder="Alt text"
-						className="w-full rounded-lg border border-[#0F4C45]/12 bg-white px-3 py-2 text-[0.8rem]"
-					/>
-					<input
-						value={block.image.caption ?? ""}
-						onChange={(event) =>
-							onChange({
-								...block,
-								image: { ...block.image, caption: event.target.value },
-							})
-						}
-						placeholder="Caption"
-						className="w-full rounded-lg border border-[#0F4C45]/12 bg-white px-3 py-2 text-[0.8rem]"
 					/>
 				</div>
 			) : null}
-
 			{block.type === "duo" ? (
-				<div className="grid gap-3 sm:grid-cols-2">
+				<div className="mt-7 grid gap-3.5 sm:grid-cols-2">
 					{block.images.map((image, idx) => (
-						<div key={`${block.id}-${idx}`} className="space-y-2">
-							<div className="flex gap-2">
-								<input
-									value={image.src}
-									onChange={(event) => {
-										const images = [...block.images] as typeof block.images;
-										images[idx] = { ...images[idx], src: event.target.value };
-										onChange({ ...block, images });
-									}}
-									className="min-w-0 flex-1 rounded-lg border border-[#0F4C45]/12 bg-white px-2 py-1.5 text-[0.75rem]"
-								/>
-								<button
-									type="button"
-									onClick={() => onPickImage(`${block.id}::${idx}`)}
-									className="rounded-lg border border-[#0F4C45]/15 px-2 text-[0.68rem] font-semibold text-[#0F4C45]"
-								>
-									Browse
-								</button>
-							</div>
-							<input
-								value={image.alt}
-								onChange={(event) => {
-									const images = [...block.images] as typeof block.images;
-									images[idx] = { ...images[idx], alt: event.target.value };
-									onChange({ ...block, images });
-								}}
-								placeholder="Alt"
-								className="w-full rounded-lg border border-[#0F4C45]/12 bg-white px-2 py-1.5 text-[0.75rem]"
-							/>
-							<input
-								value={image.caption ?? ""}
-								onChange={(event) => {
-									const images = [...block.images] as typeof block.images;
-									images[idx] = {
-										...images[idx],
-										caption: event.target.value,
-									};
-									onChange({ ...block, images });
-								}}
-								placeholder="Caption"
-								className="w-full rounded-lg border border-[#0F4C45]/12 bg-white px-2 py-1.5 text-[0.75rem]"
-							/>
-						</div>
+						<LiveImage
+							key={`${block.id}-${idx}`}
+							image={image}
+							onPick={() => onPick(String(idx))}
+							onCaption={(caption) => {
+								const images = [...block.images] as typeof block.images;
+								images[idx] = { ...images[idx], caption };
+								onChange({ ...block, images });
+							}}
+						/>
 					))}
 				</div>
 			) : null}
-
 			{block.type === "tabs" ? (
-				<div className="space-y-3">
+				<div className="mt-6 space-y-6 rounded-lg border border-dashed border-[#0F4C45]/2 p-3">
 					{block.tabs.map((tab, tabIndex) => (
-						<div
-							key={tab.id}
-							className="rounded-lg border border-[#0F4C45]/10 bg-white/80 p-2.5"
-						>
-							<div className="mb-2 grid gap-2 sm:grid-cols-2">
-								<input
-									value={tab.label}
-									onChange={(event) => {
-										const tabs = block.tabs.map((item, i) =>
-											i === tabIndex
-												? { ...item, label: event.target.value }
-												: item,
-										);
-										onChange({ ...block, tabs });
-									}}
-									className="rounded-lg border border-[#0F4C45]/12 px-2 py-1.5 text-[0.8rem]"
-									placeholder="Tab label"
-								/>
-								<input
-									value={tab.labelEn ?? ""}
-									onChange={(event) => {
-										const tabs = block.tabs.map((item, i) =>
-											i === tabIndex
-												? { ...item, labelEn: event.target.value }
-												: item,
-										);
-										onChange({ ...block, tabs });
-									}}
-									className="rounded-lg border border-[#0F4C45]/12 px-2 py-1.5 text-[0.8rem]"
-									placeholder="English label"
-								/>
-							</div>
-							<div className="flex flex-wrap gap-1 pb-2">
-								{(
-									[
-										"pull",
-										"text",
-										"image",
-										"duo",
-										"list",
-									] as BriefBlock["type"][]
-								).map((type) => (
-									<button
-										key={type}
-										type="button"
-										onClick={() => {
-											const tabs = block.tabs.map((item, i) =>
-												i === tabIndex
+						<div key={tab.id}>
+							<LiveText
+								value={tab.label}
+								onChange={(label) => {
+									const tabs = block.tabs.map((t, i) =>
+										i === tabIndex ? { ...t, label } : t,
+									);
+									onChange({ ...block, tabs });
+								}}
+								className="text-[0.9rem] font-semibold text-[#0F4C45]"
+							/>
+							<div className="mt-3 space-y-3">
+								{tab.blocks.map((child) => (
+									<BlockRow
+										key={child.id}
+										block={child}
+										onChange={(next) => {
+											const tabs = block.tabs.map((t) =>
+												t.id === tab.id
 													? {
-															...item,
-															blocks: [
-																...item.blocks,
-																createEmptyBlock(type),
-															],
+															...t,
+															blocks: t.blocks.map((b) =>
+																b.id === child.id ? next : b,
+															),
 														}
-													: item,
+													: t,
 											);
 											onChange({ ...block, tabs });
 										}}
-										className="rounded-full border border-[#0F4C45]/12 px-2 py-0.5 text-[0.62rem] font-semibold text-[#0F4C45]"
-									>
-										+ {BLOCK_LABELS[type]}
-									</button>
-								))}
-							</div>
-							<div className="space-y-2">
-								{tab.blocks.map((child, childIndex) => (
-									<BlockEditor
-										key={child.id}
-										block={child}
-										index={childIndex}
-										onChange={(next) => {
-											onNestedChange(
-												updateBlock(allBlocks, child.id, () => next),
+										onRemove={() => {
+											const tabs = block.tabs.map((t) =>
+												t.id === tab.id
+													? {
+															...t,
+															blocks: t.blocks.filter((b) => b.id !== child.id),
+														}
+													: t,
 											);
+											onChange({ ...block, tabs });
 										}}
-										onRemove={() =>
-											onNestedChange(removeBlock(allBlocks, child.id))
-										}
-										onMove={(dir) =>
-											onNestedChange(moveBlock(allBlocks, child.id, dir))
-										}
-										onPickImage={onPickImage}
-										onNestedChange={onNestedChange}
-										allBlocks={allBlocks}
+										onPick={(field) => onPick(`${child.id}::${field}`)}
 									/>
 								))}
 							</div>
 						</div>
 					))}
+				</div>
+			) : null}
+		</div>
+	);
+}
+
+export function StudioApp() {
+	const catalog = useMemo(() => buildCatalog(), []);
+	const [store, setStore] = useState<BriefStore>(
+		() => structuredClone(seedBriefs) as BriefStore,
+	);
+	const [activeId, setActiveId] = useState(catalog[0]?.id ?? "zongheng-robot");
+	const [doc, setDoc] = useState<BriefDoc>(() =>
+		loadDoc(catalog[0]!, structuredClone(seedBriefs) as BriefStore),
+	);
+	const [pickToken, setPickToken] = useState<string | null>(null);
+	const [mediaQ, setMediaQ] = useState("");
+	const [tip, setTip] = useState<string | null>(null);
+
+	const media = mediaList as string[];
+	const mediaHits = useMemo(() => {
+		const q = mediaQ.trim().toLowerCase();
+		return (q ? media.filter((p) => p.toLowerCase().includes(q)) : media).slice(
+			0,
+			48,
+		);
+	}, [media, mediaQ]);
+
+	useEffect(() => {
+		setStore((prev) => ({ ...prev, [doc.id]: doc }));
+	}, [doc]);
+
+	useEffect(() => {
+		if (!pickToken) return;
+		const onKey = (e: KeyboardEvent) => {
+			if (e.key === "Escape") setPickToken(null);
+		};
+		window.addEventListener("keydown", onKey);
+		return () => window.removeEventListener("keydown", onKey);
+	}, [pickToken]);
+
+	const switchCard = (id: string) => {
+		if (id === activeId) return;
+		const entry = catalog.find((c) => c.id === id);
+		if (!entry) return;
+		setActiveId(id);
+		setDoc(loadDoc(entry, store));
+	};
+
+	const setBlocks = (blocks: BriefBlock[]) => {
+		setDoc((prev) => ({ ...prev, blocks }));
+	};
+
+	const applyImage = (path: string) => {
+		if (!pickToken) return;
+		const parts = pickToken.split("::");
+		// formats: blockId::src | blockId::0 | blockId::childId::src
+		if (parts.length === 2) {
+			const [blockId, field] = parts;
+			if (!blockId) return;
+			setBlocks(
+				patchBlock(doc.blocks, blockId, (block) => {
+					if (block.type === "image") {
+						return { ...block, image: { ...block.image, src: path } };
+					}
+					if (block.type === "duo" && (field === "0" || field === "1")) {
+						const images = [...block.images] as typeof block.images;
+						images[Number(field)] = {
+							...images[Number(field)],
+							src: path,
+						};
+						return { ...block, images };
+					}
+					return block;
+				}),
+			);
+		} else if (parts.length === 3) {
+			const [parentHint, childId, field] = parts;
+			void parentHint;
+			if (!childId) return;
+			setBlocks(
+				patchBlock(doc.blocks, childId, (block) => {
+					if (block.type === "image") {
+						return { ...block, image: { ...block.image, src: path } };
+					}
+					if (block.type === "duo" && (field === "0" || field === "1")) {
+						const images = [...block.images] as typeof block.images;
+						images[Number(field)] = {
+							...images[Number(field)],
+							src: path,
+						};
+						return { ...block, images };
+					}
+					return block;
+				}),
+			);
+		}
+		setPickToken(null);
+		setMediaQ("");
+	};
+
+	const download = () => {
+		downloadJson({ ...store, [doc.id]: doc });
+		setTip("已下载 · 覆盖 content/briefs.json 即可");
+		window.setTimeout(() => setTip(null), 2500);
+	};
+
+	const hasKicker = doc.blocks.some((b) => b.type === "kicker");
+	const hasHeading = doc.blocks.some((b) => b.type === "heading");
+
+	return (
+		<div className="min-h-screen bg-[#E8E2D8] text-[#162b26]">
+			<header className="sticky top-0 z-20 border-b border-[#0F4C45]/10 bg-[#F7F1E8]/95 backdrop-blur">
+				<div className="mx-auto flex max-w-[42rem] items-center gap-2 px-4 py-2.5 sm:px-0">
+					<select
+						value={activeId}
+						onChange={(e) => switchCard(e.target.value)}
+						className="min-w-0 flex-1 rounded-full border border-[#0F4C45]/15 bg-white px-3 py-2 text-[0.82rem] font-semibold outline-none"
+					>
+						{catalog.map((c) => (
+							<option key={c.id} value={c.id}>
+								{c.group} · {c.title}
+							</option>
+						))}
+					</select>
+					<button
+						type="button"
+						onClick={download}
+						className="shrink-0 rounded-full bg-[#0F4C45] px-3.5 py-2 text-[0.75rem] font-semibold text-white"
+					>
+						下载
+					</button>
+					<Link
+						href="/#about"
+						className="shrink-0 rounded-full px-2 py-2 text-[0.75rem] font-semibold text-[#5C6F6A]"
+					>
+						回站
+					</Link>
+				</div>
+				<p className="mx-auto max-w-[42rem] px-4 pb-2 text-[0.68rem] text-[#6A7A76] sm:px-0">
+					直接点预览里的文字改 · 点图片换图 · 悬停出现删除
+				</p>
+			</header>
+
+			<main className="mx-auto max-w-[42rem] px-3 py-6 sm:px-0">
+				<article className="overflow-hidden rounded-2xl bg-white/95 px-6 py-8 shadow-[0_20px_50px_rgba(22,43,38,0.12)] sm:px-10 sm:py-10">
+					{!hasKicker && doc.section ? (
+						<LiveText
+							value={doc.section}
+							onChange={(section) => setDoc((p) => ({ ...p, section }))}
+							className="text-[0.68rem] font-semibold uppercase tracking-[0.24em] text-[#8A9692]"
+						/>
+					) : null}
+					{!hasHeading ? (
+						<>
+							<LiveText
+								value={doc.title}
+								onChange={(title) => setDoc((p) => ({ ...p, title }))}
+								className="mt-4 text-[1.6rem] font-extrabold tracking-tight text-[#162b26]"
+							/>
+							<LiveText
+								value={doc.subtitle ?? ""}
+								onChange={(subtitle) => setDoc((p) => ({ ...p, subtitle }))}
+								className="mt-1.5 text-[0.95rem] text-[#6A7A76]"
+								placeholder="副标题"
+							/>
+						</>
+					) : null}
+
+					<div className="space-y-1">
+						{doc.blocks.map((block) => (
+							<BlockRow
+								key={block.id}
+								block={block}
+								onChange={(next) =>
+									setBlocks(
+										patchBlock(doc.blocks, block.id, () => next),
+									)
+								}
+								onRemove={() => setBlocks(dropBlock(doc.blocks, block.id))}
+								onPick={(field) => {
+									// tabs child passes "childId::field"
+									if (field.includes("::")) {
+										setPickToken(`${block.id}::${field}`);
+									} else {
+										setPickToken(`${block.id}::${field}`);
+									}
+								}}
+							/>
+						))}
+					</div>
+
+					<div className="mt-8 flex flex-wrap gap-2 border-t border-dashed border-[#0F4C45]/15 pt-5">
+						{(
+							[
+								["heading", "加标题"],
+								["text", "加正文"],
+								["image", "加图片"],
+								["duo", "加双图"],
+							] as const
+						).map(([type, label]) => (
+							<button
+								key={type}
+								type="button"
+								onClick={() =>
+									setBlocks([...doc.blocks, createEmptyBlock(type)])
+								}
+								className="rounded-full border border-[#0F4C45]/15 px-3 py-1.5 text-[0.72rem] font-semibold text-[#0F4C45] hover:bg-[#0F4C45] hover:text-white"
+							>
+								{label}
+							</button>
+						))}
+					</div>
+				</article>
+			</main>
+
+			{pickToken ? (
+				<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+					<div className="flex max-h-[85vh] w-full max-w-lg flex-col overflow-hidden rounded-2xl bg-[#F7F1E8]">
+						<div className="flex items-center justify-between px-4 py-3">
+							<p className="font-semibold text-[#0F4C45]">选图</p>
+							<button
+								type="button"
+								onClick={() => setPickToken(null)}
+								className="text-[0.8rem] font-semibold text-[#6A7A76]"
+							>
+								关闭
+							</button>
+						</div>
+						<input
+							autoFocus
+							value={mediaQ}
+							onChange={(e) => setMediaQ(e.target.value)}
+							placeholder="搜索图片"
+							className="mx-4 mb-2 rounded-lg border border-[#0F4C45]/15 bg-white px-3 py-2 text-[0.85rem] outline-none"
+						/>
+						<div className="grid grid-cols-3 gap-2 overflow-y-auto p-3 sm:grid-cols-4">
+							{mediaHits.map((path) => (
+								<button
+									key={path}
+									type="button"
+									onClick={() => applyImage(path)}
+									className="relative aspect-square overflow-hidden rounded-lg bg-white"
+								>
+									<Image
+										src={path}
+										alt=""
+										fill
+										sizes="110px"
+										className="object-cover"
+									/>
+								</button>
+							))}
+						</div>
+					</div>
+				</div>
+			) : null}
+
+			{tip ? (
+				<div className="fixed bottom-5 left-1/2 z-50 -translate-x-1/2 rounded-full bg-[#0F4C45] px-4 py-2 text-[0.78rem] font-semibold text-white">
+					{tip}
 				</div>
 			) : null}
 		</div>

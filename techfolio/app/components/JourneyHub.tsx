@@ -39,7 +39,8 @@ type HubCard =
 	| { kind: "showcase"; item: UniversityShowcase; section: string }
 	| { kind: "company"; item: CompanyBrief }
 	| { kind: "helmet"; item: HelmetBlock }
-	| { kind: "diy"; item: DiyWallBlock };
+	| { kind: "diy"; item: DiyWallBlock }
+	| { kind: "depts"; items: UniversityShowcase[] };
 
 type StageBeat = {
 	type: "stage";
@@ -110,6 +111,7 @@ function cardId(card: HubCard) {
 	if (card.kind === "showcase") return card.item.id;
 	if (card.kind === "company") return card.item.id;
 	if (card.kind === "helmet") return "smart-helmet";
+	if (card.kind === "depts") return "campus-depts";
 	return "make-diy";
 }
 
@@ -174,7 +176,9 @@ function cardMeta(
 		case "diy":
 			return {
 				title: "DIY",
-				subtitle: card.item.titleZh,
+				subtitle: isZh
+					? `${card.item.items.length} 件桌面造物`
+					: `${card.item.items.length} desk builds`,
 				image: card.item.items[0]?.image,
 				kindLabel:
 					locale === "zh-Hant"
@@ -182,6 +186,24 @@ function cardMeta(
 						: locale === "zh-Hans"
 							? "造物 · 工作台"
 							: "MAKE · Bench",
+			};
+		case "depts":
+			return {
+				title: isZh
+					? locale === "zh-Hant"
+						? "校園部門"
+						: "校园部门"
+					: "Campus Depts",
+				subtitle: isZh
+					? "国防教育教导队 · 无人机工作站"
+					: "Defense education · Drone workstation",
+				image: card.items[0]?.cardImage,
+				kindLabel:
+					locale === "zh-Hant"
+						? "社會 · 部門"
+						: locale === "zh-Hans"
+							? "社会 · 部门"
+							: "Society · Dept",
 			};
 	}
 }
@@ -225,14 +247,23 @@ function buildJourney(): { beats: Beat[]; cards: HubCard[] } {
 	];
 
 	const societyCards: HubCard[] = [
-		...pickShowcases(["robotman"], universityProjectShowcases),
-		...universityDepartmentShowcases,
-		...pickShowcases(["volunteering", "exhibitions"], societyShowcases),
-	].map((item) => ({
-		kind: "showcase" as const,
-		item,
-		section: SOCIETY_SECTION[item.id] ?? "Society",
-	}));
+		...pickShowcases(["robotman"], universityProjectShowcases).map((item) => ({
+			kind: "showcase" as const,
+			item,
+			section: SOCIETY_SECTION[item.id] ?? "Society",
+		})),
+		{
+			kind: "depts",
+			items: universityDepartmentShowcases,
+		},
+		...pickShowcases(["volunteering", "exhibitions"], societyShowcases).map(
+			(item) => ({
+				kind: "showcase" as const,
+				item,
+				section: SOCIETY_SECTION[item.id] ?? "Society",
+			}),
+		),
+	];
 
 	let zigzag = 0;
 	let momentIndex = 0;
@@ -282,7 +313,7 @@ function buildJourney(): { beats: Beat[]; cards: HubCard[] } {
 				id: "society",
 				phase: "04",
 				title: "Society",
-				whisper: "Team, two departments, volunteering, and exhibitions.",
+				whisper: "Team, campus departments, volunteering, and exhibitions.",
 			},
 			cards: societyCards,
 		},
@@ -637,20 +668,31 @@ function useActiveStage(stageIds: string[]) {
 	return active;
 }
 
-/** Show rail only while the About section occupies the viewport. */
+/** Show rail only while About timeline is the focus — fade when skills strip enters. */
 function useAboutLocked() {
 	const [locked, setLocked] = useState(false);
 
 	useEffect(() => {
 		const about = document.getElementById("about");
+		const skills = document.getElementById("skills");
 		if (!about) return;
 
 		const update = () => {
-			const rect = about.getBoundingClientRect();
 			const vh = window.innerHeight;
-			// Locked when About covers a meaningful band of the screen
+
+			// Skills strip approaching center → release the stage rail
+			if (skills) {
+				const sr = skills.getBoundingClientRect();
+				const inMidBand = sr.top < vh * 0.7 && sr.bottom > vh * 0.22;
+				if (inMidBand) {
+					setLocked(false);
+					return;
+				}
+			}
+
+			const rect = about.getBoundingClientRect();
 			const entered = rect.top < vh * 0.55;
-			const stillHere = rect.bottom > vh * 0.35;
+			const stillHere = rect.bottom > vh * 0.42;
 			setLocked(entered && stillHere);
 		};
 
@@ -799,39 +841,114 @@ function DiyBrief({ item }: { item: DiyWallBlock }) {
 			<p className="text-[0.68rem] font-semibold uppercase tracking-[0.24em] text-[#8A9692]">
 				MAKE · DIY
 			</p>
-			<p className="mt-1 font-mono text-[0.62rem] tracking-[0.2em] text-[#8A9692]">
-				{item.num}
-			</p>
 			<h3 className="mt-4 text-[1.6rem] font-extrabold tracking-tight text-[#162b26] sm:text-[1.7rem]">
 				{item.title}
 			</h3>
 			<p className="mt-1.5 text-[0.95rem] text-[#6A7A76]">{item.titleZh}</p>
-			<p className="mt-5 text-[1rem] leading-8 text-[#333]">{item.lede}</p>
-			<p className="mt-6 text-[0.68rem] font-semibold uppercase tracking-[0.2em] text-[#8A9692]">
-				Scroll for each build
+			<p className="mt-4 text-[0.95rem] leading-7 text-[#333]">
+				{item.items.length} builds from the same desk — a compact wall, not a
+				long scroll.
 			</p>
-			<ul className="mt-4 space-y-8">
-				{item.items.map((diy, index) => (
-					<li key={diy.id} className="border-t border-black/[0.06] pt-6">
-						<p className="font-mono text-[0.62rem] tracking-[0.18em] text-[#8A9692]">
-							{String(index + 1).padStart(2, "0")} · {diy.year}
-						</p>
-						<div className="relative mt-3 aspect-[4/3] overflow-hidden bg-[#F5F5F3]">
+			<div className="mt-6 grid grid-cols-2 gap-2.5 sm:grid-cols-3 sm:gap-3">
+				{item.items.map((diy) => (
+					<figure
+						key={diy.id}
+						className="overflow-hidden rounded-md bg-[#F5F5F3]"
+					>
+						<div className="relative aspect-square">
 							<Image
 								src={diy.image.src}
 								alt={diy.image.alt}
 								fill
-								sizes="560px"
-								className="object-contain p-4"
+								sizes="200px"
+								className="object-cover"
 							/>
 						</div>
-						<h4 className="mt-4 text-[1.22rem] font-extrabold tracking-tight text-[#162b26]">
-							{diy.title}
-						</h4>
-						<p className="mt-1 text-[0.95rem] text-[#6A7A76]">{diy.titleZh}</p>
-					</li>
+						<figcaption className="px-2 py-2">
+							<p className="truncate text-[0.72rem] font-semibold tracking-tight text-[#162b26]">
+								{diy.titleZh}
+							</p>
+							<p className="mt-0.5 truncate font-mono text-[0.58rem] tracking-[0.12em] text-[#8A9692]">
+								{diy.year}
+							</p>
+						</figcaption>
+					</figure>
 				))}
-			</ul>
+			</div>
+		</article>
+	);
+}
+
+function DeptsBrief({ items }: { items: UniversityShowcase[] }) {
+	return (
+		<article className="bg-white/90 px-7 py-9 text-[#111] sm:px-11 sm:py-11">
+			<p className="text-[0.68rem] font-semibold uppercase tracking-[0.24em] text-[#8A9692]">
+				Society · Departments
+			</p>
+			<h3 className="mt-4 text-[1.6rem] font-extrabold tracking-tight text-[#162b26] sm:text-[1.7rem]">
+				Campus Departments
+			</h3>
+			<p className="mt-1.5 text-[0.95rem] text-[#6A7A76]">
+				国防教育教导队 · 无人机工作站
+			</p>
+			<p className="mt-4 text-[0.95rem] leading-7 text-[#0F4C45]">
+				Two campus posts in one brief — defense education duty, then the drone
+				workstation.
+			</p>
+
+			<div className="mt-8 space-y-10">
+				{items.map((dept, index) => {
+					const hero = dept.spreads.find(
+						(spread) =>
+							spread.type === "product-hero" || spread.type === "image-full",
+					);
+					const heroImage =
+						hero && "image" in hero && hero.image
+							? hero.image
+							: dept.cardImage;
+					const role = dept.spreads.find((spread) => spread.type === "prose");
+					const body =
+						role && role.type === "prose"
+							? role.body
+							: (dept.preview ?? []);
+
+					return (
+						<section
+							key={dept.id}
+							className={
+								index > 0 ? "border-t border-[#0F4C45]/10 pt-8" : undefined
+							}
+						>
+							<p className="font-mono text-[0.58rem] tracking-[0.2em] text-[#8A9692]">
+								{String(index + 1).padStart(2, "0")} · Dept
+							</p>
+							<h4 className="mt-2 text-[1.25rem] font-extrabold tracking-tight text-[#162b26]">
+								{dept.title}
+							</h4>
+							<p className="mt-1 text-[0.88rem] text-[#6A7A76]">
+								{dept.subtitle}
+							</p>
+							<div className="relative mt-4 aspect-[16/10] overflow-hidden bg-[#F5F5F3]">
+								<Image
+									src={heroImage.src}
+									alt={heroImage.alt}
+									fill
+									sizes="520px"
+									className="object-cover"
+								/>
+							</div>
+							{body.map((paragraph) => (
+								<p
+									key={paragraph.slice(0, 28)}
+									className="mt-3 text-[0.95rem] leading-7 text-[#333]"
+								>
+									{paragraph}
+								</p>
+							))}
+						</section>
+					);
+				})}
+			</div>
 		</article>
 	);
 }
@@ -857,6 +974,7 @@ function BriefBody({ card }: { card: HubCard }) {
 		return <InternshipBrief item={card.item} className="shadow-none" />;
 	}
 	if (card.kind === "helmet") return <HelmetBrief item={card.item} />;
+	if (card.kind === "depts") return <DeptsBrief items={card.items} />;
 	return <DiyBrief item={card.item} />;
 }
 

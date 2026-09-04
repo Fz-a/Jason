@@ -8,6 +8,7 @@ import { HomeScrollPreloader } from "./components/HomeScrollPreloader";
 import { JourneyHub } from "./components/JourneyHub";
 import { HeroNameFlip } from "./components/HeroNameFlip";
 import { LangSwitch } from "./components/LangSwitch";
+import { SkillMarquee } from "./components/SkillMarquee";
 import { useLocale } from "./lib/i18n";
 
 const montserrat = Montserrat({
@@ -274,8 +275,8 @@ export default function Home() {
     >
       <HomeScrollPreloader />
       <header className="pointer-events-none fixed inset-x-0 top-0 z-50 safe-pt px-3 sm:px-6 sm:pt-5 lg:px-8">
-        <div className="pointer-events-auto mx-auto flex max-w-[calc(100vw-1.5rem)] items-center justify-center gap-2 sm:max-w-none sm:gap-3">
-          <div className="nav-scroll max-w-[min(100%,calc(100vw-7.5rem))] overflow-x-auto rounded-full border border-[#0F4C45]/15 bg-[#F7F1E8]/92 p-1 shadow-[0_14px_40px_rgba(22,43,38,0.08)] backdrop-blur-md sm:max-w-none sm:p-1.5">
+        <div className="relative mx-auto flex max-w-[calc(100vw-1.5rem)] items-center justify-center sm:max-w-none">
+          <div className="pointer-events-auto nav-scroll max-w-full overflow-x-auto rounded-full border border-[#0F4C45]/15 bg-[#F7F1E8]/92 p-1 shadow-[0_14px_40px_rgba(22,43,38,0.08)] backdrop-blur-md sm:p-1.5">
             <nav aria-label="Primary">
               <ul className="flex w-max items-center gap-0.5 sm:gap-1">
                 {navItems.map((item) => (
@@ -296,7 +297,9 @@ export default function Home() {
               </ul>
             </nav>
           </div>
-          <LangSwitch className="shrink-0" />
+          <div className="pointer-events-auto absolute right-0 top-1/2 -translate-y-1/2">
+            <LangSwitch />
+          </div>
         </div>
       </header>
 
@@ -394,12 +397,14 @@ export default function Home() {
 
       <section
         id="about"
-        className="scroll-mt-10 bg-[#F7F1E8] pb-16 pt-8 sm:scroll-mt-14 sm:pb-20 sm:pt-10 lg:pb-24 lg:pt-14"
+        className="scroll-mt-10 bg-[#F7F1E8] pb-10 pt-8 sm:scroll-mt-14 sm:pb-12 sm:pt-10 lg:pb-14 lg:pt-14"
       >
         <div className="mx-auto w-full max-w-[1100px] px-6 sm:px-8 md:px-10 lg:px-12 xl:max-w-[1160px] xl:px-14">
           <JourneyHub />
         </div>
       </section>
+
+      <SkillMarquee />
 
       <section
         id="contact"

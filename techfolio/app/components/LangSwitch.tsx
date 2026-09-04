@@ -7,7 +7,7 @@ export function LangSwitch({ className = "" }: { className?: string }) {
 
 	return (
 		<div
-			className={`lang-switch inline-flex items-center rounded-full border border-[#0F4C45]/20 bg-[#F7F1E8]/95 p-1 shadow-[0_10px_28px_rgba(22,43,38,0.08)] backdrop-blur-md ${className}`}
+			className={`lang-switch inline-flex items-center rounded-full border border-[#0F4C45]/18 bg-[#F7F1E8]/92 p-0.5 shadow-[0_6px_16px_rgba(22,43,38,0.06)] backdrop-blur-md ${className}`}
 			role="group"
 			aria-label={t("lang.label")}
 		>
@@ -20,10 +20,10 @@ export function LangSwitch({ className = "" }: { className?: string }) {
 						title={option.title}
 						aria-pressed={active}
 						onClick={() => setLocale(option.id as Locale)}
-						className={`min-w-[2.15rem] rounded-full px-2.5 py-1.5 text-[0.72rem] font-bold tracking-[0.04em] transition duration-300 sm:min-w-[2.35rem] sm:px-3 sm:py-2 sm:text-[0.78rem] ${
+						className={`min-w-[1.55rem] rounded-full px-1.5 py-1 text-[0.6rem] font-bold tracking-[0.02em] transition duration-300 sm:min-w-[1.7rem] sm:px-2 sm:py-1 sm:text-[0.64rem] ${
 							active
-								? "bg-[#0F4C45] text-[#F7F1E8] shadow-[0_8px_18px_rgba(15,76,69,0.28)]"
-								: "text-[#0F4C45]/75 hover:bg-[#0F4C45]/10 hover:text-[#0F4C45]"
+								? "bg-[#0F4C45] text-[#F7F1E8] shadow-[0_4px_10px_rgba(15,76,69,0.22)]"
+								: "text-[#0F4C45]/70 hover:bg-[#0F4C45]/10 hover:text-[#0F4C45]"
 						}`}
 					>
 						{option.short}

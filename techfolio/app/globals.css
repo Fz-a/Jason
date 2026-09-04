@@ -34,6 +34,135 @@ body {
 	display: none;
 }
 
+/* Partner-style skill strip — quiet, spaced, hairline-framed (Tesla / Xiaomi) */
+.skill-marquee {
+	background: #f7f1e8;
+}
+
+.skill-marquee__rule {
+	height: 1px;
+	width: 100%;
+	background: linear-gradient(
+		90deg,
+		transparent 0%,
+		rgb(15 76 69 / 0.18) 18%,
+		rgb(15 76 69 / 0.18) 82%,
+		transparent 100%
+	);
+}
+
+.skill-marquee__body {
+	padding: 2.75rem 0 2.85rem;
+}
+
+.skill-marquee__label {
+	margin: 0 0 1.35rem;
+	text-align: center;
+	font-size: 0.6rem;
+	font-weight: 600;
+	letter-spacing: 0.34em;
+	text-transform: uppercase;
+	color: rgb(15 76 69 / 0.42);
+}
+
+.skill-marquee__viewport {
+	overflow: hidden;
+	mask-image: linear-gradient(
+		90deg,
+		transparent,
+		#000 10%,
+		#000 90%,
+		transparent
+	);
+}
+
+.skill-marquee__track {
+	display: flex;
+	width: max-content;
+	align-items: center;
+	animation: skill-marquee-scroll 58s linear infinite;
+	will-change: transform;
+}
+
+.skill-marquee:hover .skill-marquee__track {
+	animation-play-state: paused;
+}
+
+.skill-marquee__cell {
+	display: inline-flex;
+	flex-shrink: 0;
+	align-items: center;
+	gap: 2.4rem;
+	padding-right: 2.4rem;
+}
+
+.skill-marquee__mark {
+	font-size: 1.05rem;
+	font-weight: 600;
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
+	color: rgb(22 43 38 / 0.38);
+	white-space: nowrap;
+	transition: color 0.35s ease;
+}
+
+.skill-marquee__cell:hover .skill-marquee__mark {
+	color: rgb(15 76 69 / 0.78);
+}
+
+.skill-marquee__sep {
+	display: block;
+	width: 1px;
+	height: 0.85rem;
+	flex-shrink: 0;
+	background: rgb(15 76 69 / 0.16);
+}
+
+.skill-marquee__dot {
+	display: none;
+}
+
+@keyframes skill-marquee-scroll {
+	from {
+		transform: translate3d(0, 0, 0);
+	}
+	to {
+		transform: translate3d(-50%, 0, 0);
+	}
+}
+
+@media (min-width: 640px) {
+	.skill-marquee__body {
+		padding: 3.4rem 0 3.5rem;
+	}
+
+	.skill-marquee__label {
+		margin-bottom: 1.6rem;
+		font-size: 0.64rem;
+		letter-spacing: 0.38em;
+	}
+
+	.skill-marquee__cell {
+		gap: 3.1rem;
+		padding-right: 3.1rem;
+	}
+
+	.skill-marquee__sep {
+		height: 1rem;
+	}
+
+	.skill-marquee__mark {
+		font-size: 1.2rem;
+		letter-spacing: 0.06em;
+	}
+}
+
+@media (min-width: 1024px) {
+	.skill-marquee__mark {
+		font-size: 1.28rem;
+	}
+}
+
 .safe-px {
 	padding-left: max(1rem, env(safe-area-inset-left));
 	padding-right: max(1rem, env(safe-area-inset-right));
@@ -68,8 +197,8 @@ button,
 	transform: translate3d(-12px, -50%, 0);
 	pointer-events: none;
 	transition:
-		opacity 0.55s cubic-bezier(0.22, 1, 0.36, 1),
-		transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+		opacity 0.95s cubic-bezier(0.22, 1, 0.36, 1),
+		transform 0.95s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .journey-stage-rail.is-visible {
@@ -439,6 +568,28 @@ button,
 	.journey-moment__veil,
 	.journey-moment__hint {
 		transition: none;
+	}
+
+	.skill-marquee__track {
+		animation: none;
+		flex-wrap: wrap;
+		justify-content: center;
+		width: 100%;
+		max-width: 52rem;
+		margin-inline: auto;
+		row-gap: 1rem;
+		column-gap: 0;
+		padding-inline: 1rem;
+	}
+
+	.skill-marquee__sep {
+		display: none;
+	}
+
+	.skill-marquee__cell {
+		gap: 0;
+		padding-left: 0.9rem;
+		padding-right: 0.9rem;
 	}
 
 	.lang-switch {

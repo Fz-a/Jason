@@ -29,6 +29,7 @@ const en: Dict = {
 	"hero.resume": "Download Resume",
 	"hero.contact": "Contact Me",
 	"hero.scroll": "Scroll",
+	"skills.label": "Capabilities",
 	"contact.kicker": "Contact",
 	"contact.title": "Let’s build something thoughtful.",
 	"contact.body":
@@ -52,7 +53,7 @@ const en: Dict = {
 		"Smart Helmet venture — then the DIY desk builds.",
 	"journey.society": "Society",
 	"journey.society.whisper":
-		"Team, two departments, volunteering, and exhibitions.",
+		"Team, campus departments, volunteering, and exhibitions.",
 	"journey.peek": "Peek brief",
 	"journey.brief": "Brief",
 	"journey.close": "Close",
@@ -75,6 +76,7 @@ const zhHans: Dict = {
 	"hero.resume": "下载简历",
 	"hero.contact": "联系我",
 	"hero.scroll": "下滑",
+	"skills.label": "能力与工具",
 	"contact.kicker": "联系",
 	"contact.title": "一起把事情做得更有分量。",
 	"contact.body":
@@ -95,7 +97,7 @@ const zhHans: Dict = {
 	"journey.make": "造物",
 	"journey.make.whisper": "智能头盔创业，再到桌上的 DIY。",
 	"journey.society": "社会",
-	"journey.society.whisper": "团队、两个部门、志愿与展览。",
+	"journey.society.whisper": "团队、校园部门、志愿与展览。",
 	"journey.peek": "查看详情",
 	"journey.brief": "详情",
 	"journey.close": "关闭",
@@ -118,6 +120,7 @@ const zhHant: Dict = {
 	"hero.resume": "下載履歷",
 	"hero.contact": "聯絡我",
 	"hero.scroll": "下滑",
+	"skills.label": "能力與工具",
 	"contact.kicker": "聯絡",
 	"contact.title": "一起把事情做得更有分量。",
 	"contact.body":
@@ -138,7 +141,7 @@ const zhHant: Dict = {
 	"journey.make": "造物",
 	"journey.make.whisper": "智慧頭盔創業，再到桌上的 DIY。",
 	"journey.society": "社會",
-	"journey.society.whisper": "團隊、兩個部門、志願與展覽。",
+	"journey.society.whisper": "團隊、校園部門、志願與展覽。",
 	"journey.peek": "查看詳情",
 	"journey.brief": "詳情",
 	"journey.close": "關閉",
@@ -156,8 +159,8 @@ const dictionaries: Record<Locale, Dict> = {
 
 export const LOCALE_OPTIONS: { id: Locale; short: string; title: string }[] = [
 	{ id: "en", short: "EN", title: "English" },
-	{ id: "zh-Hans", short: "简", title: "简体中文" },
 	{ id: "zh-Hant", short: "繁", title: "繁體中文" },
+	{ id: "zh-Hans", short: "简", title: "简体中文" },
 ];
 
 type LocaleContextValue = {
