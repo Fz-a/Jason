@@ -6,17 +6,14 @@ import { Montserrat } from "next/font/google";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { HomeScrollPreloader } from "./components/HomeScrollPreloader";
-import { JourneyHub } from "./components/JourneyHub";
 import { HeroNameFlip } from "./components/HeroNameFlip";
 import { LangSwitch } from "./components/LangSwitch";
-import { SkillMarquee } from "./components/SkillMarquee";
 import { FeaturedProjects } from "./components/FeaturedProjects";
 import { ConnectionSection } from "./components/ConnectionSection";
 import { TargetSection } from "./components/TargetSection";
 import { ResearchSection } from "./components/ResearchSection";
 import { ResearchFitNext } from "./components/ResearchFitNext";
 import { StoryProgress, STORY_STAGES } from "./components/StoryProgress";
-import { ExperienceStrip } from "./components/ExperienceStrip";
 import { useLocale } from "./lib/i18n";
 import avatarSettings from "../content/avatar.json";
 
@@ -25,11 +22,10 @@ const montserrat = Montserrat({
 });
 
 const navItems = [
-  { key: "nav.home", href: "#home" },
   { key: "nav.experience", href: "#experience" },
   { key: "nav.direction", href: "#target" },
   { key: "nav.research", href: "#research" },
-  { key: "nav.archive", href: "#archive" },
+  { key: "nav.archive", href: "/archive/" },
   { key: "nav.contact", href: "#contact" },
 ] as const;
 
@@ -155,7 +151,7 @@ export default function Home() {
     activeSection as (typeof STORY_IDS)[number],
   )
     ? activeSection
-    : activeSection === "archive" || activeSection === "contact"
+    : activeSection === "contact"
       ? "next"
       : "home";
 
@@ -180,23 +176,22 @@ export default function Home() {
   ) => {
     if (!href.startsWith("#")) return;
     event.preventDefault();
-
-    if (href === "#home") {
-      const now = Date.now();
-      const tap = homeTapRef.current;
-      if (now - tap.lastAt > STUDIO_TAP_WINDOW_MS) {
-        tap.count = 0;
-      }
-      tap.count += 1;
-      tap.lastAt = now;
-      if (tap.count >= STUDIO_TAP_COUNT) {
-        tap.count = 0;
-        router.push("/studio/");
-        return;
-      }
-    }
-
     scrollToSection(href.slice(1));
+  };
+
+  // Studio access: 5 taps on the name area
+  const onStudioTap = () => {
+    const now = Date.now();
+    const tap = homeTapRef.current;
+    if (now - tap.lastAt > STUDIO_TAP_WINDOW_MS) {
+      tap.count = 0;
+    }
+    tap.count += 1;
+    tap.lastAt = now;
+    if (tap.count >= STUDIO_TAP_COUNT) {
+      tap.count = 0;
+      router.push("/studio/");
+    }
   };
 
   useEffect(() => {
@@ -214,7 +209,6 @@ export default function Home() {
       "target",
       "research",
       "next",
-      "archive",
       "contact",
     ]
       .map((id) => document.getElementById(id))
@@ -244,14 +238,7 @@ export default function Home() {
         }
       }
 
-      // Map archive/contact to story progress stages
-      if (current === "archive" || current === "contact") {
-        // keep nav highlight accurate; story progress uses last story stage near end
-        if (current === "archive") setActiveSection("archive");
-        else setActiveSection("contact");
-        return;
-      }
-
+      // keep nav highlight accurate
       setActiveSection(current);
     };
 
@@ -332,7 +319,7 @@ export default function Home() {
         current as (typeof STORY_IDS)[number],
       )
         ? current
-        : current === "archive" || current === "contact"
+        : current === "contact"
           ? "next"
           : "home";
       const idx = STORY_IDS.indexOf(
@@ -405,23 +392,32 @@ export default function Home() {
         id="home"
         className="relative min-h-[92svh] scroll-mt-10 bg-[#F7F1E8] sm:min-h-[100svh] sm:scroll-mt-14"
       >
-        <div className="mx-auto grid min-h-[calc(92svh-4.5rem)] w-full max-w-[1160px] grid-cols-1 items-center gap-5 px-5 pb-20 pt-[4.5rem] sm:min-h-[calc(100svh-5.5rem)] sm:gap-8 sm:px-8 sm:py-10 md:px-10 md:py-10 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)] lg:gap-8 lg:px-12 lg:py-10 xl:max-w-[1220px] xl:gap-10 xl:px-14">
-          <div className="order-2 mx-auto w-full max-w-[440px] text-left lg:order-1">
-            <p className="mb-2 text-[0.65rem] font-semibold uppercase tracking-[0.24em] text-[#0F4C45] sm:mb-3 sm:text-[0.74rem] sm:tracking-[0.28em] lg:text-[0.8rem]">
-              {t("hero.role")}
-            </p>
+        <div className="mx-auto grid min-h-[calc(92svh-4.5rem)] w-full max-w-[1160px] grid-cols-1 items-center gap-8 px-5 pb-20 pt-[4.5rem] sm:min-h-[calc(100svh-5.5rem)] sm:gap-10 sm:px-8 sm:py-12 md:px-10 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] lg:gap-12 lg:px-12 xl:max-w-[1220px] xl:px-14">
+          <div className="order-2 mx-auto w-full max-w-[540px] text-left lg:order-1 lg:max-w-none">
+            <button
+              type="button"
+              onClick={onStudioTap}
+              className="cursor-default text-left"
+            >
+              <p className="text-[0.68rem] font-semibold uppercase tracking-[0.28em] text-[#0F4C45]">
+                <span className="hero-name-greeting">
+                  <HeroNameFlip />
+                </span>
+              </p>
+              <p className="mt-2 text-[0.78rem] font-semibold uppercase tracking-[0.18em] text-[#0F4C45]/60">
+                {t("hero.role")}
+              </p>
+            </button>
 
-            <h1 className="text-[2.1rem] font-extrabold leading-[0.95] tracking-tight sm:text-[3rem] md:text-[3.55rem] lg:text-[3.9rem] xl:text-[4.35rem]">
-              <span className="hero-name-greeting">
-                <HeroNameFlip />
-              </span>
+            <h1 className="mt-7 whitespace-pre-line text-[2.55rem] font-extrabold leading-[0.95] tracking-tight text-[#162b26] sm:mt-9 sm:text-[3.6rem] lg:text-[4.2rem] xl:text-[4.6rem]">
+              {t("hero.headline")}
             </h1>
 
-            <p className="mt-4 max-w-[28rem] text-[0.95rem] leading-7 text-[#3E514D] sm:mt-5 sm:text-[1.02rem] lg:text-[1.05rem] lg:leading-[1.85rem]">
+            <p className="mt-6 max-w-[28rem] text-[1rem] leading-8 text-[#3E514D] sm:text-[1.05rem]">
               {t("hero.blurb")}
             </p>
 
-            <div className="mt-4 flex flex-wrap gap-1.5 sm:mt-5">
+            <p className="mt-8 text-[0.72rem] font-semibold uppercase tracking-[0.16em] text-[#0F4C45]/70">
               {(
                 [
                   "hero.chip.electronics",
@@ -430,62 +426,40 @@ export default function Home() {
                   "hero.chip.ai",
                   "hero.chip.uav",
                 ] as const
-              ).map((key) => (
-                <span
-                  key={key}
-                  className="rounded-full border border-[#0F4C45]/14 bg-[#F7F1E8] px-2.5 py-1 text-[0.68rem] font-semibold tracking-[0.04em] text-[#0F4C45]"
-                >
-                  {t(key)}
-                </span>
-              ))}
-            </div>
+              )
+                .map((key) => t(key))
+                .join(" · ")}
+            </p>
 
-            <div className="mt-6 flex flex-wrap items-center gap-2.5 sm:mt-7 sm:gap-3">
+            <div className="mt-8 flex flex-wrap items-center gap-3">
               <a
                 href="#experience"
                 onClick={(event) => handleNavClick(event, "#experience")}
-                className="cursor-pointer rounded-full bg-[#043439] px-5 py-2.5 text-sm font-semibold text-white transition hover:opacity-90 sm:px-6 lg:px-7 lg:py-3 lg:text-[0.92rem]"
+                className="cursor-pointer rounded-full bg-[#043439] px-6 py-2.5 text-sm font-semibold text-white transition hover:opacity-90"
               >
                 {t("hero.projects")}
               </a>
-
               <a
                 href="#contact"
                 onClick={(event) => handleNavClick(event, "#contact")}
-                className="cursor-pointer rounded-full border border-[#0F4C45] px-5 py-2.5 text-sm font-semibold text-[#0F4C45] transition hover:bg-[#0F4C45] hover:text-white sm:px-6 lg:px-7 lg:py-3 lg:text-[0.92rem]"
+                className="cursor-pointer text-[0.82rem] font-semibold text-[#0F4C45] underline-offset-4 hover:underline"
               >
                 {t("hero.contact")}
               </a>
-
               <a
                 href="/Jason-Chen-Resume.pdf"
                 download="Jason-Chen-Resume.pdf"
                 target="_blank"
                 rel="noreferrer"
-                className="px-1 text-[0.78rem] font-semibold text-[#0F4C45]/70 underline-offset-4 transition hover:text-[#0F4C45] hover:underline sm:text-[0.82rem]"
+                className="text-[0.78rem] font-semibold text-[#0F4C45]/55 underline-offset-4 hover:text-[#0F4C45] hover:underline"
               >
                 {t("hero.resume")}
               </a>
             </div>
-
-            <div className="mt-4 flex items-center gap-2.5">
-              {socialLinks.map((link) => (
-                <a
-                  key={link.label}
-                  href={link.href}
-                  target="_blank"
-                  rel="noreferrer"
-                  aria-label={link.label}
-                  className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-full border border-[#0F4C45]/15 bg-[#F7F1E8] text-[#0F4C45] transition hover:-translate-y-0.5 hover:border-[#0F4C45]/25 hover:bg-[#0F4C45] hover:text-white"
-                >
-                  <SocialIcon label={link.label} />
-                </a>
-              ))}
-            </div>
           </div>
 
           <div className="order-1 flex items-center justify-center lg:order-2">
-            <div className="hero-avatar relative aspect-square w-full max-w-[180px] sm:max-w-[280px] md:max-w-[320px] lg:max-w-[360px] xl:max-w-[380px]">
+            <div className="hero-avatar relative aspect-square w-full max-w-[200px] sm:max-w-[300px] lg:max-w-[360px]">
               <div className="hero-avatar__frame relative h-full w-full overflow-hidden rounded-full">
                 <Image
                   src={
@@ -495,7 +469,7 @@ export default function Home() {
                   }
                   alt="Jason Chen"
                   fill
-                  sizes="(max-width: 640px) 200px, (max-width: 1024px) 360px, 420px"
+                  sizes="(max-width: 640px) 200px, 360px"
                   priority
                   className="hero-avatar__img object-cover"
                   style={
@@ -529,7 +503,7 @@ export default function Home() {
         </div>
       </section>
 
-      <FeaturedProjects onOpenArchive={() => scrollToSection("archive")} />
+      <FeaturedProjects />
 
       <ConnectionSection />
 
@@ -540,122 +514,56 @@ export default function Home() {
       <ResearchFitNext />
 
       <section
-        id="archive"
-        className="scroll-mt-24 bg-[#F7F1E8] pb-10 pt-4 sm:scroll-mt-28 sm:pb-12 sm:pt-6 lg:pb-14"
-      >
-        <div className="mx-auto w-full max-w-[1100px] px-6 sm:px-8 md:px-10 lg:px-12 xl:max-w-[1160px] xl:px-14">
-          <JourneyHub />
-        </div>
-      </section>
-
-      <ExperienceStrip />
-
-      <SkillMarquee />
-
-      <section
         id="contact"
-        className="scroll-mt-10 bg-[#F7F1E8] pb-16 pt-7 sm:scroll-mt-14 sm:pb-20 sm:pt-9 lg:pb-24 lg:pt-12"
+        className="scroll-mt-24 border-t border-[#0F4C45]/12 bg-[#F7F1E8] pb-16 pt-12 sm:scroll-mt-28 sm:pb-20 sm:pt-16"
       >
-        <div className="mx-auto grid w-full max-w-[1100px] grid-cols-1 gap-8 px-6 sm:px-8 md:px-10 lg:grid-cols-[minmax(0,0.95fr)_minmax(260px,0.6fr)] lg:gap-12 lg:px-12 xl:max-w-[1160px] xl:gap-14 xl:px-14">
-          <div className="max-w-[610px]">
-            <p className="text-[0.68rem] font-semibold uppercase tracking-[0.26em] text-[#0F4C45] sm:text-[0.74rem] lg:text-[0.78rem]">
-              {t("contact.kicker")}
-            </p>
+        <div className="mx-auto w-full max-w-[1100px] px-6 text-center sm:px-8 md:px-10 lg:px-12 xl:max-w-[1160px] xl:px-14">
+          <p className="text-[0.68rem] font-semibold uppercase tracking-[0.28em] text-[#0F4C45]/55">
+            Jason Chen
+          </p>
+          <p className="mt-2 text-[1.1rem] font-extrabold tracking-tight text-[#162b26]">
+            {t("hero.role")}
+          </p>
+          <p className="mt-4 text-[0.72rem] font-semibold uppercase tracking-[0.14em] text-[#0F4C45]/65">
+            {(
+              [
+                "hero.chip.electronics",
+                "hero.chip.embedded",
+                "hero.chip.robotics",
+                "hero.chip.ai",
+                "hero.chip.uav",
+              ] as const
+            )
+              .map((key) => t(key))
+              .join(" · ")}
+          </p>
 
-            <h2 className="mt-3.5 max-w-[12ch] text-[1.75rem] font-extrabold leading-[0.97] tracking-tight sm:text-[2.15rem] lg:text-[2.55rem]">
-              {t("contact.title")}
-            </h2>
-
-            <p className="mt-4 max-w-[31rem] text-[0.88rem] leading-6.5 text-[#3E514D] lg:text-[0.94rem] lg:leading-[1.72rem]">
-              {t("contact.body")}
-            </p>
-
-            <div className="mt-6 flex flex-wrap gap-2.5">
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
+            <a
+              href="mailto:2260032001@student.must.edu.mo"
+              className="text-[0.88rem] font-semibold text-[#0F4C45] underline-offset-4 hover:underline"
+            >
+              Email
+            </a>
+            {socialLinks.map((link) => (
               <a
-                href="mailto:2260032001@student.must.edu.mo"
-                className="rounded-full bg-[#043439] px-5 py-2 text-[0.82rem] font-semibold text-white transition hover:opacity-90 lg:px-6 lg:py-2.5 lg:text-[0.88rem]"
+                key={link.label}
+                href={link.href}
+                target="_blank"
+                rel="noreferrer"
+                className="text-[0.88rem] font-semibold text-[#0F4C45] underline-offset-4 hover:underline"
               >
-                {t("contact.emailMe")}
+                {link.label}
               </a>
-            </div>
+            ))}
           </div>
-
-          <aside className="lg:pt-5">
-            <div className="rounded-[1.15rem] border border-[#0F4C45]/12 bg-[#DDE7DE] p-4.5 shadow-[0_16px_34px_rgba(22,43,38,0.05)] sm:p-5">
-              <p className="text-[0.68rem] font-semibold uppercase tracking-[0.24em] text-[#0F4C45] sm:text-[0.74rem]">
-                {t("contact.connect")}
-              </p>
-
-              <div className="mt-5 space-y-4 text-[#162b26]">
-                <div className="flex items-start gap-3">
-                  <span className="mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-[#0F4C45]/12 bg-[#F7F1E8] text-[#0F4C45]">
-                    <EmailIcon />
-                  </span>
-
-                  <div>
-                    <p className="text-[0.66rem] font-semibold uppercase tracking-[0.22em] text-[#6B7B77]">
-                      {t("contact.email")}
-                    </p>
-                    <a
-                      href="mailto:2260032001@student.must.edu.mo"
-                      className="mt-1.5 block text-[0.9rem] font-semibold text-[#162b26] transition hover:text-[#0F4C45] sm:text-[0.95rem]"
-                    >
-                      2260032001@student.must.edu.mo
-                    </a>
-                    <a
-                      href="mailto:1106467336@qq.com"
-                      className="mt-1.5 block text-[0.9rem] font-semibold text-[#162b26] transition hover:text-[#0F4C45] sm:text-[0.95rem]"
-                    >
-                      1106467336@qq.com
-                    </a>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3">
-                  <span className="mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-[#0F4C45]/12 bg-[#F7F1E8] text-[#0F4C45]">
-                    <LocationIcon />
-                  </span>
-
-                  <div>
-                  <p className="text-[0.66rem] font-semibold uppercase tracking-[0.22em] text-[#6B7B77]">
-                    {t("contact.locationLabel")}
-                  </p>
-                  <p className="mt-1.5 text-[0.9rem] font-semibold sm:text-[0.95rem]">
-                    {t("contact.city")}
-                  </p>
-                  </div>
-                </div>
-
-                <div className="border-t border-[#0F4C45]/10 pt-4">
-                  <p className="text-[0.66rem] font-semibold uppercase tracking-[0.22em] text-[#6B7B77]">
-                    {t("contact.profiles")}
-                  </p>
-
-                  <div className="mt-3 flex items-center gap-2.5">
-                    {socialLinks.map((link) => (
-                      <a
-                        key={link.label}
-                        href={link.href}
-                        target="_blank"
-                        rel="noreferrer"
-                        aria-label={link.label}
-                        className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-full border border-[#0F4C45]/12 bg-[#F7F1E8] text-[#0F4C45] transition hover:-translate-y-0.5 hover:bg-[#0F4C45] hover:text-white"
-                      >
-                        <SocialIcon label={link.label} />
-                      </a>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </aside>
         </div>
       </section>
 
       <footer className="border-t border-[#0F4C45]/10 bg-[#F7F1E8]">
         <div className="mx-auto flex w-full max-w-[1100px] justify-center px-6 py-6 text-center sm:px-8 md:px-10 lg:px-12 xl:max-w-[1160px] xl:px-14">
-          <p className="text-[0.72rem] font-medium tracking-[0.04em] text-[#6B7B77] sm:text-[0.78rem]">
-            © 2026 Brittne Valdivia. Built with Next.js and Tailwind CSS.
+          <p className="text-[0.72rem] font-medium tracking-[0.04em] text-[#6B7B77]">
+            © 2026 Jason Chen
           </p>
         </div>
       </footer>

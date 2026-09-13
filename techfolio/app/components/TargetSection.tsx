@@ -2,12 +2,11 @@
 
 import { useLocale } from "../lib/i18n";
 
-const TAGS = [
-	"target.tag1",
-	"target.tag2",
-	"target.tag3",
-	"target.tag4",
-	"target.tag5",
+const FLOW = [
+	"target.flow1",
+	"target.flow2",
+	"target.flow3",
+	"target.flow4",
 ] as const;
 
 export function TargetSection() {
@@ -16,37 +15,37 @@ export function TargetSection() {
 	return (
 		<section
 			id="target"
-			className="scroll-mt-24 bg-[#F7F1E8] pb-10 pt-4 sm:scroll-mt-28 sm:pb-12 sm:pt-6"
+			className="scroll-mt-24 bg-[#043439] pb-20 pt-14 text-white sm:scroll-mt-28 sm:pb-28 sm:pt-20"
 		>
-			<div className="mx-auto w-full max-w-[1100px] px-6 sm:px-8 md:px-10 lg:px-12 xl:max-w-[1160px] xl:px-14">
-				<p className="text-[0.68rem] font-semibold uppercase tracking-[0.26em] text-[#0F4C45] sm:text-[0.74rem]">
+			<div className="mx-auto w-full max-w-[1100px] px-6 text-center sm:px-8 md:px-10 lg:px-12 xl:max-w-[1160px] xl:px-14">
+				<p className="text-[0.68rem] font-semibold uppercase tracking-[0.28em] text-white/50">
 					{t("target.kicker")}
 				</p>
+				<h2 className="mx-auto mt-8 max-w-[12ch] whitespace-pre-line text-[2.8rem] font-extrabold leading-[0.95] tracking-tight sm:text-[4rem] lg:text-[4.8rem]">
+					{t("target.title")}
+				</h2>
+				<p className="mt-8 text-[1.25rem] font-semibold tracking-tight text-white/80 sm:text-[1.5rem]">
+					{t("target.tagline")}
+				</p>
 
-				<div className="mt-6 rounded-[1.2rem] border border-[#0F4C45]/14 bg-[#043439] px-6 py-10 text-center text-white sm:px-10 sm:py-14">
-					<p className="text-[0.68rem] font-semibold uppercase tracking-[0.22em] text-white/50">
-						{t("target.logic")}
-					</p>
-					<h2 className="mx-auto mt-4 max-w-[16ch] text-[1.75rem] font-extrabold leading-[1.1] tracking-tight sm:text-[2.35rem] lg:text-[2.7rem]">
-						{t("target.title")}
-					</h2>
-					<p className="mt-4 text-[1.05rem] font-semibold text-white/80 sm:text-[1.15rem]">
-						{t("target.tagline")}
-					</p>
-					<p className="mx-auto mt-4 max-w-[34rem] text-[0.88rem] leading-7 text-white/65">
-						{t("target.body")}
-					</p>
-					<div className="mt-7 flex flex-wrap justify-center gap-2">
-						{TAGS.map((key) => (
-							<span
-								key={key}
-								className="rounded-full border border-white/15 bg-white/[0.08] px-3.5 py-1.5 text-[0.72rem] font-semibold text-white/85"
-							>
+				<div className="mx-auto mt-14 flex max-w-xl flex-wrap items-center justify-center gap-x-3 gap-y-2 sm:mt-16">
+					{FLOW.map((key, i) => (
+						<span key={key} className="flex items-center gap-3">
+							<span className="text-[0.78rem] font-semibold uppercase tracking-[0.18em] text-white/85">
 								{t(key)}
 							</span>
-						))}
-					</div>
+							{i < FLOW.length - 1 ? (
+								<span aria-hidden className="text-white/35">
+									→
+								</span>
+							) : null}
+						</span>
+					))}
 				</div>
+
+				<p className="mx-auto mt-10 max-w-[34rem] text-[0.88rem] leading-7 text-white/55">
+					{t("target.body")}
+				</p>
 			</div>
 		</section>
 	);
