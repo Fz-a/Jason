@@ -6,7 +6,7 @@ export function ProjectContinue({
 }: {
 	next: ProjectDetail | null;
 }) {
-	const href = next ? `/projects/${next.slug}/` : "/#contact";
+	const href = next ? `/projects/${next.slug}/` : "/#target";
 	const label = next ? next.shortTitle : "Contact";
 	const kicker = "Next";
 

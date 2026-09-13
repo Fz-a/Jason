@@ -6,25 +6,23 @@ import {
 	useContext,
 	useEffect,
 	useMemo,
-	useState,
 	type ReactNode,
 } from "react";
 
 export type Locale = "en" | "zh-Hans" | "zh-Hant";
-
-const STORAGE_KEY = "techfolio-locale";
 
 type Dict = Record<string, string>;
 
 const en: Dict = {
 	"nav.archive": "Archive",
 	"nav.cv": "CV",
-	"story.01": "Capabilities",
+	"story.01": "Projects",
 	"story.02": "Direction",
 	"story.03": "Goal",
 	"story.04": "Research",
 	"story.05": "Research Fit",
 	"story.06": "Next Steps",
+	"story.07": "Target",
 	"hero.role": "Electronic Engineer",
 	"hero.hello": "Hello",
 	"hero.iam": "I am",
@@ -37,42 +35,53 @@ const en: Dict = {
 	"hero.chip.robotics": "Robotics",
 	"hero.chip.ai": "AI",
 	"hero.chip.uav": "UAV",
-	"hero.projects": "Four Projects",
-	"hero.contact": "Contact",
+	"hero.projects": "Projects",
+	"hero.contact": "Target",
 	"hero.resume": "Resume",
 	"hero.scroll": "Scroll",
-	"core.kicker": "01 — Capabilities",
-	"core.title": "Four capabilities built through real engineering experience.",
-	"core.blurb":
-		"Capability first — then the project that shaped it.",
+	"core.kicker": "01 — Projects",
+	"core.title": "What I Can Build.",
+	"core.blurb": "Browse by section on the right.",
 	"core.open": "Open brief",
+	"core.open.collection": "Open collection",
+	"core.collection": "Collection",
+	"core.nav": "Projects",
+	"core.diy.lede": "Nine builds from the same desk — open the wall, then tap a tile.",
+	"core.group.work": "Work",
+	"core.group.university": "University",
+	"core.group.diy": "DIY",
+	"core.group.society": "Society",
 	"core.rtk.title": "RTK & Agricultural Sensing",
 	"core.rtk.cap": "Precise Positioning",
 	"core.rtk.c1": "RTK",
 	"core.rtk.c2": "GNSS",
 	"core.rtk.c3": "LPWAN",
 	"core.rtk.c4": "Embedded",
+	"core.rtk.desc":
+		"Field RTK for farm machinery — positioning that holds up outside the lab.",
 	"core.agv.title": "Industrial AGV",
 	"core.agv.cap": "Autonomous Operation",
 	"core.agv.c1": "Robotics",
 	"core.agv.c2": "Navigation",
 	"core.agv.c3": "Motion Control",
+	"core.agv.desc":
+		"Heavy-industry AGV remotes and bring-up — from board to metal floor.",
 	"core.fire.title": "Edge AI Fire Warning",
 	"core.fire.cap": "Intelligent Perception",
 	"core.fire.c1": "Computer Vision",
 	"core.fire.c2": "Jetson",
 	"core.fire.c3": "ROS",
 	"core.fire.c4": "AI",
+	"core.fire.desc":
+		"Camera-first detection on Jetson — edge AI that confirms flame and alerts.",
 	"core.wear.title": "Smart Wearable",
 	"core.wear.cap": "Multi-Sensor Systems",
 	"core.wear.c1": "Sensors",
 	"core.wear.c2": "ESP32",
 	"core.wear.c3": "BLE / Wi-Fi",
 	"core.wear.c4": "Integration",
-	"core.converge.title": "Integrated Systems",
-	"core.converge.goal": "Intelligent UAV Systems",
-	"core.converge.blurb":
-		"From sensing and positioning to autonomous intelligent systems.",
+	"core.wear.desc":
+		"Wearable sensing through board bring-up — vitals, status, and family alerts.",
 	"archive.kicker": "Full Project Archive",
 	"archive.prompt": "Projects · Work · Experiments · Activities",
 	"archive.title": "Full Project Archive",
@@ -82,14 +91,9 @@ const en: Dict = {
 		"Chronological engineering journey — companies, university projects, make and society. For post-presentation exploration.",
 	"conn.kicker": "02 — Direction",
 	"conn.title": "Intelligent\nAgricultural\nUAV Systems",
+	"conn.bridge": "These projects can converge into one system.",
 	"conn.statement":
 		"I see UAVs as the next system where my previous engineering experience can converge.",
-	"conn.in1": "RTK",
-	"conn.in2": "Robotics",
-	"conn.in3": "AI",
-	"conn.in4": "Sensors",
-	"conn.mid": "UAV Systems",
-	"conn.apps": "Intelligent Agricultural\nApplications",
 	"goal.kicker": "03 — Goal",
 	"goal.title": "From Flying\nto Working",
 	"goal.body":
@@ -139,6 +143,7 @@ const en: Dict = {
 	"next.s4.title": "Build & Experiment",
 	"next.s5.title": "Real-world Validation",
 	"next.s6.title": "Intelligent Agricultural UAV Systems",
+	"target.kicker": "07 — Target",
 	"journey.kicker": "Archive",
 	"journey.title": "Full project archive",
 	"journey.projects": "Projects",
@@ -194,12 +199,13 @@ const en: Dict = {
 const zhHans: Dict = {
 	"nav.archive": "档案",
 	"nav.cv": "简历",
-	"story.01": "能力",
+	"story.01": "项目",
 	"story.02": "方向",
 	"story.03": "目标",
 	"story.04": "研究",
 	"story.05": "研究契合",
 	"story.06": "下一步",
+	"story.07": "Target",
 	"hero.role": "电子工程师",
 	"hero.hello": "你好",
 	"hero.iam": "我是",
@@ -212,40 +218,49 @@ const zhHans: Dict = {
 	"hero.chip.robotics": "机器人",
 	"hero.chip.ai": "人工智能",
 	"hero.chip.uav": "无人机",
-	"hero.projects": "四个项目",
-	"hero.contact": "联系",
+	"hero.projects": "项目",
+	"hero.contact": "Target",
 	"hero.resume": "简历",
 	"hero.scroll": "下滑",
-	"core.kicker": "01 — 能力",
-	"core.title": "通过真实工程经历形成的四种能力。",
-	"core.blurb": "先看能力，再看塑造它的项目。",
+	"core.kicker": "01 — 项目",
+	"core.title": "我能构建什么。",
+	"core.blurb": "右侧按区浏览。",
 	"core.open": "打开简介",
+	"core.open.collection": "打开合集",
+	"core.collection": "合集",
+	"core.nav": "项目",
+	"core.diy.lede": "同一张桌上的九件造物 — 打开墙面，再点格子。",
+	"core.group.work": "工作项目",
+	"core.group.university": "大学项目",
+	"core.group.diy": "DIY",
+	"core.group.society": "社会经历",
 	"core.rtk.title": "RTK 与农业传感",
 	"core.rtk.cap": "精准定位",
 	"core.rtk.c1": "RTK",
 	"core.rtk.c2": "GNSS",
 	"core.rtk.c3": "LPWAN",
 	"core.rtk.c4": "嵌入式",
+	"core.rtk.desc": "农机现场 RTK —— 在室外也能站得住的定位。",
 	"core.agv.title": "工业 AGV",
 	"core.agv.cap": "自主运行",
 	"core.agv.c1": "机器人",
 	"core.agv.c2": "导航",
 	"core.agv.c3": "运动控制",
+	"core.agv.desc": "重工业 AGV 遥控与交付 —— 从板卡到金属车间地面。",
 	"core.fire.title": "边缘 AI 火灾预警",
 	"core.fire.cap": "智能感知",
 	"core.fire.c1": "计算机视觉",
 	"core.fire.c2": "Jetson",
 	"core.fire.c3": "ROS",
 	"core.fire.c4": "AI",
+	"core.fire.desc": "Jetson 端侧视觉检测 —— 确认火焰并推送告警。",
 	"core.wear.title": "智能穿戴",
 	"core.wear.cap": "多传感系统",
 	"core.wear.c1": "传感",
 	"core.wear.c2": "ESP32",
 	"core.wear.c3": "BLE / Wi-Fi",
 	"core.wear.c4": "系统集成",
-	"core.converge.title": "综合系统",
-	"core.converge.goal": "智能无人机系统",
-	"core.converge.blurb": "从传感与定位，走向自主智能系统。",
+	"core.wear.desc": "穿戴传感与板卡交付 —— 体征、状态与家属提醒。",
 	"archive.kicker": "完整项目档案",
 	"archive.prompt": "项目 · 工作 · 实验 · 活动",
 	"archive.title": "完整项目档案",
@@ -255,14 +270,9 @@ const zhHans: Dict = {
 		"按时间线整理的工程旅程——公司、大学项目、造物与社会实践。适合会后深入查看。",
 	"conn.kicker": "02 — 方向",
 	"conn.title": "智能\n农业\n无人机系统",
+	"conn.bridge": "这些项目可以汇入同一套系统。",
 	"conn.statement":
 		"我把无人机看成先前工程经验可以汇聚的下一个系统。",
-	"conn.in1": "RTK",
-	"conn.in2": "机器人",
-	"conn.in3": "AI",
-	"conn.in4": "传感",
-	"conn.mid": "无人机系统",
-	"conn.apps": "智能农业\n应用",
 	"goal.kicker": "03 — 目标",
 	"goal.title": "从会飞\n到能干",
 	"goal.body":
@@ -307,6 +317,7 @@ const zhHans: Dict = {
 	"next.s4.title": "构建与实验",
 	"next.s5.title": "真实场景验证",
 	"next.s6.title": "智能农业无人机系统",
+	"target.kicker": "07 — Target",
 	"journey.kicker": "档案",
 	"journey.title": "完整项目档案",
 	"journey.projects": "项目",
@@ -358,12 +369,13 @@ const zhHans: Dict = {
 const zhHant: Dict = {
 	"nav.archive": "檔案",
 	"nav.cv": "履歷",
-	"story.01": "能力",
+	"story.01": "專案",
 	"story.02": "方向",
 	"story.03": "目標",
 	"story.04": "研究",
 	"story.05": "研究契合",
 	"story.06": "下一步",
+	"story.07": "Target",
 	"hero.role": "電子工程師",
 	"hero.hello": "你好",
 	"hero.iam": "我是",
@@ -376,40 +388,49 @@ const zhHant: Dict = {
 	"hero.chip.robotics": "機器人",
 	"hero.chip.ai": "人工智慧",
 	"hero.chip.uav": "無人機",
-	"hero.projects": "四個專案",
-	"hero.contact": "聯絡",
+	"hero.projects": "專案",
+	"hero.contact": "Target",
 	"hero.resume": "履歷",
 	"hero.scroll": "下滑",
-	"core.kicker": "01 — 能力",
-	"core.title": "透過真實工程經歷形成的四種能力。",
-	"core.blurb": "先看能力，再看塑造它的專案。",
+	"core.kicker": "01 — 專案",
+	"core.title": "我能構建什麼。",
+	"core.blurb": "右側按區瀏覽。",
 	"core.open": "打開簡介",
+	"core.open.collection": "打開合集",
+	"core.collection": "合集",
+	"core.nav": "專案",
+	"core.diy.lede": "同一張桌上的九件造物 — 打開牆面，再點格子。",
+	"core.group.work": "工作專案",
+	"core.group.university": "大學專案",
+	"core.group.diy": "DIY",
+	"core.group.society": "社會經歷",
 	"core.rtk.title": "RTK 與農業感測",
 	"core.rtk.cap": "精準定位",
 	"core.rtk.c1": "RTK",
 	"core.rtk.c2": "GNSS",
 	"core.rtk.c3": "LPWAN",
 	"core.rtk.c4": "嵌入式",
+	"core.rtk.desc": "農機現場 RTK —— 在室外也能站得住的定位。",
 	"core.agv.title": "工業 AGV",
 	"core.agv.cap": "自主運行",
 	"core.agv.c1": "機器人",
 	"core.agv.c2": "導航",
 	"core.agv.c3": "運動控制",
+	"core.agv.desc": "重工業 AGV 遙控與交付 —— 從板卡到金屬車間地面。",
 	"core.fire.title": "邊緣 AI 火災預警",
 	"core.fire.cap": "智慧感知",
 	"core.fire.c1": "電腦視覺",
 	"core.fire.c2": "Jetson",
 	"core.fire.c3": "ROS",
 	"core.fire.c4": "AI",
+	"core.fire.desc": "Jetson 端側視覺檢測 —— 確認火焰並推送告警。",
 	"core.wear.title": "智慧穿戴",
 	"core.wear.cap": "多感測系統",
 	"core.wear.c1": "感測",
 	"core.wear.c2": "ESP32",
 	"core.wear.c3": "BLE / Wi-Fi",
 	"core.wear.c4": "系統整合",
-	"core.converge.title": "綜合系統",
-	"core.converge.goal": "智慧無人機系統",
-	"core.converge.blurb": "從感測與定位，走向自主智慧系統。",
+	"core.wear.desc": "穿戴感測與板卡交付 —— 體徵、狀態與家屬提醒。",
 	"archive.kicker": "完整專案檔案",
 	"archive.prompt": "專案 · 工作 · 實驗 · 活動",
 	"archive.title": "完整專案檔案",
@@ -419,14 +440,9 @@ const zhHant: Dict = {
 		"按時間線整理的工程旅程——公司、大學專案、造物與社會實踐。適合會後深入查看。",
 	"conn.kicker": "02 — 方向",
 	"conn.title": "智慧\n農業\n無人機系統",
+	"conn.bridge": "這些專案可以匯入同一套系統。",
 	"conn.statement":
 		"我把無人機看成先前工程經驗可以匯聚的下一個系統。",
-	"conn.in1": "RTK",
-	"conn.in2": "機器人",
-	"conn.in3": "AI",
-	"conn.in4": "感測",
-	"conn.mid": "無人機系統",
-	"conn.apps": "智慧農業\n應用",
 	"goal.kicker": "03 — 目標",
 	"goal.title": "從會飛\n到能幹",
 	"goal.body":
@@ -471,6 +487,7 @@ const zhHant: Dict = {
 	"next.s4.title": "構建與實驗",
 	"next.s5.title": "真實場景驗證",
 	"next.s6.title": "智慧農業無人機系統",
+	"target.kicker": "07 — Target",
 	"journey.kicker": "檔案",
 	"journey.title": "完整專案檔案",
 	"journey.projects": "專案",
@@ -540,58 +557,24 @@ type LocaleContextValue = {
 
 const LocaleContext = createContext<LocaleContextValue | null>(null);
 
-function readStoredLocale(): Locale {
-	if (typeof window === "undefined") return "en";
-	const stored = window.localStorage.getItem(STORAGE_KEY);
-	if (stored === "en" || stored === "zh-Hans" || stored === "zh-Hant") {
-		return stored;
-	}
-	const lang = window.navigator.language.toLowerCase();
-	if (lang.startsWith("zh")) {
-		if (
-			lang.includes("tw") ||
-			lang.includes("hk") ||
-			lang.includes("hant") ||
-			lang.includes("mo")
-		) {
-			return "zh-Hant";
-		}
-		return "zh-Hans";
-	}
-	return "en";
-}
-
 export function LocaleProvider({ children }: { children: ReactNode }) {
-	const [locale, setLocaleState] = useState<Locale>("en");
-	const [ready, setReady] = useState(false);
-
-	useEffect(() => {
-		setLocaleState(readStoredLocale());
-		setReady(true);
-	}, []);
-
-	const setLocale = useCallback((next: Locale) => {
-		setLocaleState(next);
-		window.localStorage.setItem(STORAGE_KEY, next);
-		document.documentElement.lang =
-			next === "en" ? "en" : next === "zh-Hans" ? "zh-Hans" : "zh-Hant";
+	const setLocale = useCallback((_next: Locale) => {
+		/* Site is English-only for now */
 	}, []);
 
 	useEffect(() => {
-		if (!ready) return;
-		document.documentElement.lang =
-			locale === "en" ? "en" : locale === "zh-Hans" ? "zh-Hans" : "zh-Hant";
-	}, [locale, ready]);
+		document.documentElement.lang = "en";
+	}, []);
 
-	const value = useMemo<LocaleContextValue>(() => {
-		const dict = dictionaries[locale];
-		return {
-			locale,
+	const value = useMemo<LocaleContextValue>(
+		() => ({
+			locale: "en",
 			setLocale,
-			t: (key: string) => dict[key] ?? dictionaries.en[key] ?? key,
-			isZh: locale !== "en",
-		};
-	}, [locale, setLocale]);
+			t: (key: string) => dictionaries.en[key] ?? key,
+			isZh: false,
+		}),
+		[setLocale],
+	);
 
 	return (
 		<LocaleContext.Provider value={value}>{children}</LocaleContext.Provider>

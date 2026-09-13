@@ -14,7 +14,53 @@
 
 html {
 	scroll-behavior: smooth;
-	scroll-padding-top: 4.5rem;
+	scroll-padding: 0;
+	/* Soft snap — mandatory alone + nested overflow was trapping the wheel */
+	scroll-snap-type: y proximity;
+}
+
+@media (min-width: 1024px) {
+	html {
+		scroll-snap-type: y mandatory;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	html {
+		scroll-behavior: auto;
+		scroll-snap-type: none;
+	}
+}
+
+/*
+ * One browser viewport per slide.
+ * No nested overflow — that was blocking page scroll.
+ */
+.story-slide {
+	box-sizing: border-box;
+	width: 100%;
+	height: 100svh;
+	max-height: 100svh;
+	overflow: hidden;
+	scroll-snap-align: start;
+	scroll-snap-stop: always;
+	display: flex;
+	flex-direction: column;
+}
+
+.story-slide__body {
+	box-sizing: border-box;
+	flex: 1 1 auto;
+	min-height: 0;
+	width: 100%;
+	overflow: hidden;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+}
+
+.story-slide__body--top {
+	justify-content: flex-start;
 }
 
 body {
@@ -1001,4 +1047,207 @@ button,
 		opacity: 1;
 		transform: translate3d(0, 0, 0);
 	}
+}
+
+/* Projects stage — title top-left, image top-right, body spans under image (sidebar untouched) */
+.project-stage {
+	box-sizing: border-box;
+	display: grid;
+	grid-template-columns: minmax(11rem, 0.72fr) minmax(0, 1.28fr);
+	grid-template-areas:
+		"head media"
+		"body body"
+		"open open";
+	column-gap: clamp(1.25rem, 3vw, 2.75rem);
+	row-gap: 0;
+	align-items: start;
+	padding: clamp(2rem, 5vh, 3.75rem) clamp(2rem, 4vw, 3.5rem);
+	width: 100%;
+	min-height: min(70vh, 100%);
+}
+
+.project-stage__head {
+	grid-area: head;
+	min-width: 0;
+	align-self: start;
+	padding-top: 0.15rem;
+}
+
+.project-stage__eyebrow {
+	margin: 0 0 0.75rem;
+	font-size: 0.62rem;
+	font-weight: 600;
+	letter-spacing: 0.2em;
+	text-transform: uppercase;
+	color: rgb(15 76 69 / 0.42);
+}
+
+.project-stage__title {
+	margin: 0;
+	font-size: clamp(2.35rem, 4.4vw, 3.6rem);
+	font-weight: 800;
+	line-height: 0.98;
+	letter-spacing: -0.035em;
+	color: #162b26;
+	max-width: 9.5ch;
+}
+
+.project-stage__media {
+	grid-area: media;
+	position: relative;
+	display: block;
+	width: 100%;
+	max-width: min(100%, 38rem);
+	aspect-ratio: 4 / 3;
+	max-height: min(46vh, 26rem);
+	justify-self: stretch;
+	margin-top: -0.65rem;
+	overflow: hidden;
+	border: 0;
+	border-radius: 0;
+	padding: 0;
+	background: #e8e2d8;
+	cursor: pointer;
+	text-align: left;
+}
+
+.project-stage__media--diy {
+	aspect-ratio: 1 / 1;
+	max-width: min(100%, 22rem);
+	max-height: none;
+	justify-self: end;
+}
+
+/* Left edge flush with title; extends a bit further under the image */
+.project-stage__body {
+	grid-area: body;
+	box-sizing: border-box;
+	justify-self: start;
+	margin: clamp(2.25rem, 5vh, 3.25rem) 0 0;
+	padding: 0;
+	width: min(100%, 78%);
+	max-width: 46rem;
+	font-family: var(--font-geist-sans), "Segoe UI", system-ui, sans-serif;
+	font-size: clamp(0.88rem, 1.05vw, 0.98rem);
+	font-weight: 400;
+	letter-spacing: 0.01em;
+	line-height: 1.68;
+	color: #3a4f4a;
+	text-align: left;
+	display: -webkit-box;
+	-webkit-box-orient: vertical;
+	-webkit-line-clamp: 5;
+	overflow: hidden;
+}
+
+.project-stage__open {
+	grid-area: open;
+	margin-top: 1.25rem;
+	display: inline-flex;
+	align-items: center;
+	gap: 0.35rem;
+	justify-self: start;
+	border: 0;
+	background: transparent;
+	padding: 0;
+	cursor: pointer;
+	font-size: 0.8rem;
+	font-weight: 600;
+	color: rgb(15 76 69 / 0.72);
+	transition: color 180ms ease;
+}
+
+.project-stage__open:hover,
+.project-stage__open:focus-visible {
+	color: #0f4c45;
+}
+
+.project-stage__open-arrow {
+	display: inline-block;
+	transition: transform 180ms ease;
+}
+
+.project-stage__open:hover .project-stage__open-arrow,
+.project-stage__open:focus-visible .project-stage__open-arrow {
+	transform: translateX(4px);
+}
+
+@media (max-width: 900px) {
+	.project-stage {
+		grid-template-columns: 1fr;
+		grid-template-areas:
+			"head"
+			"media"
+			"body"
+			"open";
+		row-gap: 1.15rem;
+		padding: 1.25rem 1.5rem 1.75rem;
+		min-height: 0;
+	}
+
+	.project-stage__title {
+		font-size: clamp(2rem, 8.5vw, 2.75rem);
+		max-width: 12ch;
+	}
+
+	.project-stage__media {
+		max-width: 100%;
+		max-height: min(38vh, 20rem);
+	}
+
+	.project-stage__media--diy {
+		max-width: min(100%, 17rem);
+		margin-inline: auto;
+		justify-self: center;
+	}
+
+	.project-stage__body {
+		width: 100%;
+		max-width: none;
+		margin-top: 0.25rem;
+	}
+}
+
+/* Projects right rail — full-bleed sliding capsule */
+.project-nav__track {
+	position: relative;
+}
+
+.project-nav__list {
+	display: flex;
+	flex-direction: column;
+	gap: 0.18rem;
+}
+
+.project-nav__pill {
+	position: absolute;
+	inset-inline: 0;
+	top: 0;
+	z-index: 0;
+	width: 100%;
+	border-radius: 999px;
+	background: rgb(15 76 69 / 0.16);
+	border: 1px solid rgb(15 76 69 / 0.1);
+	box-shadow:
+		inset 0 1px 0 rgb(255 255 255 / 0.35),
+		0 1px 2px rgb(15 76 69 / 0.05);
+	opacity: 0;
+	pointer-events: none;
+	will-change: transform, height;
+	transition:
+		transform 340ms cubic-bezier(0.22, 1, 0.36, 1),
+		height 340ms cubic-bezier(0.22, 1, 0.36, 1),
+		opacity 180ms ease;
+}
+
+.project-nav__pill--ready {
+	opacity: 1;
+}
+
+.project-nav__item {
+	position: relative;
+	z-index: 1;
+	border: 0;
+	background: transparent;
+	border-radius: 999px;
 }

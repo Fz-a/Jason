@@ -1,183 +1,351 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useState } from "react";
-import Link from "next/link";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useLocale } from "../lib/i18n";
+import { isCapabilitiesRailActive } from "../lib/capabilities-rail";
 import { ShowcaseDocument } from "../projects/UniversityShowcase";
 import {
 	universityProjectShowcases,
 	type UniversityShowcase,
 } from "../projects/university-showcases";
-import { workShowcases } from "../projects/work-showcases";
+import { workCompanies, workShowcases } from "../projects/work-showcases";
+import { societyShowcases } from "../projects/society-showcases";
+import {
+	makeEssay,
+	type MakeDiyItem,
+	type MakeImage,
+} from "../projects/make-essay";
 
-type CapId = "rtk" | "agv" | "fire" | "wearable";
+type GroupId = "work" | "university" | "diy" | "society";
 
-type CoreCapability = {
-	id: CapId;
-	n: string;
-	titleKey: string;
-	capKey: string;
-	tags: readonly string[];
-	src: string;
-	alt: string;
-	showcaseId: string;
-	section: string;
-};
-
-const CORE: CoreCapability[] = [
-	{
-		id: "rtk",
-		n: "01",
-		titleKey: "core.rtk.title",
-		capKey: "core.rtk.cap",
-		tags: ["core.rtk.c1", "core.rtk.c2", "core.rtk.c3", "core.rtk.c4"],
-		src: "/experience/work/zongheng/rtk-field.webp",
-		alt: "RTK agricultural positioning hardware",
-		showcaseId: "rtk",
-		section: "Work",
-	},
-	{
-		id: "agv",
-		n: "02",
-		titleKey: "core.agv.title",
-		capKey: "core.agv.cap",
-		tags: ["core.agv.c1", "core.agv.c2", "core.agv.c3"],
-		src: "/experience/work/zongheng/agv-yellow.webp",
-		alt: "Industrial AGV robotics",
-		showcaseId: "agv",
-		section: "Work",
-	},
-	{
-		id: "fire",
-		n: "03",
-		titleKey: "core.fire.title",
-		capKey: "core.fire.cap",
-		tags: ["core.fire.c1", "core.fire.c2", "core.fire.c3", "core.fire.c4"],
-		src: "/experience/university/fire-warning/camera-jetson.webp",
-		alt: "Edge AI fire warning system",
-		showcaseId: "fire-warning",
-		section: "University",
-	},
-	{
-		id: "wearable",
-		n: "04",
-		titleKey: "core.wear.title",
-		capKey: "core.wear.cap",
-		tags: ["core.wear.c1", "core.wear.c2", "core.wear.c3", "core.wear.c4"],
-		src: "/experience/university/smart-clothes/smart-vest.webp",
-		alt: "Smart wearable sensing system",
-		showcaseId: "smart-clothes",
-		section: "University",
-	},
+const GROUP_META: { id: GroupId; labelKey: string }[] = [
+	{ id: "work", labelKey: "core.group.work" },
+	{ id: "university", labelKey: "core.group.university" },
+	{ id: "diy", labelKey: "core.group.diy" },
+	{ id: "society", labelKey: "core.group.society" },
 ];
 
-function MiniVisual({ id }: { id: CapId }) {
-	const stroke = "#0F4C45";
-	const muted = "rgba(15,76,69,0.35)";
-	const common = {
-		fill: "none",
-		stroke,
-		strokeWidth: 1.25,
-		strokeLinecap: "round" as const,
-		strokeLinejoin: "round" as const,
+type NavItem = {
+	key: string;
+	id: string;
+	label: string;
+	section: string;
+	imageSrc: string;
+	imageAlt: string;
+	subtitle?: string;
+	summary?: string;
+	showcase?: UniversityShowcase;
+	body?: string[];
+	pull?: string;
+	helmetImages?: MakeImage[];
+	diyItems?: MakeDiyItem[];
+	kind: "showcase" | "company" | "helmet" | "diy";
+	group: GroupId;
+};
+
+function firstSpreadBlurb(
+	s: Pick<UniversityShowcase, "preview" | "spreads" | "subtitle">,
+): string | undefined {
+	const parts: string[] = [];
+	const push = (line?: string) => {
+		const t = line?.trim();
+		if (!t || parts.includes(t)) return;
+		parts.push(t);
 	};
 
-	if (id === "rtk") {
-		return (
-			<svg viewBox="0 0 120 88" className="h-full w-full" aria-hidden>
-				<circle cx="60" cy="14" r="7" {...common} />
-				<text x="60" y="17" textAnchor="middle" fontSize="6" fill={stroke} fontFamily="monospace">
-					SAT
-				</text>
-				<path d="M60 22 v14" stroke={muted} strokeWidth="1" />
-				<rect x="42" y="36" width="36" height="16" rx="1" {...common} />
-				<text x="60" y="47" textAnchor="middle" fontSize="7" fill={stroke} fontFamily="monospace">
-					RTK
-				</text>
-				<path d="M60 52 v12" stroke={muted} strokeWidth="1" />
-				<path d="M48 72 h24 l-4 8 h-16 z" {...common} />
-				<text x="60" y="86" textAnchor="middle" fontSize="6" fill={stroke} fontFamily="monospace">
-					UAV
-				</text>
-			</svg>
-		);
+	for (const line of s.preview ?? []) push(line);
+
+	for (const spread of s.spreads) {
+		if (parts.length >= 2) break;
+		if ("body" in spread && Array.isArray(spread.body)) {
+			for (const line of spread.body) {
+				push(line);
+				if (parts.length >= 2) break;
+			}
+		}
+		if (
+			parts.length < 2 &&
+			"subtitle" in spread &&
+			typeof spread.subtitle === "string"
+		) {
+			push(
+				spread.subtitle !== s.subtitle ? spread.subtitle : undefined,
+			);
+		}
 	}
 
-	if (id === "agv") {
-		return (
-			<svg viewBox="0 0 120 88" className="h-full w-full" aria-hidden>
-				<circle cx="22" cy="44" r="5" {...common} />
-				<path d="M28 44 H52" stroke={muted} strokeWidth="1" markerEnd="url(#arrow)" />
-				<circle cx="60" cy="44" r="5" {...common} />
-				<path d="M66 44 H90" stroke={muted} strokeWidth="1" />
-				<circle cx="98" cy="44" r="5" {...common} />
-				<path d="M60 50 L72 68" stroke={muted} strokeWidth="1" />
-				<rect x="64" y="68" width="20" height="10" rx="1" {...common} />
-				<text x="74" y="76" textAnchor="middle" fontSize="6" fill={stroke} fontFamily="monospace">
-					AGV
-				</text>
-			</svg>
-		);
+	return parts.length ? parts.join(" ") : undefined;
+}
+
+function buildCatalog(isZh: boolean, t: (k: string) => string): NavItem[] {
+	const work: NavItem[] = [];
+	for (const s of workShowcases) {
+		work.push({
+			key: s.id,
+			id: s.id,
+			label: s.title,
+			section: "Work",
+			imageSrc: s.cardImage.src,
+			imageAlt: s.cardImage.alt,
+			subtitle: s.subtitle,
+			summary: firstSpreadBlurb(s),
+			showcase: s,
+			kind: "showcase",
+			group: "work",
+		});
+	}
+	for (const c of workCompanies) {
+		if (workShowcases.some((w) => w.id === c.id)) continue;
+		work.push({
+			key: c.id,
+			id: c.id,
+			label: isZh ? c.companyZh : c.company,
+			section: c.role,
+			imageSrc: c.image.src,
+			imageAlt: c.image.alt,
+			subtitle: isZh ? c.company : c.companyZh,
+			summary: c.brief?.[0] ? `${c.summary} ${c.brief[0]}` : c.summary,
+			body: [...c.brief],
+			kind: "company",
+			group: "work",
+		});
 	}
 
-	if (id === "fire") {
-		return (
-			<svg viewBox="0 0 120 88" className="h-full w-full" aria-hidden>
-				<rect x="44" y="8" width="32" height="20" rx="1" {...common} />
-				<circle cx="60" cy="18" r="5" {...common} />
-				<path d="M60 28 v12" stroke={muted} strokeWidth="1" />
-				<rect x="40" y="40" width="40" height="18" rx="1" {...common} />
-				<text x="60" y="52" textAnchor="middle" fontSize="8" fill={stroke} fontFamily="monospace">
-					AI
-				</text>
-				<path d="M60 58 v10" stroke={muted} strokeWidth="1" />
-				<text x="60" y="80" textAnchor="middle" fontSize="7" fill={stroke} fontFamily="monospace">
-					DETECT
-				</text>
-			</svg>
-		);
+	const university: NavItem[] = universityProjectShowcases.map((s) => ({
+		key: s.id,
+		id: s.id,
+		label: s.title,
+		section: "University",
+		imageSrc: s.cardImage.src,
+		imageAlt: s.cardImage.alt,
+		subtitle: s.subtitle,
+		summary: firstSpreadBlurb(s),
+		showcase: s,
+		kind: "showcase" as const,
+		group: "university" as const,
+	}));
+
+	const diy: NavItem[] = [];
+	const helmet = makeEssay.find((b) => b.type === "helmet");
+	if (helmet && helmet.type === "helmet") {
+		diy.push({
+			key: "smart-helmet",
+			id: "smart-helmet",
+			label: isZh ? helmet.titleZh : helmet.title,
+			section: "MAKE",
+			imageSrc: helmet.images[0]?.src ?? "/experience/make/helmet-product.webp",
+			imageAlt: helmet.images[0]?.alt ?? helmet.title,
+			subtitle: isZh ? helmet.title : helmet.titleZh,
+			summary: helmet.pull,
+			pull: helmet.pull,
+			body: helmet.body,
+			helmetImages: [...helmet.images],
+			kind: "helmet",
+			group: "diy",
+		});
+	}
+	const diyWall = makeEssay.find((b) => b.type === "diy-wall");
+	if (diyWall && diyWall.type === "diy-wall") {
+		diy.push({
+			key: "diy-wall",
+			id: "diy-wall",
+			label: isZh ? diyWall.titleZh : diyWall.title,
+			section: "MAKE · DIY",
+			imageSrc: diyWall.items[4]?.image.src ?? diyWall.items[0]?.image.src ?? "",
+			imageAlt: diyWall.items[0]?.image.alt ?? diyWall.title,
+			subtitle: isZh ? diyWall.title : diyWall.titleZh,
+			summary: t("core.diy.lede"),
+			diyItems: [...diyWall.items],
+			kind: "diy",
+			group: "diy",
+		});
 	}
 
+	const society: NavItem[] = societyShowcases.map((s) => ({
+		key: s.id,
+		id: s.id,
+		label: s.title,
+		section: "Society",
+		imageSrc: s.cardImage.src,
+		imageAlt: s.cardImage.alt,
+		subtitle: s.subtitle,
+		summary: firstSpreadBlurb(s),
+		showcase: s,
+		kind: "showcase" as const,
+		group: "society" as const,
+	}));
+
+	return [...work, ...university, ...diy, ...society];
+}
+
+function NavButton({
+	item,
+	active,
+	onSelect,
+	compact,
+}: {
+	item: NavItem;
+	active: boolean;
+	onSelect: (id: string) => void;
+	compact?: boolean;
+}) {
 	return (
-		<svg viewBox="0 0 120 88" className="h-full w-full" aria-hidden>
-			{[18, 36, 54, 72].map((y, i) => (
-				<g key={y}>
-					<circle cx="28" cy={y} r="4" {...common} />
-					<text x="18" y={y + 2.5} textAnchor="end" fontSize="6" fill={stroke} fontFamily="monospace">
-						S{i + 1}
-					</text>
-					<path d={`M34 ${y} H58`} stroke={muted} strokeWidth="1" />
-				</g>
-			))}
-			<path d="M58 18 V72" stroke={muted} strokeWidth="1" />
-			<path d="M58 45 H72" stroke={muted} strokeWidth="1" />
-			<rect x="72" y="36" width="36" height="18" rx="1" {...common} />
-			<text x="90" y="48" textAnchor="middle" fontSize="6" fill={stroke} fontFamily="monospace">
-				SYSTEM
-			</text>
-		</svg>
+		<button
+			type="button"
+			data-nav-id={item.id}
+			onClick={() => onSelect(item.id)}
+			className={`project-nav__item relative z-[1] block w-full text-left transition-colors ${
+				compact ? "project-nav__item--compact whitespace-nowrap px-2.5 py-1.5" : "px-2.5 py-[0.34rem]"
+			} ${
+				active
+					? "text-[#043439]"
+					: "text-[#0F4C45]/50 hover:text-[#0F4C45]/85"
+			}`}
+		>
+			<span
+				className={`${
+					compact ? "text-[0.7rem]" : "text-[0.74rem]"
+				} leading-snug tracking-tight ${
+					active ? "font-semibold" : "font-medium"
+				}`}
+			>
+				{item.label}
+			</span>
+		</button>
 	);
 }
 
-function findShowcase(id: string): UniversityShowcase | null {
+function DiyGrid({
+	items,
+	isZh,
+	onOpen,
+}: {
+	items: MakeDiyItem[];
+	isZh: boolean;
+	onOpen: (item: MakeDiyItem) => void;
+}) {
 	return (
-		universityProjectShowcases.find((s) => s.id === id) ??
-		workShowcases.find((s) => s.id === id) ??
-		null
+		<div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 sm:gap-3">
+			{items.map((diy) => (
+				<button
+					key={diy.id}
+					type="button"
+					onClick={() => onOpen(diy)}
+					className="group overflow-hidden bg-[#E8E2D8] text-left transition hover:opacity-95"
+				>
+					<div className="relative aspect-square">
+						<Image
+							src={diy.image.src}
+							alt={diy.image.alt}
+							fill
+							sizes="180px"
+							className="object-cover transition duration-500 group-hover:scale-[1.03]"
+						/>
+					</div>
+					<div className="px-2 py-2 sm:px-2.5">
+						<p className="truncate text-[0.7rem] font-semibold tracking-tight text-[#162b26]">
+							{isZh ? diy.titleZh : diy.title}
+						</p>
+						<p className="mt-0.5 font-mono text-[0.56rem] tracking-[0.1em] text-[#0F4C45]/40">
+							{diy.year}
+						</p>
+					</div>
+				</button>
+			))}
+		</div>
+	);
+}
+
+function DiyCollagePreview({ items }: { items: MakeDiyItem[] }) {
+	const tiles = items.slice(0, 9);
+	return (
+		<div className="grid aspect-square w-full grid-cols-3 gap-1 bg-[#E8E2D8] p-1 sm:gap-1.5 sm:p-1.5">
+			{tiles.map((diy) => (
+				<div key={diy.id} className="relative overflow-hidden bg-[#DDD6CC]">
+					<Image
+						src={diy.image.src}
+						alt=""
+						fill
+						sizes="120px"
+						className="object-cover"
+					/>
+				</div>
+			))}
+		</div>
 	);
 }
 
 export function FeaturedProjects() {
-	const { t } = useLocale();
-	const [activeId, setActiveId] = useState<string | null>(null);
-	const active = CORE.find((p) => p.id === activeId) ?? null;
-	const showcase = active ? findShowcase(active.showcaseId) : null;
+	const { t, isZh } = useLocale();
+	const sectionRef = useRef<HTMLElement>(null);
+	const catalog = useMemo(() => buildCatalog(isZh, t), [isZh, t]);
+	const [selectedId, setSelectedId] = useState<string>(
+		() => catalog[0]?.id ?? "rtk",
+	);
+	const [panelOpen, setPanelOpen] = useState(false);
+	const [railVisible, setRailVisible] = useState(false);
+	const [diyFocus, setDiyFocus] = useState<MakeDiyItem | null>(null);
+	const [pill, setPill] = useState({
+		top: 0,
+		height: 0,
+		ready: false,
+	});
+	const railTrackRef = useRef<HTMLDivElement>(null);
+
+	const groups = useMemo(
+		() =>
+			GROUP_META.map((g) => ({
+				...g,
+				items: catalog.filter((n) => n.group === g.id),
+			})).filter((g) => g.items.length > 0),
+		[catalog],
+	);
+
+	const selected =
+		catalog.find((n) => n.id === selectedId) ?? catalog[0] ?? null;
+
+	const canOpen = Boolean(
+		selected &&
+			(selected.showcase ||
+				selected.kind === "helmet" ||
+				selected.kind === "diy" ||
+				(selected.kind === "company" && selected.body?.length)),
+	);
 
 	useEffect(() => {
-		if (!activeId) return;
+		const el = sectionRef.current;
+		if (!el) return;
+		let raf = 0;
+		const update = () => {
+			raf = 0;
+			const r = el.getBoundingClientRect();
+			const vh = window.innerHeight;
+			setRailVisible((prev) => {
+				const show = isCapabilitiesRailActive(r, vh, prev);
+				return prev === show ? prev : show;
+			});
+		};
+		const onScroll = () => {
+			if (!raf) raf = requestAnimationFrame(update);
+		};
+		update();
+		window.addEventListener("scroll", onScroll, { passive: true });
+		window.addEventListener("resize", onScroll);
+		return () => {
+			if (raf) cancelAnimationFrame(raf);
+			window.removeEventListener("scroll", onScroll);
+			window.removeEventListener("resize", onScroll);
+		};
+	}, []);
+
+	useEffect(() => {
+		if (!panelOpen && !diyFocus) return;
 		const onKey = (e: KeyboardEvent) => {
-			if (e.key === "Escape") setActiveId(null);
+			if (e.key === "Escape") {
+				if (diyFocus) setDiyFocus(null);
+				else setPanelOpen(false);
+			}
 		};
 		const prev = document.body.style.overflow;
 		document.body.style.overflow = "hidden";
@@ -186,131 +354,193 @@ export function FeaturedProjects() {
 			document.body.style.overflow = prev;
 			window.removeEventListener("keydown", onKey);
 		};
-	}, [activeId]);
+	}, [panelOpen, diyFocus]);
+
+	useLayoutEffect(() => {
+		const syncPill = () => {
+			const track = railTrackRef.current;
+			if (!track) return;
+			const btn = track.querySelector(
+				`[data-nav-id="${selectedId}"]`,
+			) as HTMLElement | null;
+			if (!btn) {
+				setPill((p) => ({ ...p, ready: false }));
+				return;
+			}
+			const trackRect = track.getBoundingClientRect();
+			const btnRect = btn.getBoundingClientRect();
+			setPill({
+				top: btnRect.top - trackRect.top + track.scrollTop,
+				height: btnRect.height,
+				ready: true,
+			});
+		};
+
+		syncPill();
+		window.addEventListener("resize", syncPill);
+		return () => window.removeEventListener("resize", syncPill);
+	}, [selectedId, groups, railVisible]);
+
+	const select = (id: string) => {
+		setSelectedId(id);
+		setPanelOpen(false);
+		setDiyFocus(null);
+	};
+
+	const openLabel =
+		selected?.kind === "helmet" || selected?.kind === "diy"
+			? t("core.open.collection")
+			: t("core.open");
 
 	return (
 		<section
+			ref={sectionRef}
 			id="experience"
-			className="scroll-mt-24 bg-[#F7F1E8] pb-14 pt-14 sm:scroll-mt-28 sm:pb-20 sm:pt-16"
+			className="story-slide relative bg-[#F7F1E8]"
 		>
-			<div className="mx-auto w-full max-w-[1100px] px-6 sm:px-8 md:px-10 lg:px-12 xl:max-w-[1160px] xl:px-14">
-				<p className="text-[0.68rem] font-semibold uppercase tracking-[0.28em] text-[#0F4C45]/70">
-					{t("core.kicker")}
-				</p>
-				<h2 className="mt-4 max-w-[18ch] text-[2rem] font-extrabold leading-[1.05] tracking-tight text-[#162b26] sm:text-[2.6rem]">
-					{t("core.title")}
-				</h2>
-				<p className="mt-4 max-w-[34rem] text-[0.9rem] leading-7 text-[#3E514D]">
-					{t("core.blurb")}
-				</p>
+			<aside
+				aria-hidden={!railVisible}
+				className={`pointer-events-none fixed inset-y-0 right-2 z-30 hidden w-[12.75rem] items-center xl:flex 2xl:right-5 2xl:w-[14rem] ${
+					railVisible ? "opacity-100" : "opacity-0"
+				}`}
+				style={{ transition: "opacity 260ms ease-out" }}
+			>
+				<nav
+					aria-label={t("core.nav")}
+					className={`project-nav w-full pr-1 ${
+						railVisible ? "pointer-events-auto" : "pointer-events-none"
+					}`}
+				>
+					<div ref={railTrackRef} className="project-nav__track relative">
+						<span
+							aria-hidden
+							className={`project-nav__pill ${
+								pill.ready ? "project-nav__pill--ready" : ""
+							}`}
+							style={{
+								transform: `translate3d(0, ${pill.top}px, 0)`,
+								height: pill.height,
+							}}
+						/>
+						<div className="space-y-[1.15rem]">
+							{groups.map((group) => (
+								<div key={group.id}>
+									<p className="mb-1.5 px-2.5 text-[0.56rem] font-semibold uppercase tracking-[0.16em] text-[#0F4C45]/42">
+										{t(group.labelKey)}
+									</p>
+									<ul className="project-nav__list">
+										{group.items.map((item) => (
+											<li key={item.key}>
+												<NavButton
+													item={item}
+													active={item.id === selectedId}
+													onSelect={select}
+												/>
+											</li>
+										))}
+									</ul>
+								</div>
+							))}
+						</div>
+					</div>
+				</nav>
+			</aside>
 
-				{/* Compact capability rows — not a PPT card grid */}
-				<div className="mt-12 divide-y divide-[#0F4C45]/12 border-y border-[#0F4C45]/12">
-					{CORE.map((item) => (
-						<article
-							key={item.id}
-							className="grid grid-cols-1 gap-6 py-8 sm:py-10 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] lg:items-center lg:gap-10"
-						>
+			<div className="story-slide__body xl:pr-[15rem] 2xl:pr-[16.5rem]">
+				<div className="mx-auto flex h-full w-full max-w-[1180px] flex-col justify-center xl:max-w-[1240px]">
+					<nav
+						aria-label={t("core.nav")}
+						className="shrink-0 space-y-2 px-6 pt-4 sm:px-8 md:px-10 lg:px-12 xl:hidden"
+					>
+						{groups.map((group) => (
+							<div key={group.id}>
+								<p className="mb-1 px-0.5 text-[0.56rem] font-semibold uppercase tracking-[0.16em] text-[#0F4C45]/40">
+									{t(group.labelKey)}
+								</p>
+								<ul className="-mx-1 flex w-full gap-0.5 overflow-x-auto pb-1">
+									{group.items.map((item) => (
+										<li key={item.key} className="shrink-0">
+											<NavButton
+												item={item}
+												active={item.id === selectedId}
+												onSelect={select}
+												compact
+											/>
+										</li>
+									))}
+								</ul>
+							</div>
+						))}
+					</nav>
+
+					{selected ? (
+						<article key={selected.id} className="project-stage">
+							<header className="project-stage__head">
+								<p className="project-stage__eyebrow">
+									{selected.section}
+									{selected.kind === "helmet" || selected.kind === "diy"
+										? ` · ${t("core.collection")}`
+										: null}
+								</p>
+								<h2 className="project-stage__title">{selected.label}</h2>
+							</header>
+
 							<button
 								type="button"
-								onClick={() => setActiveId(item.id)}
-								className="group text-left"
+								onClick={() => (canOpen ? setPanelOpen(true) : undefined)}
+								className={`project-stage__media group ${
+									selected.kind === "diy" ? "project-stage__media--diy" : ""
+								}`}
 							>
-								<p className="font-mono text-[0.68rem] text-[#0F4C45]/40">
-									{item.n}
-								</p>
-								<h3 className="mt-2 text-[1.25rem] font-extrabold tracking-tight text-[#162b26] sm:text-[1.45rem]">
-									{t(item.capKey)}
-								</h3>
-								<p className="mt-1.5 text-[0.9rem] font-medium text-[#4A5C58]">
-									{t(item.titleKey)}
-								</p>
-								<p className="mt-3 text-[0.68rem] font-semibold uppercase tracking-[0.12em] text-[#0F4C45]/60">
-									{item.tags.map((key) => t(key)).join(" · ")}
-								</p>
-								<span className="mt-4 inline-block text-[0.75rem] font-semibold text-[#0F4C45]/55 underline-offset-4 group-hover:text-[#0F4C45] group-hover:underline">
-									{t("core.open")} →
-								</span>
+								{selected.kind === "diy" && selected.diyItems ? (
+									<div className="absolute inset-0 transition duration-700 group-hover:scale-[1.02]">
+										<DiyCollagePreview items={selected.diyItems} />
+									</div>
+								) : (
+									<Image
+										src={selected.imageSrc}
+										alt={selected.imageAlt}
+										fill
+										sizes="(max-width: 900px) 100vw, 55vw"
+										priority
+										className="object-cover transition duration-700 group-hover:scale-[1.02]"
+									/>
+								)}
 							</button>
 
-							<div className="grid grid-cols-[5.5rem_minmax(0,1fr)] items-center gap-4 sm:grid-cols-[6.5rem_minmax(0,1fr)] sm:gap-5">
-								<div className="aspect-square w-full border border-[#0F4C45]/12 bg-[#FFFCFA] p-1.5">
-									<MiniVisual id={item.id} />
-								</div>
+							{selected.summary || selected.subtitle ? (
+								<p className="project-stage__body">
+									{selected.summary &&
+									selected.summary !== selected.subtitle
+										? selected.summary
+										: selected.subtitle}
+								</p>
+							) : null}
+
+							{canOpen ? (
 								<button
 									type="button"
-									onClick={() => setActiveId(item.id)}
-									className="relative aspect-[16/10] w-full overflow-hidden bg-[#E8E2D8]"
+									onClick={() => setPanelOpen(true)}
+									className="project-stage__open"
 								>
-									<Image
-										src={item.src}
-										alt={item.alt}
-										fill
-										sizes="(max-width: 1024px) 50vw, 360px"
-										className="object-cover transition duration-500 hover:scale-[1.02]"
-									/>
+									{openLabel}
+									<span className="project-stage__open-arrow" aria-hidden>
+										→
+									</span>
 								</button>
-							</div>
+							) : null}
 						</article>
-					))}
-				</div>
-
-				{/* Capabilities converge */}
-				<div className="mt-14 text-center sm:mt-16">
-					<p className="mx-auto flex max-w-2xl flex-wrap items-center justify-center gap-x-3 gap-y-2 text-[0.72rem] font-semibold uppercase tracking-[0.12em] text-[#0F4C45]/55">
-						<span>{t("core.rtk.cap")}</span>
-						<span aria-hidden className="text-[#0F4C45]/25">
-							·
-						</span>
-						<span>{t("core.agv.cap")}</span>
-						<span aria-hidden className="text-[#0F4C45]/25">
-							·
-						</span>
-						<span>{t("core.fire.cap")}</span>
-						<span aria-hidden className="text-[#0F4C45]/25">
-							·
-						</span>
-						<span>{t("core.wear.cap")}</span>
-					</p>
-					<div className="mt-4 flex flex-col items-center" aria-hidden>
-						<span className="h-8 w-px bg-[#0F4C45]/25" />
-						<span className="mt-1 text-[#0F4C45]/40">↓</span>
-					</div>
-					<p className="mt-3 text-[1.05rem] font-extrabold tracking-tight text-[#162b26]">
-						{t("core.converge.title")}
-					</p>
-					<div className="mt-3 flex flex-col items-center" aria-hidden>
-						<span className="h-6 w-px bg-[#0F4C45]/25" />
-						<span className="mt-1 text-[#0F4C45]/40">↓</span>
-					</div>
-					<p className="mt-3 text-[1.15rem] font-extrabold tracking-tight text-[#043439]">
-						{t("core.converge.goal")}
-					</p>
-					<p className="mx-auto mt-4 max-w-[28rem] text-[0.85rem] leading-6 text-[#6A7A76]">
-						{t("core.converge.blurb")}
-					</p>
-				</div>
-
-				<div className="mt-16 border-t border-[#0F4C45]/10 pt-10 text-center">
-					<p className="text-[0.68rem] font-semibold uppercase tracking-[0.22em] text-[#0F4C45]/45">
-						{t("archive.kicker")}
-					</p>
-					<Link
-						href="/archive/"
-						className="mt-3 inline-block text-[0.88rem] font-semibold text-[#0F4C45] underline-offset-4 hover:underline"
-					>
-						{t("archive.cta")} →
-					</Link>
+					) : null}
 				</div>
 			</div>
 
-			{active && showcase ? (
+			{panelOpen && selected ? (
 				<div className="fixed inset-0 z-50 flex items-end justify-center bg-[#162b26]/40 p-0 backdrop-blur-[2px] sm:items-center sm:p-6">
 					<button
 						type="button"
 						aria-label={t("journey.close")}
 						className="absolute inset-0 cursor-pointer border-0 bg-transparent"
-						onClick={() => setActiveId(null)}
+						onClick={() => setPanelOpen(false)}
 					/>
 					<div
 						role="dialog"
@@ -319,22 +549,168 @@ export function FeaturedProjects() {
 					>
 						<div className="flex shrink-0 items-center justify-between border-b border-[#0F4C45]/10 px-5 py-3.5">
 							<p className="text-[0.68rem] font-semibold uppercase tracking-[0.2em] text-[#0F4C45]/50">
-								Brief
+								{selected.kind === "helmet" || selected.kind === "diy"
+									? t("core.collection")
+									: "Brief"}
 							</p>
 							<button
 								type="button"
-								onClick={() => setActiveId(null)}
+								onClick={() => setPanelOpen(false)}
 								className="text-[0.78rem] font-semibold text-[#6A7A76] hover:text-[#0F4C45]"
 							>
 								{t("journey.close")}
 							</button>
 						</div>
 						<div className="min-h-0 flex-1 overflow-y-auto">
-							<ShowcaseDocument
-								item={showcase}
-								sectionLabel={active.section}
-								className="shadow-none"
+							{selected.showcase ? (
+								<ShowcaseDocument
+									item={selected.showcase}
+									sectionLabel={selected.section}
+									className="shadow-none"
+								/>
+							) : null}
+
+							{selected.kind === "company" && selected.body ? (
+								<article className="px-6 py-8 sm:px-9 sm:py-10">
+									<p className="text-[0.68rem] font-semibold uppercase tracking-[0.2em] text-[#0F4C45]/45">
+										{selected.section}
+									</p>
+									<h3 className="mt-3 text-[1.45rem] font-extrabold tracking-tight text-[#162b26]">
+										{selected.label}
+									</h3>
+									{selected.subtitle ? (
+										<p className="mt-1.5 text-[0.9rem] text-[#6A7A76]">
+											{selected.subtitle}
+										</p>
+									) : null}
+									<div className="mt-5 space-y-3">
+										{selected.body.map((line) => (
+											<p
+												key={line.slice(0, 24)}
+												className="text-[0.95rem] leading-7 text-[#3E514D]"
+											>
+												{line}
+											</p>
+										))}
+									</div>
+								</article>
+							) : null}
+
+							{selected.kind === "helmet" ? (
+								<article className="px-6 py-8 sm:px-9 sm:py-10">
+									<p className="text-[0.68rem] font-semibold uppercase tracking-[0.2em] text-[#0F4C45]/45">
+										MAKE · {t("core.collection")}
+									</p>
+									<h3 className="mt-3 text-[1.45rem] font-extrabold tracking-tight text-[#162b26]">
+										{selected.label}
+									</h3>
+									{selected.pull ? (
+										<p className="mt-5 text-[1rem] font-medium leading-8 text-[#0F4C45]">
+											{selected.pull}
+										</p>
+									) : null}
+									{selected.body?.map((line) => (
+										<p
+											key={line.slice(0, 24)}
+											className="mt-3.5 text-[0.95rem] leading-7 text-[#3E514D]"
+										>
+											{line}
+										</p>
+									))}
+									{selected.helmetImages?.length ? (
+										<div className="mt-7 grid gap-3 sm:grid-cols-2">
+											{selected.helmetImages.map((image) => (
+												<figure
+													key={image.src}
+													className="overflow-hidden bg-[#E8E2D8]"
+												>
+													<div className="relative aspect-[4/3]">
+														<Image
+															src={image.src}
+															alt={image.alt}
+															fill
+															sizes="320px"
+															className="object-cover"
+														/>
+													</div>
+													{image.caption ? (
+														<figcaption className="px-3 py-2.5 text-[0.74rem] text-[#6A7A76]">
+															{image.caption}
+														</figcaption>
+													) : null}
+												</figure>
+											))}
+										</div>
+									) : null}
+								</article>
+							) : null}
+
+							{selected.kind === "diy" && selected.diyItems ? (
+								<article className="px-6 py-8 sm:px-9 sm:py-10">
+									<p className="text-[0.68rem] font-semibold uppercase tracking-[0.2em] text-[#0F4C45]/45">
+										MAKE · DIY
+									</p>
+									<h3 className="mt-3 text-[1.45rem] font-extrabold tracking-tight text-[#162b26]">
+										{selected.label}
+									</h3>
+									<p className="mt-4 text-[0.9rem] leading-7 text-[#3E514D]">
+										{t("core.diy.lede")}
+									</p>
+									<div className="mt-6">
+										<DiyGrid
+											items={selected.diyItems}
+											isZh={isZh}
+											onOpen={setDiyFocus}
+										/>
+									</div>
+								</article>
+							) : null}
+						</div>
+					</div>
+				</div>
+			) : null}
+
+			{diyFocus ? (
+				<div className="fixed inset-0 z-[60] flex items-end justify-center bg-[#162b26]/45 p-0 backdrop-blur-[2px] sm:items-center sm:p-6">
+					<button
+						type="button"
+						aria-label={t("journey.close")}
+						className="absolute inset-0 cursor-pointer border-0 bg-transparent"
+						onClick={() => setDiyFocus(null)}
+					/>
+					<div
+						role="dialog"
+						aria-modal="true"
+						className="relative z-10 w-full max-w-[28rem] overflow-hidden rounded-t-2xl bg-[#F7F1E8] shadow-2xl sm:rounded-2xl"
+					>
+						<div className="flex items-center justify-between border-b border-[#0F4C45]/10 px-5 py-3.5">
+							<p className="text-[0.68rem] font-semibold uppercase tracking-[0.2em] text-[#0F4C45]/50">
+								DIY · {diyFocus.year}
+							</p>
+							<button
+								type="button"
+								onClick={() => setDiyFocus(null)}
+								className="text-[0.78rem] font-semibold text-[#6A7A76] hover:text-[#0F4C45]"
+							>
+								{t("journey.close")}
+							</button>
+						</div>
+						<div className="relative aspect-square bg-[#E8E2D8]">
+							<Image
+								src={diyFocus.image.src}
+								alt={diyFocus.image.alt}
+								fill
+								sizes="448px"
+								className="object-contain p-6"
 							/>
+						</div>
+						<div className="px-5 py-4">
+							<p className="text-[1.05rem] font-extrabold tracking-tight text-[#162b26]">
+								{isZh ? diyFocus.titleZh : diyFocus.title}
+							</p>
+							<p className="mt-1 text-[0.85rem] text-[#4A5C58]">
+								{isZh ? diyFocus.title : diyFocus.titleZh}
+							</p>
 						</div>
 					</div>
 				</div>

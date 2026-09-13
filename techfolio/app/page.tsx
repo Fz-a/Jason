@@ -3,12 +3,10 @@
 import { gsap } from "gsap";
 import Image from "next/image";
 import { Montserrat } from "next/font/google";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { HomeScrollPreloader } from "./components/HomeScrollPreloader";
 import { HeroNameFlip } from "./components/HeroNameFlip";
-import { LangSwitch } from "./components/LangSwitch";
 import { FeaturedProjects } from "./components/FeaturedProjects";
 import { ConnectionSection } from "./components/ConnectionSection";
 import { GoalSection } from "./components/GoalSection";
@@ -29,7 +27,6 @@ const socialLinks = [
   { label: "Gitee", href: "https://gitee.com/Fz_z" },
 ];
 
-const NAV_SCROLL_OFFSET = 72;
 const STUDIO_TAP_COUNT = 5;
 const STUDIO_TAP_WINDOW_MS = 1400;
 
@@ -51,21 +48,13 @@ export default function Home() {
     activeSection as (typeof STORY_IDS)[number],
   )
     ? activeSection
-    : activeSection === "contact"
-      ? "next"
-      : "";
+    : "";
 
   const scrollToSection = (sectionId: string) => {
     const target = document.getElementById(sectionId);
     if (!target) return;
 
-    const scrollRoot = document.scrollingElement ?? document.documentElement;
-    const top =
-      target.getBoundingClientRect().top +
-      scrollRoot.scrollTop -
-      NAV_SCROLL_OFFSET;
-
-    scrollRoot.scrollTo({ top: Math.max(0, top), behavior: "smooth" });
+    target.scrollIntoView({ behavior: "smooth", block: "start" });
     window.history.replaceState(null, "", `#${sectionId}`);
     setActiveSection(sectionId);
   };
@@ -109,7 +98,7 @@ export default function Home() {
       "research",
       "fit",
       "next",
-      "contact",
+      "target",
     ]
       .map((id) => document.getElementById(id))
       .filter((el): el is HTMLElement => Boolean(el));
@@ -124,10 +113,10 @@ export default function Home() {
       const nearPageBottom =
         window.innerHeight + window.scrollY >=
         document.documentElement.scrollHeight - 32;
-      const scrollMarker = window.scrollY + 160;
+      const scrollMarker = window.scrollY + window.innerHeight * 0.45;
 
       if (nearPageBottom) {
-        setActiveSection("contact");
+        setActiveSection("target");
         return;
       }
 
@@ -210,9 +199,7 @@ export default function Home() {
         current as (typeof STORY_IDS)[number],
       )
         ? current
-        : current === "contact"
-          ? "next"
-          : "experience";
+        : "experience";
       const idx = STORY_IDS.indexOf(
         storyActive as (typeof STORY_IDS)[number],
       );
@@ -246,41 +233,15 @@ export default function Home() {
 
   return (
     <main
-      className={`${montserrat.className} min-h-screen bg-[#F7F1E8] text-[#162b26]`}
+      className={`${montserrat.className} bg-[#F7F1E8] text-[#162b26]`}
     >
       <HomeScrollPreloader />
       <StoryProgress activeId={storyProgressId} onNavigate={scrollToSection} />
 
-      {/* Minimal presentation header */}
-      <header className="pointer-events-none fixed inset-x-0 top-0 z-50 safe-pt px-5 sm:px-8 lg:px-10">
-        <div className="mx-auto flex max-w-[1160px] items-center justify-end py-4 sm:py-5">
-          <div className="pointer-events-auto flex items-center gap-4 sm:gap-5">
-            <Link
-              href="/archive/"
-              className="text-[0.72rem] font-semibold uppercase tracking-[0.14em] text-[#0F4C45]/70 transition hover:text-[#043439]"
-            >
-              {t("nav.archive")}
-            </Link>
-            <a
-              href="/Jason-Chen-Resume.pdf"
-              download="Jason-Chen-Resume.pdf"
-              target="_blank"
-              rel="noreferrer"
-              className="text-[0.72rem] font-semibold uppercase tracking-[0.14em] text-[#0F4C45]/70 transition hover:text-[#043439]"
-            >
-              {t("nav.cv")}
-            </a>
-            <LangSwitch />
-          </div>
-        </div>
-      </header>
-
       {/* HERO — restored classic intro (Hello / circular portrait / CTAs) */}
-      <section
-        id="home"
-        className="relative min-h-[92svh] scroll-mt-10 bg-[#F7F1E8] sm:min-h-[100svh] sm:scroll-mt-14"
-      >
-        <div className="mx-auto grid min-h-[calc(92svh-4.5rem)] w-full max-w-[1160px] grid-cols-1 items-center gap-8 px-5 pb-20 pt-[4.5rem] sm:min-h-[calc(100svh-5.5rem)] sm:gap-10 sm:px-8 sm:py-12 md:px-10 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] lg:gap-12 lg:px-12 xl:max-w-[1220px] xl:px-14">
+      <section id="home" className="story-slide relative bg-[#F7F1E8]">
+        <div className="story-slide__body">
+        <div className="mx-auto grid h-full w-full max-w-[1160px] flex-1 grid-cols-1 items-center gap-6 px-5 pb-16 pt-[4.5rem] sm:gap-8 sm:px-8 sm:py-10 md:px-10 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] lg:gap-12 lg:px-12 xl:max-w-[1220px] xl:px-14">
           <div className="order-2 mx-auto w-full max-w-[540px] text-left lg:order-1 lg:max-w-none">
             <button
               type="button"
@@ -330,8 +291,8 @@ export default function Home() {
                 {t("hero.projects")}
               </a>
               <a
-                href="#contact"
-                onClick={(event) => handleNavClick(event, "#contact")}
+                href="#target"
+                onClick={(event) => handleNavClick(event, "#target")}
                 className="cursor-pointer text-[0.82rem] font-semibold text-[#0F4C45] underline-offset-4 hover:underline"
               >
                 {t("hero.contact")}
@@ -376,8 +337,9 @@ export default function Home() {
             </div>
           </div>
         </div>
+        </div>
 
-        <div className="pointer-events-none absolute inset-x-0 bottom-6 flex justify-center sm:bottom-12">
+        <div className="pointer-events-none absolute inset-x-0 bottom-6 z-10 flex justify-center sm:bottom-10">
           <a
             ref={scrollCueRef}
             href="#experience"
@@ -399,56 +361,53 @@ export default function Home() {
       <ResearchSection />
       <ResearchFitNext />
 
-      {/* Minimal contact — not a major section */}
-      <section
-        id="contact"
-        className="scroll-mt-24 border-t border-[#0F4C45]/10 bg-[#F7F1E8] pb-14 pt-12 sm:pb-16 sm:pt-14"
-      >
-        <div className="mx-auto w-full max-w-[1100px] px-6 text-center sm:px-8 md:px-10 lg:px-12 xl:max-w-[1160px] xl:px-14">
-          <p className="text-[0.68rem] font-semibold uppercase tracking-[0.28em] text-[#0F4C45]/50">
-            Jason Chen
-          </p>
-          <p className="mt-2 text-[1rem] font-extrabold tracking-tight text-[#162b26]">
-            {t("hero.role")}
-          </p>
-          <div className="mt-7 flex flex-wrap items-center justify-center gap-5">
-            <a
-              href="mailto:2260032001@student.must.edu.mo"
-              className="text-[0.85rem] font-semibold text-[#0F4C45] underline-offset-4 hover:underline"
-            >
-              Email
-            </a>
-            <a
-              href="/Jason-Chen-Resume.pdf"
-              download="Jason-Chen-Resume.pdf"
-              target="_blank"
-              rel="noreferrer"
-              className="text-[0.85rem] font-semibold text-[#0F4C45] underline-offset-4 hover:underline"
-            >
-              {t("nav.cv")}
-            </a>
-            {socialLinks.map((link) => (
+      {/* 06 — Target (+ footer inside same viewport so snap stays aligned) */}
+      <section id="target" className="story-slide bg-[#F7F1E8]">
+        <div className="story-slide__body px-6 py-10 sm:px-8 md:px-10 lg:px-12">
+          <div className="mx-auto flex w-full max-w-[1100px] flex-col items-center justify-center text-center xl:max-w-[1160px]">
+            <p className="text-[0.68rem] font-semibold uppercase tracking-[0.28em] text-[#0F4C45]/70">
+              {t("target.kicker")}
+            </p>
+            <p className="mt-4 text-[1.15rem] font-extrabold tracking-tight text-[#162b26] sm:text-[1.35rem]">
+              Jason Chen
+            </p>
+            <p className="mt-2 text-[0.95rem] font-medium text-[#4A5C58]">
+              {t("hero.role")}
+            </p>
+            <div className="mt-7 flex flex-wrap items-center justify-center gap-5">
               <a
-                key={link.label}
-                href={link.href}
+                href="mailto:2260032001@student.must.edu.mo"
+                className="text-[0.85rem] font-semibold text-[#0F4C45] underline-offset-4 hover:underline"
+              >
+                Email
+              </a>
+              <a
+                href="/Jason-Chen-Resume.pdf"
+                download="Jason-Chen-Resume.pdf"
                 target="_blank"
                 rel="noreferrer"
                 className="text-[0.85rem] font-semibold text-[#0F4C45] underline-offset-4 hover:underline"
               >
-                {link.label}
+                {t("nav.cv")}
               </a>
-            ))}
+              {socialLinks.map((link) => (
+                <a
+                  key={link.label}
+                  href={link.href}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-[0.85rem] font-semibold text-[#0F4C45] underline-offset-4 hover:underline"
+                >
+                  {link.label}
+                </a>
+              ))}
+            </div>
+            <p className="mt-14 text-[0.72rem] font-medium tracking-[0.04em] text-[#6B7B77]">
+              © 2026 Jason Chen
+            </p>
           </div>
         </div>
       </section>
-
-      <footer className="border-t border-[#0F4C45]/08 bg-[#F7F1E8]">
-        <div className="mx-auto flex w-full max-w-[1100px] justify-center px-6 py-6 text-center sm:px-8">
-          <p className="text-[0.72rem] font-medium tracking-[0.04em] text-[#6B7B77]">
-            © 2026 Jason Chen
-          </p>
-        </div>
-      </footer>
     </main>
   );
 }
