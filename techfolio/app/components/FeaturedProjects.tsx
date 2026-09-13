@@ -31,7 +31,7 @@ const CORE: CoreProject[] = [
 		titleKey: "core.rtk.title",
 		capKey: "core.rtk.cap",
 		bodyKey: "core.rtk.body",
-		tags: ["core.rtk.c1", "core.rtk.c2", "core.rtk.c3", "core.rtk.c4", "core.rtk.c5"],
+		tags: ["core.rtk.c1", "core.rtk.c2", "core.rtk.c3", "core.rtk.c4"],
 		src: "/experience/work/zongheng/rtk-field.webp",
 		alt: "RTK agricultural positioning hardware",
 		showcaseId: "rtk",
@@ -43,7 +43,7 @@ const CORE: CoreProject[] = [
 		titleKey: "core.agv.title",
 		capKey: "core.agv.cap",
 		bodyKey: "core.agv.body",
-		tags: ["core.agv.c1", "core.agv.c2", "core.agv.c3", "core.agv.c4", "core.agv.c5"],
+		tags: ["core.agv.c1", "core.agv.c2", "core.agv.c3"],
 		src: "/experience/work/zongheng/agv-yellow.webp",
 		alt: "Industrial AGV robotics",
 		showcaseId: "agv",
@@ -55,7 +55,7 @@ const CORE: CoreProject[] = [
 		titleKey: "core.fire.title",
 		capKey: "core.fire.cap",
 		bodyKey: "core.fire.body",
-		tags: ["core.fire.c1", "core.fire.c2", "core.fire.c3", "core.fire.c4", "core.fire.c5"],
+		tags: ["core.fire.c1", "core.fire.c2", "core.fire.c3", "core.fire.c4"],
 		src: "/experience/university/fire-warning/camera-jetson.webp",
 		alt: "Edge AI fire warning system",
 		showcaseId: "fire-warning",
@@ -67,7 +67,7 @@ const CORE: CoreProject[] = [
 		titleKey: "core.wear.title",
 		capKey: "core.wear.cap",
 		bodyKey: "core.wear.body",
-		tags: ["core.wear.c1", "core.wear.c2", "core.wear.c3", "core.wear.c4", "core.wear.c5"],
+		tags: ["core.wear.c1", "core.wear.c2", "core.wear.c3", "core.wear.c4"],
 		src: "/experience/university/smart-clothes/smart-vest.webp",
 		alt: "Smart wearable sensing system",
 		showcaseId: "smart-clothes",
@@ -106,87 +106,80 @@ export function FeaturedProjects() {
 	return (
 		<section
 			id="experience"
-			className="scroll-mt-24 bg-[#F7F1E8] pb-16 pt-10 sm:scroll-mt-28 sm:pb-24 sm:pt-16"
+			className="scroll-mt-24 bg-[#F7F1E8] pb-16 pt-14 sm:scroll-mt-28 sm:pb-24 sm:pt-20"
 		>
 			<div className="mx-auto w-full max-w-[1100px] px-6 sm:px-8 md:px-10 lg:px-12 xl:max-w-[1160px] xl:px-14">
 				<p className="text-[0.68rem] font-semibold uppercase tracking-[0.28em] text-[#0F4C45]/70">
 					{t("core.kicker")}
 				</p>
-				<h2 className="mt-4 max-w-[12ch] whitespace-pre-line text-[2.4rem] font-extrabold leading-[0.95] tracking-tight text-[#162b26] sm:text-[3.2rem] lg:text-[3.6rem]">
+				<h2 className="mt-4 max-w-[14ch] whitespace-pre-line text-[2.4rem] font-extrabold leading-[0.95] tracking-tight text-[#162b26] sm:text-[3.2rem] lg:text-[3.6rem]">
 					{t("core.title")}
 				</h2>
 				<p className="mt-5 max-w-[34rem] text-[0.95rem] leading-7 text-[#3E514D]">
 					{t("core.blurb")}
 				</p>
 
-				<div className="mt-14 space-y-20 sm:mt-20 sm:space-y-28">
-					{CORE.map((item, i) => (
-						<article
-							key={item.id}
-							className={`grid grid-cols-1 items-center gap-8 lg:grid-cols-2 lg:gap-14 ${
-								i % 2 === 1 ? "lg:[&>*:first-child]:order-2" : ""
-							}`}
-						>
+				{/* Vertical editorial sequence — not a card grid */}
+				<div className="mt-16 space-y-24 sm:mt-24 sm:space-y-32">
+					{CORE.map((item) => (
+						<article key={item.id} className="max-w-[52rem]">
+							<p className="font-mono text-[0.72rem] font-semibold tracking-[0.08em] text-[#0F4C45]/45">
+								{item.n}
+							</p>
+							<p className="mt-4 text-[0.78rem] font-semibold uppercase tracking-[0.22em] text-[#0F4C45]">
+								{t(item.capKey)}
+							</p>
+							<h3 className="mt-2 text-[1.65rem] font-extrabold tracking-tight text-[#162b26] sm:text-[2rem]">
+								{t(item.titleKey)}
+							</h3>
+							<p className="mt-4 text-[0.72rem] font-semibold uppercase tracking-[0.14em] text-[#0F4C45]/65">
+								{item.tags.map((key) => t(key)).join(" · ")}
+							</p>
+
 							<button
 								type="button"
 								onClick={() => setActiveId(item.id)}
-								className="group relative aspect-[16/10] w-full overflow-hidden rounded-[0.35rem] bg-[#E8E2D8] text-left"
+								className="group relative mt-8 aspect-[16/10] w-full overflow-hidden bg-[#E8E2D8] text-left"
 							>
 								<Image
 									src={item.src}
 									alt={item.alt}
 									fill
-									sizes="(max-width: 1024px) 100vw, 50vw"
-									className="object-cover transition duration-700 group-hover:scale-[1.03]"
+									sizes="(max-width: 1024px) 100vw, 720px"
+									className="object-cover transition duration-700 group-hover:scale-[1.02]"
 								/>
 							</button>
 
-							<div>
-								<p className="text-[0.68rem] font-semibold uppercase tracking-[0.28em] text-[#0F4C45]/55">
-									{item.n}
-								</p>
-								<h3 className="mt-3 text-[1.55rem] font-extrabold tracking-tight text-[#162b26] sm:text-[1.85rem]">
-									{t(item.titleKey)}
-								</h3>
-								<p className="mt-3 text-[0.78rem] font-semibold uppercase tracking-[0.2em] text-[#0F4C45]">
-									{t(item.capKey)}
-								</p>
-								<p className="mt-4 max-w-[28rem] text-[0.9rem] leading-7 text-[#4A5C58]">
-									{t(item.bodyKey)}
-								</p>
-								<ul className="mt-5 flex flex-wrap gap-x-3 gap-y-1.5">
-									{item.tags.map((key) => (
-										<li
-											key={key}
-											className="text-[0.72rem] font-semibold uppercase tracking-[0.12em] text-[#0F4C45]/75"
-										>
-											{t(key)}
-										</li>
-									))}
-								</ul>
-								<button
-									type="button"
-									onClick={() => setActiveId(item.id)}
-									className="mt-6 text-[0.8rem] font-semibold text-[#0F4C45] underline-offset-4 transition hover:underline"
-								>
-									{t("core.open")}
-								</button>
-							</div>
+							<p className="mt-6 max-w-[36rem] text-[0.95rem] leading-7 text-[#4A5C58]">
+								{t(item.bodyKey)}
+							</p>
+							<button
+								type="button"
+								onClick={() => setActiveId(item.id)}
+								className="mt-4 text-[0.78rem] font-semibold text-[#0F4C45]/70 underline-offset-4 transition hover:text-[#0F4C45] hover:underline"
+							>
+								{t("core.open")}
+							</button>
 						</article>
 					))}
 				</div>
 
-				<div className="mt-20 border-t border-[#0F4C45]/12 pt-12 text-center sm:mt-28">
-					<p className="text-[0.95rem] text-[#4A5C58]">{t("archive.prompt")}</p>
-					<p className="mt-2 text-[1.25rem] font-extrabold tracking-tight text-[#162b26] sm:text-[1.45rem]">
+				{/* Quiet archive entry */}
+				<div className="mt-24 border-t border-[#0F4C45]/10 pt-14 text-center sm:mt-32">
+					<p className="text-[0.68rem] font-semibold uppercase tracking-[0.22em] text-[#0F4C45]/45">
+						{t("archive.kicker")}
+					</p>
+					<p className="mt-3 text-[1.15rem] font-extrabold tracking-tight text-[#162b26]">
 						{t("archive.title")}
+					</p>
+					<p className="mt-2 text-[0.85rem] text-[#6A7A76]">
+						{t("archive.prompt")}
 					</p>
 					<Link
 						href="/archive/"
-						className="mt-6 inline-flex items-center gap-2 rounded-full border border-[#0F4C45] px-6 py-2.5 text-[0.82rem] font-semibold text-[#0F4C45] transition hover:bg-[#043439] hover:text-white"
+						className="mt-6 inline-block text-[0.82rem] font-semibold text-[#0F4C45] underline-offset-4 transition hover:underline"
 					>
-						{t("archive.cta")}
-						<span aria-hidden>→</span>
+						{t("archive.cta")} →
 					</Link>
 				</div>
 			</div>

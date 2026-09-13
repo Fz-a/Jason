@@ -1,9 +1,8 @@
-# Brittne Valdivia Portfolio
-A customizable portfolio template for developers, designers, and career changers who want a clean way to showcase projects, skills, and case studies.
+# Jason Chen — Research Presentation Portfolio
 
-Use this template for your own portfolio. Please replace all personal content and keep credit in your README with a link back to this repository.
+Personal research presentation site for Jason Chen (Electronic Engineer): hardware → intelligent systems → agricultural UAV direction.
 
-**Live Demo:** [brittnevaldivia.com](https://brittnevaldivia.com)
+Originally adapted from an open portfolio template (Brittne Valdivia). Personal content, branding, and images are Jason's own.
 
 **License Notice:** The source code in this repository is licensed under MIT. Personal content such as portfolio copy, project case studies, resume files, branding, and images is not included in that license and should be replaced with your own before publishing.
 

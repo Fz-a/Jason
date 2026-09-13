@@ -3,6 +3,7 @@
 import { gsap } from "gsap";
 import Image from "next/image";
 import { Montserrat } from "next/font/google";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { HomeScrollPreloader } from "./components/HomeScrollPreloader";
@@ -10,124 +11,22 @@ import { HeroNameFlip } from "./components/HeroNameFlip";
 import { LangSwitch } from "./components/LangSwitch";
 import { FeaturedProjects } from "./components/FeaturedProjects";
 import { ConnectionSection } from "./components/ConnectionSection";
-import { TargetSection } from "./components/TargetSection";
+import { GoalSection } from "./components/GoalSection";
 import { ResearchSection } from "./components/ResearchSection";
 import { ResearchFitNext } from "./components/ResearchFitNext";
 import { StoryProgress, STORY_STAGES } from "./components/StoryProgress";
 import { useLocale } from "./lib/i18n";
-import avatarSettings from "../content/avatar.json";
 
 const montserrat = Montserrat({
   subsets: ["latin"],
 });
 
-const navItems = [
-  { key: "nav.experience", href: "#experience" },
-  { key: "nav.direction", href: "#target" },
-  { key: "nav.research", href: "#research" },
-  { key: "nav.archive", href: "/archive/" },
-  { key: "nav.contact", href: "#contact" },
-] as const;
-
 const STORY_IDS = STORY_STAGES.map((s) => s.id);
 
 const socialLinks = [
-  {
-    label: "GitHub",
-    href: "https://github.com/Fz-a",
-  },
-  {
-    label: "Gitee",
-    href: "https://gitee.com/Fz_z",
-  },
-  {
-    label: "CSDN",
-    href: "https://blog.csdn.net/weixin_63844594",
-  },
+  { label: "GitHub", href: "https://github.com/Fz-a" },
+  { label: "Gitee", href: "https://gitee.com/Fz_z" },
 ];
-
-function GitHubIcon() {
-  return (
-    <svg
-      aria-hidden="true"
-      viewBox="0 0 24 24"
-      className="h-4 w-4"
-      fill="currentColor"
-    >
-      <path d="M12 2C6.48 2 2 6.58 2 12.23c0 4.52 2.87 8.35 6.84 9.7.5.1.68-.22.68-.49 0-.24-.01-1.04-.01-1.88-2.78.62-3.37-1.2-3.37-1.2-.45-1.19-1.11-1.5-1.11-1.5-.91-.64.07-.62.07-.62 1 .07 1.53 1.06 1.53 1.06.9 1.57 2.35 1.12 2.92.86.09-.67.35-1.12.64-1.38-2.22-.26-4.56-1.14-4.56-5.09 0-1.12.39-2.03 1.03-2.74-.1-.26-.45-1.31.1-2.73 0 0 .84-.27 2.75 1.05A9.3 9.3 0 0 1 12 6.84c.85 0 1.71.12 2.51.36 1.91-1.32 2.75-1.05 2.75-1.05.55 1.42.2 2.47.1 2.73.64.71 1.03 1.62 1.03 2.74 0 3.96-2.34 4.82-4.57 5.08.36.32.69.95.69 1.92 0 1.39-.01 2.5-.01 2.84 0 .27.18.6.69.49A10.25 10.25 0 0 0 22 12.23C22 6.58 17.52 2 12 2Z" />
-    </svg>
-  );
-}
-
-function GiteeIcon() {
-  return (
-    <svg
-      aria-hidden="true"
-      viewBox="0 0 24 24"
-      className="h-[1.05rem] w-[1.05rem]"
-      fill="currentColor"
-    >
-      <path d="M11.984 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.016 0zm6.09 5.333c.328 0 .593.266.592.593v1.482a.594.594 0 0 1-.593.592H9.777c-.982 0-1.778.796-1.778 1.778v5.63c0 .327.266.592.593.592h5.63c.982 0 1.778-.796 1.778-1.778v-.296a.593.593 0 0 0-.592-.593h-4.15a.592.592 0 0 1-.592-.592v-1.482a.593.593 0 0 1 .593-.592h6.815c.327 0 .593.265.593.592v3.408a4 4 0 0 1-4 4H5.926a.593.593 0 0 1-.593-.593V9.778a4.444 4.444 0 0 1 4.445-4.444h8.296Z" />
-    </svg>
-  );
-}
-
-function CSDNIcon() {
-  return (
-    <svg
-      aria-hidden="true"
-      viewBox="0 0 24 24"
-      className="h-[1.05rem] w-[1.05rem]"
-      fill="currentColor"
-    >
-      <path d="M4.693 13.638c-.497.568-1.363.63-1.712.63-.648 0-1.144-.164-1.474-.488-.313-.307-.478-.76-.489-1.346-.025-1.358.744-2.762 2.074-2.762.635 0 1.124.455 1.311.644a.337.337 0 0 0 .282.099.38.38 0 0 0 .241-.159c.068-.087.135-.237.138-.401s-.057-.344-.243-.49a2.642 2.642 0 0 0-1.668-.591c-.819 0-1.627.376-2.218 1.033-.621.691-.953 1.63-.935 2.646.015.815.282 1.5.773 1.982.528.518 1.3.791 2.235.791 1.097 0 1.776-.325 2.154-.597a.584.584 0 0 0 .24-.456.702.702 0 0 0-.208-.497c-.23-.248-.448-.101-.503-.037ZM9.663 11.488a7.471 7.471 0 0 0-.698-.248c-.157-.048-.309-.091-.45-.131-.922-.26-1.027-.5-1.017-.68.022-.363.515-.853 1.352-.792.607.045 1.015.509 1.205.781.149.214.371.135.434.095a.602.602 0 0 0 .309-.514.626.626 0 0 0-.209-.488 2.654 2.654 0 0 0-3.347-.273c-.456.323-.744.772-.77 1.202-.064 1.061 1.015 1.366 1.803 1.588.214.061.429.127.667.202 1.14.357 1.173.717 1.092 1.267-.082.556-.696.834-1.685.761-1.029-.076-1.464-.61-1.612-.901-.05-.098-.205-.248-.413-.156-.514.229-.473.731-.26.993.339.416 1.15 1.035 2.667 1.035 1.734 0 2.255-.875 2.378-1.64.092-.572-.022-1.028-.348-1.396-.236-.267-.592-.495-1.101-.706ZM16.44 9.323c-.598-.431-1.393-.61-2.36-.532-.712.058-1.274.243-1.335.263l-.006.002a.437.437 0 0 0-.297.379l-.47 5.201a.337.337 0 0 0 .247.35l.072.02.066.018.086.021a7.914 7.914 0 0 0 1.64.183c.972 0 1.765-.23 2.36-.684.764-.583 1.141-1.5 1.118-2.725-.021-1.135-.398-1.974-1.121-2.495Zm-.662 4.461c-.836.639-2.09.562-2.677.481a.128.128 0 0 1-.109-.137l.397-4.248a.113.113 0 0 1 .086-.1c.999-.241 1.777-.168 2.312.218.189.137.348.331.471.568.176.339.277.765.286 1.234.017.916-.24 1.583-.765 1.984ZM23.967 10.41a1.92 1.92 0 0 0-.432-.919c-.399-.465-1.029-.689-1.848-.689-.734 0-1.372.228-1.947.799.007-.086.019-.159.018-.223s-.017-.116-.066-.163c-.048-.045-.077-.067-.127-.077-.05-.01-.122-.008-.256-.006a.587.587 0 0 0-.589.54s-.325 3.874-.428 5.165a.308.308 0 0 0 .073.228.36.36 0 0 0 .26.131h.387a.224.224 0 0 0 .226-.205l.273-2.929.014-.147a1.902 1.902 0 0 1 .082-.412c.014-.045.03-.092.047-.14.245-.694.803-1.72 1.971-1.694.84.018 1.449.455 1.385 1.114-.101 1.034-.266 3.1-.358 4.14-.019.209.182.273.252.273h.304a.442.442 0 0 0 .444-.404s.185-2.127.294-3.352l.048-.532a1.959 1.959 0 0 0-.026-.5Z" />
-    </svg>
-  );
-}
-
-function SocialIcon({ label }: { label: string }) {
-  switch (label) {
-    case "GitHub":
-      return <GitHubIcon />;
-    case "Gitee":
-      return <GiteeIcon />;
-    case "CSDN":
-      return <CSDNIcon />;
-    default:
-      return null;
-  }
-}
-
-function EmailIcon() {
-  return (
-    <svg
-      aria-hidden="true"
-      viewBox="0 0 24 24"
-      className="h-4 w-4"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.9"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M4 6.5h16v11H4z" />
-      <path d="m4.5 7 7.5 6 7.5-6" />
-    </svg>
-  );
-}
-
-function LocationIcon() {
-  return (
-    <svg
-      aria-hidden="true"
-      viewBox="0 0 24 24"
-      className="h-4 w-4"
-      fill="currentColor"
-    >
-      <path d="M12 2.75A6.25 6.25 0 0 0 5.75 9c0 4.35 5.18 10.72 5.4 10.99a1.1 1.1 0 0 0 1.7 0c.22-.27 5.4-6.64 5.4-10.99A6.25 6.25 0 0 0 12 2.75Zm0 8.9A2.65 2.65 0 1 1 12 6.35a2.65 2.65 0 0 1 0 5.3Z" />
-    </svg>
-  );
-}
 
 const NAV_SCROLL_OFFSET = 72;
 const STUDIO_TAP_COUNT = 5;
@@ -151,9 +50,9 @@ export default function Home() {
     activeSection as (typeof STORY_IDS)[number],
   )
     ? activeSection
-    : activeSection === "contact"
+    : activeSection === "fit" || activeSection === "contact"
       ? "next"
-      : "home";
+      : "";
 
   const scrollToSection = (sectionId: string) => {
     const target = document.getElementById(sectionId);
@@ -172,14 +71,13 @@ export default function Home() {
 
   const handleNavClick = (
     event: React.MouseEvent<HTMLAnchorElement>,
-    href: string
+    href: string,
   ) => {
     if (!href.startsWith("#")) return;
     event.preventDefault();
     scrollToSection(href.slice(1));
   };
 
-  // Studio access: 5 taps on the name area
   const onStudioTap = () => {
     const now = Date.now();
     const tap = homeTapRef.current;
@@ -206,8 +104,9 @@ export default function Home() {
       "home",
       "experience",
       "connection",
-      "target",
+      "goal",
       "research",
+      "fit",
       "next",
       "contact",
     ]
@@ -237,14 +136,11 @@ export default function Home() {
           current = section.id;
         }
       }
-
-      // keep nav highlight accurate
       setActiveSection(current);
     };
 
     if (cue && cueDot && cueText) {
       gsap.set(cue, { autoAlpha: 1, y: 0, scale: 1 });
-
       animations.push(
         gsap.to(cue, {
           y: -6,
@@ -252,9 +148,8 @@ export default function Home() {
           repeat: -1,
           yoyo: true,
           ease: "sine.inOut",
-        })
+        }),
       );
-
       animations.push(
         gsap.to(cueDot, {
           scaleY: 0.65,
@@ -263,9 +158,8 @@ export default function Home() {
           repeat: -1,
           yoyo: true,
           ease: "power1.inOut",
-        })
+        }),
       );
-
       animations.push(
         gsap.to(cueText, {
           opacity: 0.55,
@@ -273,17 +167,13 @@ export default function Home() {
           repeat: -1,
           yoyo: true,
           ease: "sine.inOut",
-        })
+        }),
       );
     }
 
     const onScroll = () => {
       updateActiveSection();
-
-      if (!cue) {
-        return;
-      }
-
+      if (!cue) return;
       if (window.scrollY > 36 && !cueHidden) {
         cueHidden = true;
         gsap.to(cue, {
@@ -319,22 +209,25 @@ export default function Home() {
         current as (typeof STORY_IDS)[number],
       )
         ? current
-        : current === "contact"
+        : current === "fit" || current === "contact"
           ? "next"
-          : "home";
+          : "experience";
       const idx = STORY_IDS.indexOf(
         storyActive as (typeof STORY_IDS)[number],
       );
 
       if (e.key === "ArrowDown" || e.key === "PageDown") {
         e.preventDefault();
-        const next = STORY_IDS[Math.min(idx + 1, STORY_IDS.length - 1)];
+        const next = STORY_IDS[Math.min(Math.max(idx, 0) + 1, STORY_IDS.length - 1)];
         scrollToSection(next);
       } else if (e.key === "ArrowUp" || e.key === "PageUp") {
         e.preventDefault();
-        const prev = STORY_IDS[Math.max(idx - 1, 0)];
-        scrollToSection(prev);
-      } else if (/^[1-6]$/.test(e.key)) {
+        if (idx <= 0) {
+          scrollToSection("home");
+        } else {
+          scrollToSection(STORY_IDS[idx - 1]);
+        }
+      } else if (/^[1-5]$/.test(e.key)) {
         const stage = STORY_IDS[Number(e.key) - 1];
         if (stage) scrollToSection(stage);
       }
@@ -355,134 +248,75 @@ export default function Home() {
       className={`${montserrat.className} min-h-screen bg-[#F7F1E8] text-[#162b26]`}
     >
       <HomeScrollPreloader />
-      <StoryProgress
-        activeId={storyProgressId}
-        onNavigate={scrollToSection}
-      />
-      <header className="pointer-events-none fixed inset-x-0 top-0 z-50 safe-pt px-3 sm:px-6 sm:pt-5 lg:px-8">
-        <div className="relative mx-auto flex max-w-[calc(100vw-1.5rem)] items-center justify-center sm:max-w-none">
-          <div className="pointer-events-auto nav-scroll max-w-full overflow-x-auto rounded-full border border-[#0F4C45]/15 bg-[#F7F1E8]/92 p-1 shadow-[0_14px_40px_rgba(22,43,38,0.08)] backdrop-blur-md sm:p-1.5">
-            <nav aria-label="Primary">
-              <ul className="flex w-max items-center gap-0.5 sm:gap-1">
-                {navItems.map((item) => (
-                  <li key={item.href}>
-                    <a
-                      href={item.href}
-                      onClick={(event) => handleNavClick(event, item.href)}
-                      className={`block cursor-pointer rounded-full px-3 py-1.5 text-[0.72rem] font-semibold transition sm:px-4.5 sm:py-2.5 sm:text-[0.83rem] lg:px-5 lg:py-2.5 lg:text-[0.88rem] ${
-                        activeSection === item.href.slice(1)
-                          ? "bg-[#043439] text-white shadow-[0_10px_24px_rgba(4,52,57,0.22)]"
-                          : "text-[#0F4C45] hover:bg-[#0F4C45]/8"
-                      }`}
-                    >
-                      {t(item.key)}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </nav>
-          </div>
-          <div className="pointer-events-auto absolute right-0 top-1/2 -translate-y-1/2">
+      <StoryProgress activeId={storyProgressId} onNavigate={scrollToSection} />
+
+      {/* Minimal presentation header */}
+      <header className="pointer-events-none fixed inset-x-0 top-0 z-50 safe-pt px-5 sm:px-8 lg:px-10">
+        <div className="mx-auto flex max-w-[1160px] items-center justify-between py-4 sm:py-5">
+          <button
+            type="button"
+            onClick={onStudioTap}
+            className="pointer-events-auto cursor-default text-left"
+          >
+            <p className="text-[0.72rem] font-bold uppercase tracking-[0.2em] text-[#043439]">
+              <HeroNameFlip />
+            </p>
+          </button>
+          <div className="pointer-events-auto flex items-center gap-4 sm:gap-6">
+            <Link
+              href="/archive/"
+              className="text-[0.72rem] font-semibold uppercase tracking-[0.14em] text-[#0F4C45]/70 transition hover:text-[#043439]"
+            >
+              {t("nav.archive")} →
+            </Link>
             <LangSwitch />
           </div>
         </div>
       </header>
 
+      {/* HERO — not a numbered chapter */}
       <section
         id="home"
-        className="relative min-h-[92svh] scroll-mt-10 bg-[#F7F1E8] sm:min-h-[100svh] sm:scroll-mt-14"
+        className="relative min-h-[92svh] scroll-mt-10 bg-[#F7F1E8] sm:min-h-[100svh]"
       >
-        <div className="mx-auto grid min-h-[calc(92svh-4.5rem)] w-full max-w-[1160px] grid-cols-1 items-center gap-8 px-5 pb-20 pt-[4.5rem] sm:min-h-[calc(100svh-5.5rem)] sm:gap-10 sm:px-8 sm:py-12 md:px-10 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] lg:gap-12 lg:px-12 xl:max-w-[1220px] xl:px-14">
-          <div className="order-2 mx-auto w-full max-w-[540px] text-left lg:order-1 lg:max-w-none">
-            <button
-              type="button"
-              onClick={onStudioTap}
-              className="cursor-default text-left"
-            >
-              <p className="text-[0.68rem] font-semibold uppercase tracking-[0.28em] text-[#0F4C45]">
-                <span className="hero-name-greeting">
-                  <HeroNameFlip />
-                </span>
-              </p>
-              <p className="mt-2 text-[0.78rem] font-semibold uppercase tracking-[0.18em] text-[#0F4C45]/60">
-                {t("hero.role")}
-              </p>
-            </button>
+        <div className="mx-auto grid min-h-[calc(92svh-4.5rem)] w-full max-w-[1160px] grid-cols-1 items-center gap-10 px-5 pb-24 pt-[5.5rem] sm:min-h-[calc(100svh-5.5rem)] sm:gap-12 sm:px-8 sm:py-16 md:px-10 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)] lg:gap-14 lg:px-12 xl:px-14">
+          <div className="order-2 mx-auto w-full max-w-[540px] lg:order-1 lg:max-w-none">
+            <p className="text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-[#0F4C45]/65">
+              {t("hero.role")}
+            </p>
 
-            <h1 className="mt-7 whitespace-pre-line text-[2.55rem] font-extrabold leading-[0.95] tracking-tight text-[#162b26] sm:mt-9 sm:text-[3.6rem] lg:text-[4.2rem] xl:text-[4.6rem]">
+            <h1 className="mt-8 whitespace-pre-line text-[2.6rem] font-extrabold leading-[0.94] tracking-tight text-[#162b26] sm:mt-10 sm:text-[3.8rem] lg:text-[4.4rem] xl:text-[4.8rem]">
               {t("hero.headline")}
             </h1>
 
-            <p className="mt-6 max-w-[28rem] text-[1rem] leading-8 text-[#3E514D] sm:text-[1.05rem]">
+            <p className="mt-7 max-w-[28rem] text-[1rem] leading-8 text-[#3E514D] sm:text-[1.05rem]">
               {t("hero.blurb")}
             </p>
 
-            <p className="mt-8 text-[0.72rem] font-semibold uppercase tracking-[0.16em] text-[#0F4C45]/70">
+            <p className="mt-8 text-[0.7rem] font-semibold uppercase tracking-[0.16em] text-[#0F4C45]/55">
               {(
                 [
                   "hero.chip.electronics",
                   "hero.chip.embedded",
                   "hero.chip.robotics",
                   "hero.chip.ai",
-                  "hero.chip.uav",
                 ] as const
               )
                 .map((key) => t(key))
                 .join(" · ")}
             </p>
-
-            <div className="mt-8 flex flex-wrap items-center gap-3">
-              <a
-                href="#experience"
-                onClick={(event) => handleNavClick(event, "#experience")}
-                className="cursor-pointer rounded-full bg-[#043439] px-6 py-2.5 text-sm font-semibold text-white transition hover:opacity-90"
-              >
-                {t("hero.projects")}
-              </a>
-              <a
-                href="#contact"
-                onClick={(event) => handleNavClick(event, "#contact")}
-                className="cursor-pointer text-[0.82rem] font-semibold text-[#0F4C45] underline-offset-4 hover:underline"
-              >
-                {t("hero.contact")}
-              </a>
-              <a
-                href="/Jason-Chen-Resume.pdf"
-                download="Jason-Chen-Resume.pdf"
-                target="_blank"
-                rel="noreferrer"
-                className="text-[0.78rem] font-semibold text-[#0F4C45]/55 underline-offset-4 hover:text-[#0F4C45] hover:underline"
-              >
-                {t("hero.resume")}
-              </a>
-            </div>
           </div>
 
           <div className="order-1 flex items-center justify-center lg:order-2">
-            <div className="hero-avatar relative aspect-square w-full max-w-[200px] sm:max-w-[300px] lg:max-w-[360px]">
-              <div className="hero-avatar__frame relative h-full w-full overflow-hidden rounded-full">
-                <Image
-                  src={
-                    avatarSettings.v
-                      ? `${avatarSettings.src}?v=${avatarSettings.v}`
-                      : avatarSettings.src
-                  }
-                  alt="Jason Chen"
-                  fill
-                  sizes="(max-width: 640px) 200px, 360px"
-                  priority
-                  className="hero-avatar__img object-cover"
-                  style={
-                    avatarSettings.source
-                      ? undefined
-                      : {
-                          transform: `translate(${avatarSettings.tx ?? 0}%, ${avatarSettings.ty ?? 0}%) scale(${avatarSettings.scale})`,
-                          transformOrigin: "center center",
-                        }
-                  }
-                />
-                <span aria-hidden className="hero-avatar__veil" />
-              </div>
+            <div className="relative aspect-[4/5] w-full max-w-[280px] overflow-hidden bg-[#E8E2D8] sm:max-w-[340px] lg:max-w-[400px]">
+              <Image
+                src="/experience/work/zongheng/rtk-field.webp"
+                alt="Engineering field systems"
+                fill
+                sizes="(max-width: 640px) 280px, 400px"
+                priority
+                className="object-cover"
+              />
             </div>
           </div>
         </div>
@@ -492,11 +326,11 @@ export default function Home() {
             ref={scrollCueRef}
             href="#experience"
             onClick={(event) => handleNavClick(event, "#experience")}
-            className="pointer-events-auto flex cursor-pointer flex-col items-center gap-2.5 text-[0.6rem] font-semibold uppercase tracking-[0.28em] text-[#0F4C45]/72 transition"
+            className="pointer-events-auto flex cursor-pointer flex-col items-center gap-2.5 text-[0.6rem] font-semibold uppercase tracking-[0.28em] text-[#0F4C45]/55 transition"
           >
             <span
               ref={cueDotRef}
-              className="block h-8 w-px bg-[#0F4C45]/35"
+              className="block h-8 w-px bg-[#0F4C45]/30"
             />
             <span ref={cueTextRef}>{t("hero.scroll")}</span>
           </a>
@@ -504,44 +338,39 @@ export default function Home() {
       </section>
 
       <FeaturedProjects />
-
       <ConnectionSection />
-
-      <TargetSection />
-
+      <GoalSection />
       <ResearchSection />
-
       <ResearchFitNext />
 
+      {/* Minimal contact — not a major section */}
       <section
         id="contact"
-        className="scroll-mt-24 border-t border-[#0F4C45]/12 bg-[#F7F1E8] pb-16 pt-12 sm:scroll-mt-28 sm:pb-20 sm:pt-16"
+        className="scroll-mt-24 border-t border-[#0F4C45]/10 bg-[#F7F1E8] pb-14 pt-12 sm:pb-16 sm:pt-14"
       >
         <div className="mx-auto w-full max-w-[1100px] px-6 text-center sm:px-8 md:px-10 lg:px-12 xl:max-w-[1160px] xl:px-14">
-          <p className="text-[0.68rem] font-semibold uppercase tracking-[0.28em] text-[#0F4C45]/55">
+          <p className="text-[0.68rem] font-semibold uppercase tracking-[0.28em] text-[#0F4C45]/50">
             Jason Chen
           </p>
-          <p className="mt-2 text-[1.1rem] font-extrabold tracking-tight text-[#162b26]">
+          <p className="mt-2 text-[1rem] font-extrabold tracking-tight text-[#162b26]">
             {t("hero.role")}
           </p>
-          <p className="mt-4 text-[0.72rem] font-semibold uppercase tracking-[0.14em] text-[#0F4C45]/65">
+          <p className="mt-3 text-[0.68rem] font-semibold uppercase tracking-[0.14em] text-[#0F4C45]/50">
             {(
               [
                 "hero.chip.electronics",
                 "hero.chip.embedded",
                 "hero.chip.robotics",
                 "hero.chip.ai",
-                "hero.chip.uav",
               ] as const
             )
               .map((key) => t(key))
               .join(" · ")}
           </p>
-
-          <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
+          <div className="mt-7 flex flex-wrap items-center justify-center gap-5">
             <a
               href="mailto:2260032001@student.must.edu.mo"
-              className="text-[0.88rem] font-semibold text-[#0F4C45] underline-offset-4 hover:underline"
+              className="text-[0.85rem] font-semibold text-[#0F4C45] underline-offset-4 hover:underline"
             >
               Email
             </a>
@@ -551,7 +380,7 @@ export default function Home() {
                 href={link.href}
                 target="_blank"
                 rel="noreferrer"
-                className="text-[0.88rem] font-semibold text-[#0F4C45] underline-offset-4 hover:underline"
+                className="text-[0.85rem] font-semibold text-[#0F4C45] underline-offset-4 hover:underline"
               >
                 {link.label}
               </a>
@@ -560,8 +389,8 @@ export default function Home() {
         </div>
       </section>
 
-      <footer className="border-t border-[#0F4C45]/10 bg-[#F7F1E8]">
-        <div className="mx-auto flex w-full max-w-[1100px] justify-center px-6 py-6 text-center sm:px-8 md:px-10 lg:px-12 xl:max-w-[1160px] xl:px-14">
+      <footer className="border-t border-[#0F4C45]/08 bg-[#F7F1E8]">
+        <div className="mx-auto flex w-full max-w-[1100px] justify-center px-6 py-6 text-center sm:px-8">
           <p className="text-[0.72rem] font-medium tracking-[0.04em] text-[#6B7B77]">
             © 2026 Jason Chen
           </p>

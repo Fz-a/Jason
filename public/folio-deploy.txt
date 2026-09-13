@@ -1,7 +1,3 @@
-# Folio deploy marker — open this URL after push to confirm Cloudflare published the new build.
-# Expected: https://cjyfz.dpdns.org/folio-deploy.txt
-stamp=2026-09-13T17:40+08:00
-build=CF_STATIC_DEPLOY=1
-deploy=static-assets-only
-fix=research-presentation-visual-ia
-ui=editorial-six-chapter-story
+stamp=2026-09-13T18:05
+version=research-presentation-5-chapters-goal
+note=Experience Connection Goal Research Next — simplified presentation IA
