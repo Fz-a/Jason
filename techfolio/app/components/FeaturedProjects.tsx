@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useLocale } from "../lib/i18n";
 import { isCapabilitiesRailActive } from "../lib/capabilities-rail";
+import { ZoomableFrame } from "./ImageLightbox";
 import { ShowcaseDocument } from "../projects/UniversityShowcase";
 import {
 	universityProjectShowcases,
@@ -627,15 +628,26 @@ export function FeaturedProjects() {
 													key={image.src}
 													className="overflow-hidden bg-[#E8E2D8]"
 												>
-													<div className="relative aspect-[4/3]">
-														<Image
-															src={image.src}
-															alt={image.alt}
-															fill
-															sizes="320px"
-															className="object-cover"
-														/>
-													</div>
+													<ZoomableFrame
+														image={{
+															src: image.src,
+															alt: image.alt,
+															width: 960,
+															height: 720,
+															caption: image.caption,
+														}}
+														className="block w-full"
+													>
+														<div className="relative aspect-[4/3]">
+															<Image
+																src={image.src}
+																alt={image.alt}
+																fill
+																sizes="320px"
+																className="object-cover transition group-hover/zoom:opacity-95"
+															/>
+														</div>
+													</ZoomableFrame>
 													{image.caption ? (
 														<figcaption className="px-3 py-2.5 text-[0.74rem] text-[#6A7A76]">
 															{image.caption}

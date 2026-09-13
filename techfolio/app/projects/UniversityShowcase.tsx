@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useEffect, useId, useState } from "react";
+import { ZoomableFrame } from "../components/ImageLightbox";
 import type { ProjectImage } from "./project-data";
 import {
   type ShowcaseSpread,
@@ -32,18 +33,20 @@ function DocImage({
 }) {
   return (
     <figure className={className}>
-      <div className={`overflow-hidden ${frameClassName}`}>
-        <Image
-          src={image.src}
-          alt={image.alt}
-          width={image.width}
-          height={image.height}
-          quality={95}
-          priority={priority}
-          sizes="(max-width: 720px) 100vw, 720px"
-          className={`${imgClassName} [image-rendering:auto]`}
-        />
-      </div>
+      <ZoomableFrame image={image} className="block w-full">
+        <div className={`overflow-hidden ${frameClassName}`}>
+          <Image
+            src={image.src}
+            alt={image.alt}
+            width={image.width}
+            height={image.height}
+            quality={95}
+            priority={priority}
+            sizes="(max-width: 720px) 100vw, 720px"
+            className={`${imgClassName} [image-rendering:auto] transition duration-300 group-hover/zoom:opacity-95`}
+          />
+        </div>
+      </ZoomableFrame>
       {image.caption ? (
         <figcaption className="mt-2.5 text-center text-[0.66rem] font-medium tracking-[0.06em] text-[#8A9692]">
           {image.caption}
@@ -236,17 +239,19 @@ function Spread({ spread }: { spread: ShowcaseSpread }) {
                     <div
                       className={`relative ${cover ? "aspect-[4/5] sm:aspect-[3/4]" : "flex aspect-[4/3] items-center justify-center px-4 py-3 sm:px-5"}`}
                     >
-                      <Image
-                        src={image.src}
-                        alt={image.alt}
-                        width={image.width}
-                        height={image.height}
-                        className={
-                          cover
-                            ? "h-full w-full object-cover"
-                            : "max-h-full w-full object-contain"
-                        }
-                      />
+                      <ZoomableFrame image={image} className="absolute inset-0 block h-full w-full">
+                        <Image
+                          src={image.src}
+                          alt={image.alt}
+                          width={image.width}
+                          height={image.height}
+                          className={
+                            cover
+                              ? "h-full w-full object-cover transition group-hover/zoom:opacity-95"
+                              : "h-full w-full object-contain transition group-hover/zoom:opacity-95"
+                          }
+                        />
+                      </ZoomableFrame>
                     </div>
                     {detail || image.caption ? (
                       <div className="border-t border-black/[0.05] px-4 py-3.5 sm:px-5">
@@ -330,17 +335,19 @@ function Spread({ spread }: { spread: ShowcaseSpread }) {
                     </p>
                   </div>
                   <div className={`relative ${cover ? "aspect-[4/5]" : "aspect-[4/3]"}`}>
-                    <Image
-                      src={image.src}
-                      alt={image.alt}
-                      width={image.width}
-                      height={image.height}
-                      className={
-                        cover
-                          ? "h-full w-full object-cover"
-                          : "h-full w-full object-contain p-2"
-                      }
-                    />
+                    <ZoomableFrame image={image} className="absolute inset-0 block h-full w-full">
+                      <Image
+                        src={image.src}
+                        alt={image.alt}
+                        width={image.width}
+                        height={image.height}
+                        className={
+                          cover
+                            ? "h-full w-full object-cover transition group-hover/zoom:opacity-95"
+                            : "h-full w-full object-contain p-2 transition group-hover/zoom:opacity-95"
+                        }
+                      />
+                    </ZoomableFrame>
                   </div>
                   {detail ? (
                     <div className="border-t border-black/[0.05] px-3 py-2.5 sm:px-4 sm:py-3">
@@ -483,16 +490,18 @@ function Spread({ spread }: { spread: ShowcaseSpread }) {
             </p>
           </div>
           <div className="relative aspect-[16/10] w-full bg-[#F4F4F4]">
-            <Image
-              src={spread.image.src}
-              alt={spread.image.alt}
-              width={spread.image.width}
-              height={spread.image.height}
-              priority
-              quality={95}
-              sizes="(max-width: 720px) 100vw, 720px"
-              className="h-full w-full object-cover"
-            />
+            <ZoomableFrame image={spread.image} className="absolute inset-0 block h-full w-full">
+              <Image
+                src={spread.image.src}
+                alt={spread.image.alt}
+                width={spread.image.width}
+                height={spread.image.height}
+                priority
+                quality={95}
+                sizes="(max-width: 720px) 100vw, 720px"
+                className="h-full w-full object-cover transition group-hover/zoom:opacity-95"
+              />
+            </ZoomableFrame>
           </div>
         </section>
       );
@@ -641,13 +650,15 @@ function ThemeStorySection({
 
       {heroImage ? (
         <div className="border-b border-[#0F4C45]/10 bg-[#F7F1E8]">
-          <Image
-            src={heroImage.src}
-            alt={heroImage.alt}
-            width={heroImage.width}
-            height={heroImage.height}
-            className="h-auto w-full object-cover"
-          />
+          <ZoomableFrame image={heroImage} className="block w-full">
+            <Image
+              src={heroImage.src}
+              alt={heroImage.alt}
+              width={heroImage.width}
+              height={heroImage.height}
+              className="h-auto w-full object-cover transition group-hover/zoom:opacity-95"
+            />
+          </ZoomableFrame>
           {heroImage.caption ? (
             <p className="px-5 py-3 text-[0.72rem] leading-5 text-[#6A7A76] sm:px-7">
               {heroImage.caption}
