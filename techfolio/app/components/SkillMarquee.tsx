@@ -23,26 +23,53 @@ type SkillItem = {
 };
 
 /**
- * Placeholder stack — replace / reorder later with your real skills.
- * Keep `id` stable when renaming for future i18n.
+ * Skills collected via guided pick — all steps done.
+ * Confirm with user before locking display names.
  */
 export const SKILL_ITEMS: SkillItem[] = [
-	{ id: "inventor", name: "Inventor", icon: "cube" },
+	// CAD
+	{ id: "solidworks", name: "SolidWorks", icon: "cube" },
 	{ id: "fusion360", name: "Fusion 360", icon: "orbit" },
 	{ id: "sketchup", name: "SketchUp", icon: "cube" },
-	{ id: "solidworks", name: "SolidWorks", icon: "cube" },
 	{ id: "autocad", name: "AutoCAD", icon: "draft" },
-	{ id: "kicad", name: "KiCad", icon: "circuit" },
+	// EDA
 	{ id: "altium", name: "Altium", icon: "circuit" },
+	{ id: "proteus", name: "Proteus", icon: "circuit" },
+	{ id: "multisim", name: "Multisim", icon: "circuit" },
+	{ id: "easyeda", name: "EasyEDA", icon: "circuit" },
+	// Embedded
 	{ id: "stm32", name: "STM32", icon: "chip" },
 	{ id: "arduino", name: "Arduino", icon: "board" },
-	{ id: "ros2", name: "ROS 2", icon: "bot" },
-	{ id: "opencv", name: "OpenCV", icon: "eye" },
+	{ id: "esp32", name: "ESP32", icon: "chip" },
+	{ id: "raspberry-pi", name: "Raspberry Pi", icon: "board" },
+	{ id: "mcs51", name: "51 MCU", icon: "chip" },
+	{ id: "nrf", name: "nRF / BLE", icon: "chip" },
+	{ id: "jetson-nano", name: "Jetson Nano", icon: "bot" },
+	{ id: "jieli", name: "Jieli", icon: "chip" },
+	{ id: "cw-series", name: "CW Series", icon: "chip" },
+	{ id: "gd32", name: "GD32", icon: "chip" },
+	// Languages
+	{ id: "cpp", name: "C++", icon: "code" },
 	{ id: "python", name: "Python", icon: "code" },
-	{ id: "cpp", name: "C / C++", icon: "code" },
-	{ id: "matlab", name: "MATLAB", icon: "plot" },
-	{ id: "gazebo", name: "Gazebo", icon: "bot" },
-	{ id: "blender", name: "Blender", icon: "mesh" },
+	{ id: "java", name: "Java", icon: "code" },
+	{ id: "vue", name: "Vue", icon: "code" },
+	{ id: "html", name: "HTML", icon: "code" },
+	// Robot / vision
+	{ id: "ros", name: "ROS", icon: "bot" },
+	{ id: "opencv", name: "OpenCV", icon: "eye" },
+	{ id: "yolov5", name: "YOLOv5", icon: "eye" },
+	// Toolchain / creative
+	{ id: "cursor", name: "Cursor", icon: "code" },
+	{ id: "git", name: "Git", icon: "code" },
+	{ id: "github", name: "GitHub", icon: "code" },
+	{ id: "docker", name: "Docker", icon: "code" },
+	{ id: "linux", name: "Linux", icon: "code" },
+	{ id: "qt5", name: "Qt 5", icon: "code" },
+	{ id: "vscode", name: "VS Code", icon: "code" },
+	{ id: "photoshop", name: "Photoshop", icon: "mesh" },
+	{ id: "indesign", name: "InDesign", icon: "mesh" },
+	{ id: "touchdesigner", name: "TouchDesigner", icon: "mesh" },
+	{ id: "mapping", name: "Mapping", icon: "mesh" },
 ];
 
 function SkillIcon({ kind }: { kind: IconKind }) {
@@ -146,17 +173,14 @@ function SkillIcon({ kind }: { kind: IconKind }) {
 function MarqueeRow({
 	items,
 	direction,
-	offset,
 }: {
 	items: SkillItem[];
 	direction: "left" | "right";
-	offset?: boolean;
 }) {
-	const loop = [...items, ...items];
+	/* Triple the set so the -50% loop stays seamless even with few items */
+	const loop = [...items, ...items, ...items, ...items];
 	return (
-		<div
-			className={`skill-marquee__viewport${offset ? " skill-marquee__viewport--offset" : ""}`}
-		>
+		<div className="skill-marquee__viewport">
 			<div
 				className={`skill-marquee__track skill-marquee__track--${direction}`}
 				aria-hidden="true"
@@ -167,6 +191,7 @@ function MarqueeRow({
 							<SkillIcon kind={item.icon} />
 							<span className="skill-marquee__mark">{item.name}</span>
 						</span>
+						<span className="skill-marquee__sep" aria-hidden="true" />
 					</span>
 				))}
 			</div>
@@ -176,8 +201,9 @@ function MarqueeRow({
 
 export function SkillMarquee() {
 	const { t } = useLocale();
-	const rowA = SKILL_ITEMS.filter((_, i) => i % 2 === 0);
-	const rowB = SKILL_ITEMS.filter((_, i) => i % 2 === 1);
+	const mid = Math.ceil(SKILL_ITEMS.length / 2);
+	const rowA = SKILL_ITEMS.slice(0, mid);
+	const rowB = [...SKILL_ITEMS.slice(mid), ...SKILL_ITEMS.slice(0, 2)];
 
 	return (
 		<section
@@ -192,7 +218,7 @@ export function SkillMarquee() {
 
 				<div className="skill-marquee__rows">
 					<MarqueeRow items={rowA} direction="left" />
-					<MarqueeRow items={rowB} direction="right" offset />
+					<MarqueeRow items={rowB} direction="right" />
 				</div>
 
 				<ul className="sr-only">

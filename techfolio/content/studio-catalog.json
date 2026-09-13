@@ -1,0 +1,89 @@
+{
+	"items": [
+		{
+			"id": "zongheng-robot",
+			"title": "Zongheng Robot",
+			"group": "项目",
+			"source": "showcase"
+		},
+		{
+			"id": "rtk",
+			"title": "RTK Positioning",
+			"group": "项目",
+			"source": "showcase"
+		},
+		{
+			"id": "agv",
+			"title": "AGV & Remote",
+			"group": "项目",
+			"source": "showcase"
+		},
+		{
+			"id": "smart-clothes",
+			"title": "Smart Clothes for Elderly",
+			"group": "项目",
+			"source": "showcase"
+		},
+		{
+			"id": "fire-warning",
+			"title": "Early Fire Warning System",
+			"group": "项目",
+			"source": "showcase"
+		},
+		{
+			"id": "zongheng",
+			"title": "Guangzhou Zongheng",
+			"group": "公司",
+			"source": "company"
+		},
+		{
+			"id": "moore",
+			"title": "Shenzhen Moore Creative",
+			"group": "公司",
+			"source": "company"
+		},
+		{
+			"id": "cvte",
+			"title": "Guangzhou CVTE",
+			"group": "公司",
+			"source": "company"
+		},
+		{
+			"id": "smart-helmet",
+			"title": "Smart Helmet",
+			"group": "造物",
+			"source": "helmet"
+		},
+		{
+			"id": "make-diy",
+			"title": "DIY",
+			"group": "造物",
+			"source": "diy"
+		},
+		{
+			"id": "robotman",
+			"title": "Robotman Team",
+			"group": "社会",
+			"source": "showcase"
+		},
+		{
+			"id": "volunteering",
+			"title": "Volunteering",
+			"group": "社会",
+			"source": "showcase"
+		},
+		{
+			"id": "exhibitions",
+			"title": "Exhibitions",
+			"group": "社会",
+			"source": "showcase"
+		},
+		{
+			"id": "campus-depts",
+			"title": "校园部门",
+			"group": "社会",
+			"source": "showcase"
+		}
+	],
+	"hidden": []
+}

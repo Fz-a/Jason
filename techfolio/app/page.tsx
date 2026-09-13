@@ -3,6 +3,7 @@
 import { gsap } from "gsap";
 import Image from "next/image";
 import { Montserrat } from "next/font/google";
+import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { HomeScrollPreloader } from "./components/HomeScrollPreloader";
 import { JourneyHub } from "./components/JourneyHub";
@@ -10,6 +11,7 @@ import { HeroNameFlip } from "./components/HeroNameFlip";
 import { LangSwitch } from "./components/LangSwitch";
 import { SkillMarquee } from "./components/SkillMarquee";
 import { useLocale } from "./lib/i18n";
+import avatarSettings from "../content/avatar.json";
 
 const montserrat = Montserrat({
   subsets: ["latin"],
@@ -120,13 +122,17 @@ function LocationIcon() {
 }
 
 const NAV_SCROLL_OFFSET = 72;
+const STUDIO_TAP_COUNT = 5;
+const STUDIO_TAP_WINDOW_MS = 1400;
 
 export default function Home() {
   const { t } = useLocale();
+  const router = useRouter();
   const [activeSection, setActiveSection] = useState("home");
   const scrollCueRef = useRef<HTMLAnchorElement>(null);
   const cueDotRef = useRef<HTMLSpanElement>(null);
   const cueTextRef = useRef<HTMLSpanElement>(null);
+  const homeTapRef = useRef({ count: 0, lastAt: 0 });
 
   const scrollToSection = (sectionId: string) => {
     const target = document.getElementById(sectionId);
@@ -149,6 +155,22 @@ export default function Home() {
   ) => {
     if (!href.startsWith("#")) return;
     event.preventDefault();
+
+    if (href === "#home") {
+      const now = Date.now();
+      const tap = homeTapRef.current;
+      if (now - tap.lastAt > STUDIO_TAP_WINDOW_MS) {
+        tap.count = 0;
+      }
+      tap.count += 1;
+      tap.lastAt = now;
+      if (tap.count >= STUDIO_TAP_COUNT) {
+        tap.count = 0;
+        router.push("/studio/");
+        return;
+      }
+    }
+
     scrollToSection(href.slice(1));
   };
 
@@ -364,16 +386,29 @@ export default function Home() {
           </div>
 
           <div className="order-1 flex items-center justify-center lg:order-2">
-            <div className="relative aspect-square w-full max-w-[220px] overflow-hidden rounded-full bg-white drop-shadow-xl sm:max-w-[380px] md:max-w-[460px] lg:max-w-[560px] xl:max-w-[620px]">
-              <div className="absolute inset-x-0 bottom-0 flex justify-center">
+            <div className="hero-avatar relative aspect-square w-full max-w-[200px] sm:max-w-[300px] md:max-w-[340px] lg:max-w-[380px] xl:max-w-[400px]">
+              <div className="hero-avatar__frame relative h-full w-full overflow-hidden rounded-full">
                 <Image
-                  src="/avatar2.png"
+                  src={
+                    avatarSettings.v
+                      ? `${avatarSettings.src}?v=${avatarSettings.v}`
+                      : avatarSettings.src
+                  }
                   alt="Jason Chen"
-                  width={1024}
-                  height={1024}
+                  fill
+                  sizes="(max-width: 640px) 240px, (max-width: 1024px) 400px, 480px"
                   priority
-                  className="aspect-square w-[90%] object-cover object-[center_18%]"
+                  className="hero-avatar__img object-cover"
+                  style={
+                    avatarSettings.source
+                      ? undefined
+                      : {
+                          transform: `translate(${avatarSettings.tx ?? 0}%, ${avatarSettings.ty ?? 0}%) scale(${avatarSettings.scale})`,
+                          transformOrigin: "center center",
+                        }
+                  }
                 />
+                <span aria-hidden className="hero-avatar__veil" />
               </div>
             </div>
           </div>

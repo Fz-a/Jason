@@ -418,8 +418,6 @@ function MomentCard({
 	align,
 	index,
 	onCommit,
-	onHover,
-	onLeave,
 }: {
 	meta: CardMeta;
 	active: boolean;
@@ -427,8 +425,6 @@ function MomentCard({
 	align: "left" | "right";
 	index: number;
 	onCommit: () => void;
-	onHover: () => void;
-	onLeave: () => void;
 }) {
 	const { t } = useLocale();
 	const mark = String(index).padStart(2, "0");
@@ -438,10 +434,6 @@ function MomentCard({
 		<button
 			type="button"
 			onClick={onCommit}
-			onMouseEnter={onHover}
-			onFocus={onHover}
-			onMouseLeave={onLeave}
-			onBlur={onLeave}
 			className={`journey-moment group relative w-full max-w-[18.5rem] cursor-pointer text-left outline-none sm:max-w-[20.5rem] ${
 				sideEnd ? "sm:ml-auto sm:text-right" : "sm:mr-auto sm:text-left"
 			} ${dimmed ? "is-dimmed" : ""} ${active ? "is-active" : ""}`}
@@ -521,16 +513,12 @@ function BeatRow({
 	dimmed,
 	reducedMotion,
 	onCommit,
-	onHover,
-	onLeave,
 }: {
 	beat: CardBeat;
 	active: boolean;
 	dimmed: boolean;
 	reducedMotion: boolean;
 	onCommit: () => void;
-	onHover: () => void;
-	onLeave: () => void;
 }) {
 	const { locale } = useLocale();
 	const meta = cardMeta(beat.card, locale);
@@ -544,8 +532,6 @@ function BeatRow({
 			active={active}
 			dimmed={dimmed}
 			onCommit={onCommit}
-			onHover={onHover}
-			onLeave={onLeave}
 		/>
 	);
 
@@ -1293,40 +1279,20 @@ export function JourneyHub() {
 	const [open, setOpen] = useState(false);
 	const paneRef = useRef<HTMLElement>(null);
 	const pathRef = useRef<HTMLDivElement>(null);
-	const hoverTimer = useRef<number | null>(null);
 	const reduced = usePrefersReducedMotion();
 	const progress = useSpineProgress(pathRef, reduced);
 
 	const activeCard = cards.find((card) => cardId(card) === activeId) ?? null;
 	const railVisible = aboutLocked && !open;
 
-	const clearTimers = useCallback(() => {
-		if (hoverTimer.current !== null) {
-			window.clearTimeout(hoverTimer.current);
-			hoverTimer.current = null;
-		}
+	const openBrief = useCallback((id: string) => {
+		setActiveId(id);
+		setOpen(true);
 	}, []);
 
-	const openBrief = useCallback(
-		(id: string, immediate = false) => {
-			clearTimers();
-			const apply = () => {
-				setActiveId(id);
-				setOpen(true);
-			};
-			if (immediate || reduced || open) {
-				apply();
-				return;
-			}
-			hoverTimer.current = window.setTimeout(apply, 220);
-		},
-		[clearTimers, open, reduced],
-	);
-
 	const close = useCallback(() => {
-		clearTimers();
 		setOpen(false);
-	}, [clearTimers]);
+	}, []);
 
 	useEffect(() => {
 		if (!open) return;
@@ -1341,8 +1307,6 @@ export function JourneyHub() {
 			document.body.style.overflow = previous;
 		};
 	}, [open]);
-
-	useEffect(() => () => clearTimers(), [clearTimers]);
 
 	return (
 		<div className="relative">
@@ -1407,9 +1371,7 @@ export function JourneyHub() {
 								active={isActive}
 								dimmed={open && !isActive}
 								reducedMotion={reduced}
-								onCommit={() => openBrief(id, true)}
-								onHover={() => openBrief(id)}
-								onLeave={clearTimers}
+								onCommit={() => openBrief(id)}
 							/>
 						);
 					})}
