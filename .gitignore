@@ -71,3 +71,6 @@ tmp/
 *realesrgan-x4plus*
 
 
+
+# temp hide of Next API routes during static export
+techfolio/.api-static-build-hidden/
