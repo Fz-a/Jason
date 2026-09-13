@@ -10,6 +10,9 @@ import { JourneyHub } from "./components/JourneyHub";
 import { HeroNameFlip } from "./components/HeroNameFlip";
 import { LangSwitch } from "./components/LangSwitch";
 import { SkillMarquee } from "./components/SkillMarquee";
+import { FeaturedProjects } from "./components/FeaturedProjects";
+import { EngineeringPath } from "./components/EngineeringPath";
+import { ExperienceStrip } from "./components/ExperienceStrip";
 import { useLocale } from "./lib/i18n";
 import avatarSettings from "../content/avatar.json";
 
@@ -20,6 +23,7 @@ const montserrat = Montserrat({
 const navItems = [
   { key: "nav.home", href: "#home" },
   { key: "nav.about", href: "#about" },
+  { key: "nav.projects", href: "#projects" },
   { key: "nav.contact", href: "#contact" },
 ] as const;
 
@@ -184,6 +188,7 @@ export default function Home() {
   useEffect(() => {
     const homeSection = document.getElementById("home");
     const aboutSection = document.getElementById("about");
+    const projectsSection = document.getElementById("projects");
     const contactSection = document.getElementById("contact");
 
     const cue = scrollCueRef.current;
@@ -203,6 +208,11 @@ export default function Home() {
         (contactSection && scrollMarker >= contactSection.offsetTop)
       ) {
         setActiveSection("contact");
+        return;
+      }
+
+      if (projectsSection && scrollMarker >= projectsSection.offsetTop) {
+        setActiveSection("projects");
         return;
       }
 
@@ -327,37 +337,50 @@ export default function Home() {
 
       <section
         id="home"
-        className="relative min-h-[100svh] scroll-mt-10 bg-[#F7F1E8] sm:min-h-screen sm:scroll-mt-14"
+        className="relative min-h-[92svh] scroll-mt-10 bg-[#F7F1E8] sm:min-h-[100svh] sm:scroll-mt-14"
       >
-        <div className="mx-auto grid min-h-[calc(100svh-5rem)] w-full max-w-[1160px] grid-cols-1 items-center gap-6 px-5 pb-24 pt-[4.75rem] sm:min-h-[calc(100vh-5.5rem)] sm:gap-8 sm:px-8 sm:py-10 md:px-10 md:py-10 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)] lg:gap-8 lg:px-12 lg:py-10 xl:max-w-[1220px] xl:gap-10 xl:px-14">
-          <div className="order-2 mx-auto w-full max-w-[420px] text-left lg:order-1">
-            <div className="mb-3 text-[0.65rem] font-semibold uppercase tracking-[0.24em] text-[#0F4C45] sm:text-[0.74rem] sm:tracking-[0.28em] lg:text-[0.8rem]">
-              <p>{t("hero.role")}</p>
-              <p className="mt-1 tracking-[0.18em] sm:tracking-[0.22em]">
-                {t("hero.tags")}
-              </p>
-            </div>
+        <div className="mx-auto grid min-h-[calc(92svh-4.5rem)] w-full max-w-[1160px] grid-cols-1 items-center gap-5 px-5 pb-20 pt-[4.5rem] sm:min-h-[calc(100svh-5.5rem)] sm:gap-8 sm:px-8 sm:py-10 md:px-10 md:py-10 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)] lg:gap-8 lg:px-12 lg:py-10 xl:max-w-[1220px] xl:gap-10 xl:px-14">
+          <div className="order-2 mx-auto w-full max-w-[440px] text-left lg:order-1">
+            <p className="mb-2 text-[0.65rem] font-semibold uppercase tracking-[0.24em] text-[#0F4C45] sm:mb-3 sm:text-[0.74rem] sm:tracking-[0.28em] lg:text-[0.8rem]">
+              {t("hero.role")}
+            </p>
 
-            <h1 className="text-[1.95rem] font-extrabold leading-[0.95] tracking-tight sm:text-[2.9rem] md:text-[3.5rem] lg:text-[3.9rem] xl:text-[4.35rem]">
-              <span className="block">{t("hero.hello")}</span>
+            <h1 className="text-[2.1rem] font-extrabold leading-[0.95] tracking-tight sm:text-[3rem] md:text-[3.55rem] lg:text-[3.9rem] xl:text-[4.35rem]">
               <span className="hero-name-greeting">
-                {t("hero.iam")} <HeroNameFlip />
+                <HeroNameFlip />
               </span>
             </h1>
 
-            <p className="mt-4 max-w-[28rem] text-[0.92rem] leading-7 text-[#3E514D] sm:mt-5 sm:text-[0.96rem] lg:text-[1rem] lg:leading-[1.9rem]">
+            <p className="mt-4 max-w-[28rem] text-[0.95rem] leading-7 text-[#3E514D] sm:mt-5 sm:text-[1.02rem] lg:text-[1.05rem] lg:leading-[1.85rem]">
               {t("hero.blurb")}
             </p>
 
-            <div className="mt-6 flex flex-wrap gap-2.5 sm:mt-7 sm:gap-3">
+            <div className="mt-4 flex flex-wrap gap-1.5 sm:mt-5">
+              {(
+                [
+                  "hero.chip.electronics",
+                  "hero.chip.embedded",
+                  "hero.chip.robotics",
+                  "hero.chip.ai",
+                  "hero.chip.uav",
+                ] as const
+              ).map((key) => (
+                <span
+                  key={key}
+                  className="rounded-full border border-[#0F4C45]/14 bg-[#F7F1E8] px-2.5 py-1 text-[0.68rem] font-semibold tracking-[0.04em] text-[#0F4C45]"
+                >
+                  {t(key)}
+                </span>
+              ))}
+            </div>
+
+            <div className="mt-6 flex flex-wrap items-center gap-2.5 sm:mt-7 sm:gap-3">
               <a
-                href="/Jason-Chen-Resume.pdf"
-                download="Jason-Chen-Resume.pdf"
-                target="_blank"
-                rel="noreferrer"
-                className="rounded-full bg-[#043439] px-5 py-2.5 text-sm font-semibold text-white transition hover:opacity-90 sm:px-6 lg:px-7 lg:py-3 lg:text-[0.92rem]"
+                href="#projects"
+                onClick={(event) => handleNavClick(event, "#projects")}
+                className="cursor-pointer rounded-full bg-[#043439] px-5 py-2.5 text-sm font-semibold text-white transition hover:opacity-90 sm:px-6 lg:px-7 lg:py-3 lg:text-[0.92rem]"
               >
-                {t("hero.resume")}
+                {t("hero.projects")}
               </a>
 
               <a
@@ -366,6 +389,16 @@ export default function Home() {
                 className="cursor-pointer rounded-full border border-[#0F4C45] px-5 py-2.5 text-sm font-semibold text-[#0F4C45] transition hover:bg-[#0F4C45] hover:text-white sm:px-6 lg:px-7 lg:py-3 lg:text-[0.92rem]"
               >
                 {t("hero.contact")}
+              </a>
+
+              <a
+                href="/Jason-Chen-Resume.pdf"
+                download="Jason-Chen-Resume.pdf"
+                target="_blank"
+                rel="noreferrer"
+                className="px-1 text-[0.78rem] font-semibold text-[#0F4C45]/70 underline-offset-4 transition hover:text-[#0F4C45] hover:underline sm:text-[0.82rem]"
+              >
+                {t("hero.resume")}
               </a>
             </div>
 
@@ -386,7 +419,7 @@ export default function Home() {
           </div>
 
           <div className="order-1 flex items-center justify-center lg:order-2">
-            <div className="hero-avatar relative aspect-square w-full max-w-[200px] sm:max-w-[300px] md:max-w-[340px] lg:max-w-[380px] xl:max-w-[400px]">
+            <div className="hero-avatar relative aspect-square w-full max-w-[180px] sm:max-w-[280px] md:max-w-[320px] lg:max-w-[360px] xl:max-w-[380px]">
               <div className="hero-avatar__frame relative h-full w-full overflow-hidden rounded-full">
                 <Image
                   src={
@@ -396,7 +429,7 @@ export default function Home() {
                   }
                   alt="Jason Chen"
                   fill
-                  sizes="(max-width: 640px) 240px, (max-width: 1024px) 400px, 480px"
+                  sizes="(max-width: 640px) 200px, (max-width: 1024px) 360px, 420px"
                   priority
                   className="hero-avatar__img object-cover"
                   style={
@@ -414,7 +447,7 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="pointer-events-none absolute inset-x-0 bottom-8 flex justify-center sm:bottom-16">
+        <div className="pointer-events-none absolute inset-x-0 bottom-6 flex justify-center sm:bottom-12">
           <a
             ref={scrollCueRef}
             href="#about"
@@ -432,12 +465,35 @@ export default function Home() {
 
       <section
         id="about"
-        className="scroll-mt-10 bg-[#F7F1E8] pb-10 pt-8 sm:scroll-mt-14 sm:pb-12 sm:pt-10 lg:pb-14 lg:pt-14"
+        className="scroll-mt-10 bg-[#F7F1E8] pb-6 pt-6 sm:scroll-mt-14 sm:pb-8 sm:pt-8 lg:pb-10 lg:pt-10"
+      >
+        <div className="mx-auto w-full max-w-[1100px] px-6 sm:px-8 md:px-10 lg:px-12 xl:max-w-[1160px] xl:px-14">
+          <p className="text-[0.68rem] font-semibold uppercase tracking-[0.26em] text-[#0F4C45] sm:text-[0.74rem]">
+            {t("about.kicker")}
+          </p>
+          <h2 className="mt-3 max-w-[18ch] text-[1.55rem] font-extrabold tracking-tight text-[#162b26] sm:text-[1.9rem] lg:text-[2.1rem]">
+            {t("about.title")}
+          </h2>
+          <p className="mt-4 max-w-[40rem] text-[0.92rem] leading-7 text-[#3E514D] sm:text-[0.96rem] lg:leading-[1.8rem]">
+            {t("about.body")}
+          </p>
+        </div>
+      </section>
+
+      <FeaturedProjects />
+
+      <EngineeringPath />
+
+      <section
+        id="journey"
+        className="scroll-mt-10 bg-[#F7F1E8] pb-10 pt-4 sm:scroll-mt-14 sm:pb-12 sm:pt-6 lg:pb-14"
       >
         <div className="mx-auto w-full max-w-[1100px] px-6 sm:px-8 md:px-10 lg:px-12 xl:max-w-[1160px] xl:px-14">
           <JourneyHub />
         </div>
       </section>
+
+      <ExperienceStrip />
 
       <SkillMarquee />
 

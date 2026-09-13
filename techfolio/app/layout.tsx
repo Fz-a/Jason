@@ -17,7 +17,7 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://cjyfz.dpdns.org"),
   title: "Jason Chen | Electronic Engineer",
   description:
-    "I turn ideas into real-world products through hardware, software, AI, and robotics.",
+    "Building intelligent systems from hardware to AI — electronics, embedded, robotics, and low-altitude technology.",
   icons: {
     icon: [{ url: "/favicon.png", type: "image/png" }],
     shortcut: "/favicon.png",
@@ -26,7 +26,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Jason Chen | Electronic Engineer",
     description:
-      "I turn ideas into real-world products through hardware, software, AI, and robotics.",
+      "Building intelligent systems from hardware to AI — electronics, embedded, robotics, and low-altitude technology.",
     siteName: "Jason Chen Portfolio",
     type: "website",
     url: "https://cjyfz.dpdns.org",
@@ -35,7 +35,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Jason Chen | Electronic Engineer",
     description:
-      "I turn ideas into real-world products through hardware, software, AI, and robotics.",
+      "Building intelligent systems from hardware to AI — electronics, embedded, robotics, and low-altitude technology.",
   },
 };
 

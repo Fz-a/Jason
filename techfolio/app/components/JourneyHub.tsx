@@ -654,12 +654,12 @@ function useActiveStage(stageIds: string[]) {
 	return active;
 }
 
-/** Show rail only while About timeline is the focus — fade when skills strip enters. */
+/** Show rail only while Journey timeline is the focus — fade when skills strip enters. */
 function useAboutLocked() {
 	const [locked, setLocked] = useState(false);
 
 	useEffect(() => {
-		const about = document.getElementById("about");
+		const about = document.getElementById("journey");
 		const skills = document.getElementById("skills");
 		if (!about) return;
 
@@ -1310,6 +1310,15 @@ export function JourneyHub() {
 
 	return (
 		<div className="relative">
+			<div className="mb-8 text-center sm:mb-10">
+				<p className="text-[0.68rem] font-semibold uppercase tracking-[0.26em] text-[#0F4C45] sm:text-[0.74rem]">
+					{t("journey.kicker")}
+				</p>
+				<h2 className="mt-3 text-[1.55rem] font-extrabold tracking-tight text-[#162b26] sm:text-[1.85rem]">
+					{t("journey.title")}
+				</h2>
+			</div>
+
 			<StageRail
 				stages={stages}
 				activeId={activeStage}

@@ -5,20 +5,25 @@ export function HeroNameFlip() {
 		<span
 			className="hero-name-roll"
 			tabIndex={0}
-			aria-label="Jason, hover to reveal 陈进阳"
+			aria-label="Jason Chen, hover to reveal 陈进阳"
 		>
 			<span className="hero-name-roll__shell">
 				<span className="hero-name-roll__sizer" aria-hidden="true">
-					<span className="hero-name-roll__sizer-en">Jason</span>
+					<span className="hero-name-roll__sizer-en">Jason Chen</span>
 					<span className="hero-name-roll__sizer-zh">陈进阳</span>
 				</span>
 				<span className="hero-name-roll__viewport">
 					<span className="hero-name-roll__track">
 						<span className="hero-name-roll__line hero-name-roll__line--en">
-							<span className="hero-name-roll__text">Jason</span>
+							<span className="hero-name-roll__text">Jason Chen</span>
 						</span>
-						<span className="hero-name-roll__line hero-name-roll__line--zh" aria-hidden="true">
-							<span className="hero-name-roll__text hero-name-roll__text--zh">陈进阳</span>
+						<span
+							className="hero-name-roll__line hero-name-roll__line--zh"
+							aria-hidden="true"
+						>
+							<span className="hero-name-roll__text hero-name-roll__text--zh">
+								陈进阳
+							</span>
 						</span>
 					</span>
 				</span>

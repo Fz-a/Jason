@@ -31,13 +31,31 @@ export function EngineeringPath() {
 					{t("path.blurb")}
 				</p>
 
-				<ol className="eng-path mt-7 sm:mt-8">
+				<ol className="mt-7 flex flex-col gap-0 sm:mt-8 md:flex-row md:flex-wrap md:items-center md:gap-x-1 md:gap-y-3">
 					{STEPS.map((key, i) => (
-						<li key={key} className="eng-path__step">
-							<span className="eng-path__dot" aria-hidden />
-							<span className="eng-path__label">{t(key)}</span>
+						<li key={key} className="flex items-center gap-2.5 md:gap-1.5">
+							<span className="flex items-center gap-2.5 py-2 md:py-0">
+								<span
+									aria-hidden
+									className="h-2 w-2 shrink-0 rounded-full bg-[#0F4C45]"
+								/>
+								<span className="text-[0.88rem] font-semibold text-[#162b26] md:text-[0.8rem]">
+									{t(key)}
+								</span>
+							</span>
 							{i < STEPS.length - 1 ? (
-								<span className="eng-path__line" aria-hidden />
+								<span
+									aria-hidden
+									className="ml-[0.2rem] hidden text-[#0F4C45]/35 md:inline md:px-1"
+								>
+									→
+								</span>
+							) : null}
+							{i < STEPS.length - 1 ? (
+								<span
+									aria-hidden
+									className="ml-[0.3rem] h-4 w-px bg-[#0F4C45]/18 md:hidden"
+								/>
 							) : null}
 						</li>
 					))}
