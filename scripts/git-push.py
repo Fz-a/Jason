@@ -428,12 +428,9 @@ def commit_local_changes(message: str | None) -> bool:
 		)
 		return False
 
-	# stage one-by-one so skips stay out (skip paths already in the index)
-	for code, path in entries:
-		if path not in pushable:
-			continue
-		if code[0] not in (" ", "?"):
-			continue
+	# Always stage pushable paths (XY status is easy to mis-handle on Windows).
+	# Skipped paths stay out of the index.
+	for path in pushable:
 		r = git("add", "--", path)
 		if r.returncode != 0:
 			die(f"git add 失败：{path}\n{out_text(r)}")
@@ -597,9 +594,17 @@ def main() -> int:
 	print("\n========== 完成 ==========", flush=True)
 	print("GitHub 已是最新提交。", flush=True)
 	print("若 https://cjyfz.dpdns.org 看起来还是旧版：", flush=True)
-	print("  1) 等 Cloudflare Pages 构建 1～3 分钟", flush=True)
+	print("  1) 等 Cloudflare Pages 构建 2～5 分钟", flush=True)
 	print("  2) 浏览器硬刷新：Ctrl+F5（或清缓存）", flush=True)
-	print("  3) 右键查看源代码，确认含 folio-buddy/boot.js?v=46", flush=True)
+	print("  3) 打开 https://cjyfz.dpdns.org/folio-deploy.txt 看 stamp 是否已更新", flush=True)
+	print("  4) 页面搜索 Target & Direction / 目标与方向（旧版是线性 Electronics→…）", flush=True)
+	left = porcelain_paths()
+	if left:
+		print("\n[提醒] 推送后工作区仍有未上传改动：", flush=True)
+		for code, path in left[:15]:
+			print(f"      {code} {path}", flush=True)
+		if len(left) > 15:
+			print(f"      …另有 {len(left) - 15} 项", flush=True)
 	print(f"提交: {head}", flush=True)
 	if repo:
 		print(f"GitHub: https://github.com/{repo[0]}/{repo[1]}/commit/{head}", flush=True)

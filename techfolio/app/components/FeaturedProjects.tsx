@@ -1,105 +1,180 @@
 "use client";
 
 import Image from "next/image";
+import { useEffect, useState } from "react";
 import { useLocale } from "../lib/i18n";
+import { ShowcaseDocument } from "../projects/UniversityShowcase";
+import {
+	universityProjectShowcases,
+	type UniversityShowcase,
+} from "../projects/university-showcases";
+import { workShowcases } from "../projects/work-showcases";
 
-const FEATURED = [
+type WorkCard = {
+	id: string;
+	titleKey: string;
+	tagsKey: string;
+	src: string;
+	alt: string;
+	exploring?: boolean;
+	showcaseId: string;
+	section: string;
+};
+
+const WORK: WorkCard[] = [
 	{
-		id: "01",
-		titleKey: "featured.01.title",
-		tagsKey: "featured.01.tags",
-		descKey: "featured.01.desc",
+		id: "clothes",
+		titleKey: "work.clothes.title",
+		tagsKey: "work.clothes.tags",
 		src: "/experience/university/smart-clothes/smart-vest.webp",
 		alt: "Smart care clothing wearable vest",
-		exploring: false,
+		showcaseId: "smart-clothes",
+		section: "University",
 	},
 	{
-		id: "02",
-		titleKey: "featured.02.title",
-		tagsKey: "featured.02.tags",
-		descKey: "featured.02.desc",
+		id: "agv",
+		titleKey: "work.agv.title",
+		tagsKey: "work.agv.tags",
 		src: "/experience/work/zongheng/agv-yellow.webp",
-		alt: "Industrial AGV robot",
-		exploring: false,
+		alt: "Industrial AGV",
+		showcaseId: "agv",
+		section: "Work",
 	},
 	{
-		id: "03",
-		titleKey: "featured.03.title",
-		tagsKey: "featured.03.tags",
-		descKey: "featured.03.desc",
+		id: "vxs",
+		titleKey: "work.vxs.title",
+		tagsKey: "work.vxs.tags",
 		src: "/experience/work/zongheng/vxs-100.webp",
-		alt: "VXS-100 AI handheld terminal",
-		exploring: false,
+		alt: "VXS-100 AI handheld",
+		showcaseId: "zongheng-robot",
+		section: "Work",
 	},
 	{
-		id: "04",
-		titleKey: "featured.04.title",
-		tagsKey: "featured.04.tags",
-		descKey: "featured.04.desc",
+		id: "low-altitude",
+		titleKey: "work.uav.title",
+		tagsKey: "work.uav.tags",
 		src: "/experience/work/zongheng/rtk-batch.webp",
-		alt: "RTK modules for low-altitude and positioning work",
+		alt: "RTK and low-altitude related hardware",
 		exploring: true,
+		showcaseId: "rtk",
+		section: "Work",
 	},
-] as const;
+];
+
+function findShowcase(id: string): UniversityShowcase | null {
+	return (
+		universityProjectShowcases.find((s) => s.id === id) ??
+		workShowcases.find((s) => s.id === id) ??
+		null
+	);
+}
 
 export function FeaturedProjects() {
 	const { t } = useLocale();
+	const [activeId, setActiveId] = useState<string | null>(null);
+
+	const activeCard = WORK.find((w) => w.id === activeId) ?? null;
+	const activeShowcase = activeCard
+		? findShowcase(activeCard.showcaseId)
+		: null;
+
+	useEffect(() => {
+		if (!activeId) return;
+		const onKey = (e: KeyboardEvent) => {
+			if (e.key === "Escape") setActiveId(null);
+		};
+		const prev = document.body.style.overflow;
+		document.body.style.overflow = "hidden";
+		window.addEventListener("keydown", onKey);
+		return () => {
+			document.body.style.overflow = prev;
+			window.removeEventListener("keydown", onKey);
+		};
+	}, [activeId]);
 
 	return (
 		<section
 			id="projects"
-			className="scroll-mt-10 bg-[#F7F1E8] pb-10 pt-6 sm:scroll-mt-14 sm:pb-12 sm:pt-8 lg:pb-14 lg:pt-10"
+			className="scroll-mt-10 bg-[#F7F1E8] pb-8 pt-4 sm:scroll-mt-14 sm:pb-10 sm:pt-6"
 		>
 			<div className="mx-auto w-full max-w-[1100px] px-6 sm:px-8 md:px-10 lg:px-12 xl:max-w-[1160px] xl:px-14">
 				<p className="text-[0.68rem] font-semibold uppercase tracking-[0.26em] text-[#0F4C45] sm:text-[0.74rem]">
-					{t("featured.kicker")}
+					{t("work.kicker")}
 				</p>
-				<h2 className="mt-3 text-[1.65rem] font-extrabold tracking-tight text-[#162b26] sm:text-[2rem] lg:text-[2.25rem]">
-					{t("featured.title")}
+				<h2 className="mt-2 text-[1.35rem] font-extrabold tracking-tight text-[#162b26] sm:text-[1.55rem]">
+					{t("work.title")}
 				</h2>
 
-				<div className="mt-7 grid grid-cols-1 gap-5 sm:mt-8 sm:grid-cols-2 sm:gap-6">
-					{FEATURED.map((item) => (
-						<a
+				<div className="mt-5 grid grid-cols-1 gap-3 sm:mt-6 sm:grid-cols-2 sm:gap-4 lg:grid-cols-4">
+					{WORK.map((item) => (
+						<button
 							key={item.id}
-							href="#journey"
-							className="group flex flex-col overflow-hidden rounded-[1.05rem] border border-[#0F4C45]/10 bg-[#FFFCFA] shadow-[0_12px_28px_rgba(22,43,38,0.04)] transition hover:-translate-y-0.5 hover:border-[#0F4C45]/18 hover:shadow-[0_16px_36px_rgba(22,43,38,0.07)]"
+							type="button"
+							onClick={() => setActiveId(item.id)}
+							className="group overflow-hidden rounded-xl border border-[#0F4C45]/10 bg-[#FFFCFA] text-left transition hover:border-[#0F4C45]/18"
 						>
-							<div className="relative aspect-[4/3] overflow-hidden bg-[#E8E2D8]">
+							<div className="relative aspect-[16/10] overflow-hidden bg-[#E8E2D8]">
 								<Image
 									src={item.src}
 									alt={item.alt}
 									fill
-									sizes="(max-width: 640px) 100vw, 50vw"
-									className="object-cover transition duration-500 group-hover:scale-[1.03]"
+									sizes="(max-width: 640px) 100vw, 25vw"
+									className="object-cover transition duration-400 group-hover:scale-[1.03]"
 								/>
 								{item.exploring ? (
-									<span className="absolute left-3 top-3 rounded-full bg-[#043439]/92 px-2.5 py-1 text-[0.62rem] font-semibold uppercase tracking-[0.12em] text-white">
+									<span className="absolute left-2 top-2 rounded-full bg-[#043439]/90 px-2 py-0.5 text-[0.58rem] font-semibold uppercase tracking-[0.1em] text-white">
 										{t("featured.exploring")}
 									</span>
 								) : null}
 							</div>
-							<div className="flex flex-1 flex-col px-4 py-4 sm:px-5 sm:py-5">
-								<p className="text-[0.65rem] font-semibold tracking-[0.2em] text-[#8A9692]">
-									{item.id}
-								</p>
-								<h3 className="mt-1.5 text-[1.05rem] font-extrabold tracking-tight text-[#162b26] sm:text-[1.12rem]">
+							<div className="px-3 py-2.5">
+								<p className="text-[0.88rem] font-extrabold tracking-tight text-[#162b26]">
 									{t(item.titleKey)}
-								</h3>
-								<p className="mt-1.5 text-[0.72rem] font-medium leading-5 text-[#0F4C45]/75">
+								</p>
+								<p className="mt-0.5 text-[0.68rem] font-medium text-[#0F4C45]/70">
 									{t(item.tagsKey)}
 								</p>
-								<p className="mt-2.5 flex-1 text-[0.84rem] leading-6 text-[#3E514D]">
-									{t(item.descKey)}
-								</p>
-								<span className="mt-4 text-[0.78rem] font-semibold text-[#043439] transition group-hover:translate-x-0.5">
-									{t("featured.view")} →
-								</span>
 							</div>
-						</a>
+						</button>
 					))}
 				</div>
 			</div>
+
+			{activeCard && activeShowcase ? (
+				<div className="fixed inset-0 z-50 flex items-end justify-center bg-[#162b26]/40 p-0 backdrop-blur-[2px] sm:items-center sm:p-6">
+					<button
+						type="button"
+						aria-label={t("journey.close")}
+						className="absolute inset-0 cursor-pointer border-0 bg-transparent"
+						onClick={() => setActiveId(null)}
+					/>
+					<div
+						role="dialog"
+						aria-modal="true"
+						className="relative z-10 flex max-h-[88vh] w-full max-w-[46rem] flex-col overflow-hidden rounded-t-2xl bg-[#F7F1E8] shadow-2xl sm:rounded-2xl"
+					>
+						<div className="flex shrink-0 items-center justify-between border-b border-[#0F4C45]/10 px-5 py-3.5">
+							<p className="text-[0.68rem] font-semibold uppercase tracking-[0.2em] text-[#0F4C45]/50">
+								Brief
+							</p>
+							<button
+								type="button"
+								onClick={() => setActiveId(null)}
+								className="text-[0.78rem] font-semibold text-[#6A7A76] hover:text-[#0F4C45]"
+							>
+								{t("journey.close")}
+							</button>
+						</div>
+						<div className="min-h-0 flex-1 overflow-y-auto">
+							<ShowcaseDocument
+								item={activeShowcase}
+								sectionLabel={activeCard.section}
+								className="shadow-none"
+							/>
+						</div>
+					</div>
+				</div>
+			) : null}
 		</section>
 	);
 }
