@@ -3,13 +3,14 @@
 import { useEffect, useState } from "react";
 import { useLocale } from "../lib/i18n";
 
-/** Five story chapters — hero is separate, not numbered. */
+/** Six story chapters — hero is separate. */
 export const STORY_STAGES = [
 	{ id: "experience", key: "story.01", short: "01" },
-	{ id: "connection", key: "story.02", short: "02" },
+	{ id: "direction", key: "story.02", short: "02" },
 	{ id: "goal", key: "story.03", short: "03" },
 	{ id: "research", key: "story.04", short: "04" },
-	{ id: "next", key: "story.05", short: "05" },
+	{ id: "fit", key: "story.05", short: "05" },
+	{ id: "next", key: "story.06", short: "06" },
 ] as const;
 
 type Props = {
@@ -32,10 +33,10 @@ export function StoryProgress({ activeId, onNavigate }: Props) {
 
 	return (
 		<>
-			{/* Desktop: subtle left rail */}
+			{/* Desktop: number + full chapter title */}
 			<nav
 				aria-label="Presentation progress"
-				className={`pointer-events-none fixed left-3 top-1/2 z-40 hidden -translate-y-1/2 flex-col gap-1 transition-opacity duration-500 xl:flex ${
+				className={`pointer-events-none fixed left-4 top-1/2 z-40 hidden max-w-[11rem] -translate-y-1/2 flex-col gap-0.5 transition-opacity duration-500 xl:flex ${
 					visible ? "opacity-100" : "opacity-0"
 				}`}
 			>
@@ -46,22 +47,24 @@ export function StoryProgress({ activeId, onNavigate }: Props) {
 							key={stage.id}
 							type="button"
 							onClick={() => onNavigate(stage.id)}
-							className="pointer-events-auto group flex items-baseline gap-2 px-1 py-1.5 text-left"
+							className="pointer-events-auto group flex items-start gap-2.5 px-1 py-1.5 text-left"
 						>
 							<span
-								className={`font-mono text-[0.65rem] tabular-nums transition ${
+								className={`mt-0.5 shrink-0 font-mono text-[0.65rem] tabular-nums transition ${
 									active
 										? "font-bold text-[#043439]"
 										: i < activeIndex
-											? "text-[#0F4C45]/45"
+											? "text-[#0F4C45]/50"
 											: "text-[#0F4C45]/28"
 								}`}
 							>
 								{stage.short}
 							</span>
 							<span
-								className={`hidden text-[0.58rem] font-semibold uppercase tracking-[0.16em] transition 2xl:inline ${
-									active ? "text-[#043439]" : "text-[#0F4C45]/30"
+								className={`text-[0.68rem] font-semibold leading-snug tracking-tight transition ${
+									active
+										? "text-[#043439]"
+										: "text-[#0F4C45]/40 group-hover:text-[#0F4C45]/70"
 								}`}
 							>
 								{t(stage.key)}
@@ -71,14 +74,14 @@ export function StoryProgress({ activeId, onNavigate }: Props) {
 				})}
 			</nav>
 
-			{/* Mobile: compact numbers */}
+			{/* Mobile: compact — numbers with aria labels */}
 			<nav
 				aria-label="Presentation progress"
 				className={`pointer-events-none fixed inset-x-0 top-[3.25rem] z-40 flex justify-center px-3 transition-opacity duration-500 sm:top-[3.5rem] xl:hidden ${
 					visible ? "opacity-100" : "opacity-0"
 				}`}
 			>
-				<div className="pointer-events-auto flex items-center gap-3 rounded-full border border-[#0F4C45]/10 bg-[#F7F1E8]/90 px-3.5 py-1.5 backdrop-blur-md">
+				<div className="pointer-events-auto flex max-w-full items-center gap-1 overflow-x-auto rounded-full border border-[#0F4C45]/10 bg-[#F7F1E8]/92 px-2.5 py-1.5 backdrop-blur-md sm:gap-2 sm:px-3">
 					{STORY_STAGES.map((stage) => {
 						const active = stage.id === activeId;
 						return (
@@ -87,7 +90,8 @@ export function StoryProgress({ activeId, onNavigate }: Props) {
 								type="button"
 								onClick={() => onNavigate(stage.id)}
 								aria-label={t(stage.key)}
-								className={`font-mono text-[0.68rem] tabular-nums transition ${
+								title={t(stage.key)}
+								className={`shrink-0 font-mono text-[0.65rem] tabular-nums transition ${
 									active
 										? "font-bold text-[#043439]"
 										: "text-[#0F4C45]/35"

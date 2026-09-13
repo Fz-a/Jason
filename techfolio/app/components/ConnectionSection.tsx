@@ -14,18 +14,17 @@ export function ConnectionSection() {
 
 	return (
 		<section
-			id="connection"
+			id="direction"
 			className="scroll-mt-24 bg-[#F7F1E8] pb-20 pt-12 sm:scroll-mt-28 sm:pb-28 sm:pt-16"
 		>
 			<div className="mx-auto w-full max-w-[1100px] px-6 sm:px-8 md:px-10 lg:px-12 xl:max-w-[1160px] xl:px-14">
 				<p className="text-[0.68rem] font-semibold uppercase tracking-[0.28em] text-[#0F4C45]/70">
 					{t("conn.kicker")}
 				</p>
-				<h2 className="mt-4 max-w-[14ch] whitespace-pre-line text-[2.2rem] font-extrabold leading-[0.98] tracking-tight text-[#162b26] sm:text-[3rem] lg:text-[3.4rem]">
+				<h2 className="mt-4 max-w-[16ch] whitespace-pre-line text-[2.2rem] font-extrabold leading-[0.98] tracking-tight text-[#162b26] sm:text-[3rem] lg:text-[3.4rem]">
 					{t("conn.title")}
 				</h2>
 
-				{/* Convergence diagram */}
 				<div className="mt-14 sm:mt-20">
 					<ul className="mx-auto max-w-xl space-y-0">
 						{STREAMS.map((s, i) => (
@@ -73,7 +72,7 @@ export function ConnectionSection() {
 					</div>
 				</div>
 
-				<p className="mx-auto mt-14 max-w-[34rem] text-center text-[1.15rem] font-semibold leading-8 tracking-tight text-[#162b26] sm:mt-16 sm:text-[1.35rem]">
+				<p className="mx-auto mt-14 max-w-[38rem] text-center text-[1.1rem] font-semibold leading-8 tracking-tight text-[#162b26] sm:mt-16 sm:text-[1.3rem]">
 					{t("conn.statement")}
 				</p>
 			</div>

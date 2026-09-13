@@ -3,10 +3,30 @@
 import { useLocale } from "../lib/i18n";
 
 const DIRS = [
-	{ n: "01", title: "research.d1.title", tech: "research.d1.tech" },
-	{ n: "02", title: "research.d2.title", tech: "research.d2.tech" },
-	{ n: "03", title: "research.d3.title", tech: "research.d3.tech" },
-	{ n: "04", title: "research.d4.title", tech: "research.d4.tech" },
+	{
+		n: "01",
+		title: "research.d1.title",
+		tech: "research.d1.tech",
+		body: "research.d1.body",
+	},
+	{
+		n: "02",
+		title: "research.d2.title",
+		tech: "research.d2.tech",
+		body: "research.d2.body",
+	},
+	{
+		n: "03",
+		title: "research.d3.title",
+		tech: "research.d3.tech",
+		body: "research.d3.body",
+	},
+	{
+		n: "04",
+		title: "research.d4.title",
+		tech: "research.d4.tech",
+		body: "research.d4.body",
+	},
 ] as const;
 
 export function ResearchSection() {
@@ -25,7 +45,6 @@ export function ResearchSection() {
 					{t("research.title")}
 				</h2>
 
-				{/* Editorial list — not decorative cards */}
 				<div className="mt-12 space-y-0 border-t border-[#0F4C45]/15 sm:mt-14">
 					{DIRS.map((d) => (
 						<div
@@ -41,6 +60,9 @@ export function ResearchSection() {
 								</h3>
 								<p className="mt-2 text-[0.78rem] font-semibold uppercase tracking-[0.12em] text-[#0F4C45]/65">
 									{t(d.tech)}
+								</p>
+								<p className="mt-3 max-w-[36rem] text-[0.9rem] leading-7 text-[#4A5C58]">
+									{t(d.body)}
 								</p>
 							</div>
 						</div>

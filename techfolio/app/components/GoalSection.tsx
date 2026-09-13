@@ -43,6 +43,10 @@ export function GoalSection() {
 						</div>
 					))}
 				</div>
+
+				<p className="mx-auto mt-12 max-w-[32rem] text-[0.9rem] leading-7 text-white/50">
+					{t("goal.body")}
+				</p>
 			</div>
 		</section>
 	);

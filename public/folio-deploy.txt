@@ -1,3 +1,3 @@
-stamp=2026-09-13T18:05
-version=research-presentation-5-chapters-goal
-note=Experience Connection Goal Research Next — simplified presentation IA
+stamp=2026-09-13T18:20
+version=research-presentation-6-chapters-fit
+note=Who / What I can do / Why direction / Goal / Research / Fit / Next

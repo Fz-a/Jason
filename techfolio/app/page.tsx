@@ -16,6 +16,7 @@ import { ResearchSection } from "./components/ResearchSection";
 import { ResearchFitNext } from "./components/ResearchFitNext";
 import { StoryProgress, STORY_STAGES } from "./components/StoryProgress";
 import { useLocale } from "./lib/i18n";
+import avatarSettings from "../content/avatar.json";
 
 const montserrat = Montserrat({
   subsets: ["latin"],
@@ -50,7 +51,7 @@ export default function Home() {
     activeSection as (typeof STORY_IDS)[number],
   )
     ? activeSection
-    : activeSection === "fit" || activeSection === "contact"
+    : activeSection === "contact"
       ? "next"
       : "";
 
@@ -103,7 +104,7 @@ export default function Home() {
     const sections = [
       "home",
       "experience",
-      "connection",
+      "direction",
       "goal",
       "research",
       "fit",
@@ -209,7 +210,7 @@ export default function Home() {
         current as (typeof STORY_IDS)[number],
       )
         ? current
-        : current === "fit" || current === "contact"
+        : current === "contact"
           ? "next"
           : "experience";
       const idx = STORY_IDS.indexOf(
@@ -227,7 +228,7 @@ export default function Home() {
         } else {
           scrollToSection(STORY_IDS[idx - 1]);
         }
-      } else if (/^[1-5]$/.test(e.key)) {
+      } else if (/^[1-6]$/.test(e.key)) {
         const stage = STORY_IDS[Number(e.key) - 1];
         if (stage) scrollToSection(stage);
       }
@@ -252,71 +253,126 @@ export default function Home() {
 
       {/* Minimal presentation header */}
       <header className="pointer-events-none fixed inset-x-0 top-0 z-50 safe-pt px-5 sm:px-8 lg:px-10">
-        <div className="mx-auto flex max-w-[1160px] items-center justify-between py-4 sm:py-5">
-          <button
-            type="button"
-            onClick={onStudioTap}
-            className="pointer-events-auto cursor-default text-left"
-          >
-            <p className="text-[0.72rem] font-bold uppercase tracking-[0.2em] text-[#043439]">
-              <HeroNameFlip />
-            </p>
-          </button>
-          <div className="pointer-events-auto flex items-center gap-4 sm:gap-6">
+        <div className="mx-auto flex max-w-[1160px] items-center justify-end py-4 sm:py-5">
+          <div className="pointer-events-auto flex items-center gap-4 sm:gap-5">
             <Link
               href="/archive/"
               className="text-[0.72rem] font-semibold uppercase tracking-[0.14em] text-[#0F4C45]/70 transition hover:text-[#043439]"
             >
-              {t("nav.archive")} →
+              {t("nav.archive")}
             </Link>
+            <a
+              href="/Jason-Chen-Resume.pdf"
+              download="Jason-Chen-Resume.pdf"
+              target="_blank"
+              rel="noreferrer"
+              className="text-[0.72rem] font-semibold uppercase tracking-[0.14em] text-[#0F4C45]/70 transition hover:text-[#043439]"
+            >
+              {t("nav.cv")}
+            </a>
             <LangSwitch />
           </div>
         </div>
       </header>
 
-      {/* HERO — not a numbered chapter */}
+      {/* HERO — restored classic intro (Hello / circular portrait / CTAs) */}
       <section
         id="home"
-        className="relative min-h-[92svh] scroll-mt-10 bg-[#F7F1E8] sm:min-h-[100svh]"
+        className="relative min-h-[92svh] scroll-mt-10 bg-[#F7F1E8] sm:min-h-[100svh] sm:scroll-mt-14"
       >
-        <div className="mx-auto grid min-h-[calc(92svh-4.5rem)] w-full max-w-[1160px] grid-cols-1 items-center gap-10 px-5 pb-24 pt-[5.5rem] sm:min-h-[calc(100svh-5.5rem)] sm:gap-12 sm:px-8 sm:py-16 md:px-10 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)] lg:gap-14 lg:px-12 xl:px-14">
-          <div className="order-2 mx-auto w-full max-w-[540px] lg:order-1 lg:max-w-none">
-            <p className="text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-[#0F4C45]/65">
-              {t("hero.role")}
-            </p>
+        <div className="mx-auto grid min-h-[calc(92svh-4.5rem)] w-full max-w-[1160px] grid-cols-1 items-center gap-8 px-5 pb-20 pt-[4.5rem] sm:min-h-[calc(100svh-5.5rem)] sm:gap-10 sm:px-8 sm:py-12 md:px-10 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] lg:gap-12 lg:px-12 xl:max-w-[1220px] xl:px-14">
+          <div className="order-2 mx-auto w-full max-w-[540px] text-left lg:order-1 lg:max-w-none">
+            <button
+              type="button"
+              onClick={onStudioTap}
+              className="cursor-default text-left"
+            >
+              <p className="text-[0.68rem] font-semibold uppercase tracking-[0.28em] text-[#0F4C45]">
+                <span className="hero-name-greeting">
+                  <span>{t("hero.hello")}, </span>
+                  <span>{t("hero.iam")} </span>
+                  <HeroNameFlip />
+                </span>
+              </p>
+              <p className="mt-2 text-[0.78rem] font-semibold uppercase tracking-[0.18em] text-[#0F4C45]/60">
+                {t("hero.role")}
+              </p>
+            </button>
 
-            <h1 className="mt-8 whitespace-pre-line text-[2.6rem] font-extrabold leading-[0.94] tracking-tight text-[#162b26] sm:mt-10 sm:text-[3.8rem] lg:text-[4.4rem] xl:text-[4.8rem]">
+            <h1 className="mt-7 whitespace-pre-line text-[2.55rem] font-extrabold leading-[0.95] tracking-tight text-[#162b26] sm:mt-9 sm:text-[3.6rem] lg:text-[4.2rem] xl:text-[4.6rem]">
               {t("hero.headline")}
             </h1>
 
-            <p className="mt-7 max-w-[28rem] text-[1rem] leading-8 text-[#3E514D] sm:text-[1.05rem]">
+            <p className="mt-6 max-w-[28rem] text-[1rem] leading-8 text-[#3E514D] sm:text-[1.05rem]">
               {t("hero.blurb")}
             </p>
 
-            <p className="mt-8 text-[0.7rem] font-semibold uppercase tracking-[0.16em] text-[#0F4C45]/55">
+            <p className="mt-8 text-[0.72rem] font-semibold uppercase tracking-[0.16em] text-[#0F4C45]/70">
               {(
                 [
                   "hero.chip.electronics",
                   "hero.chip.embedded",
                   "hero.chip.robotics",
                   "hero.chip.ai",
+                  "hero.chip.uav",
                 ] as const
               )
                 .map((key) => t(key))
                 .join(" · ")}
             </p>
+
+            <div className="mt-8 flex flex-wrap items-center gap-3">
+              <a
+                href="#experience"
+                onClick={(event) => handleNavClick(event, "#experience")}
+                className="cursor-pointer rounded-full bg-[#043439] px-6 py-2.5 text-sm font-semibold text-white transition hover:opacity-90"
+              >
+                {t("hero.projects")}
+              </a>
+              <a
+                href="#contact"
+                onClick={(event) => handleNavClick(event, "#contact")}
+                className="cursor-pointer text-[0.82rem] font-semibold text-[#0F4C45] underline-offset-4 hover:underline"
+              >
+                {t("hero.contact")}
+              </a>
+              <a
+                href="/Jason-Chen-Resume.pdf"
+                download="Jason-Chen-Resume.pdf"
+                target="_blank"
+                rel="noreferrer"
+                className="text-[0.78rem] font-semibold text-[#0F4C45]/55 underline-offset-4 hover:text-[#0F4C45] hover:underline"
+              >
+                {t("hero.resume")}
+              </a>
+            </div>
           </div>
 
           <div className="order-1 flex items-center justify-center lg:order-2">
-            <div className="relative aspect-[4/5] w-full max-w-[280px] overflow-hidden bg-[#E8E2D8] sm:max-w-[340px] lg:max-w-[400px]">
-              <Image
-                src="/experience/work/zongheng/rtk-field.webp"
-                alt="Engineering field systems"
-                fill
-                sizes="(max-width: 640px) 280px, 400px"
-                priority
-                className="object-cover"
-              />
+            <div className="hero-avatar relative aspect-square w-full max-w-[200px] sm:max-w-[300px] lg:max-w-[360px]">
+              <div className="hero-avatar__frame relative h-full w-full overflow-hidden rounded-full">
+                <Image
+                  src={
+                    avatarSettings.v
+                      ? `${avatarSettings.src}?v=${avatarSettings.v}`
+                      : avatarSettings.src
+                  }
+                  alt="Jason Chen"
+                  fill
+                  sizes="(max-width: 640px) 200px, 360px"
+                  priority
+                  className="hero-avatar__img object-cover"
+                  style={
+                    avatarSettings.source
+                      ? undefined
+                      : {
+                          transform: `translate(${avatarSettings.tx ?? 0}%, ${avatarSettings.ty ?? 0}%) scale(${avatarSettings.scale})`,
+                          transformOrigin: "center center",
+                        }
+                  }
+                />
+                <span aria-hidden className="hero-avatar__veil" />
+              </div>
             </div>
           </div>
         </div>
@@ -326,11 +382,11 @@ export default function Home() {
             ref={scrollCueRef}
             href="#experience"
             onClick={(event) => handleNavClick(event, "#experience")}
-            className="pointer-events-auto flex cursor-pointer flex-col items-center gap-2.5 text-[0.6rem] font-semibold uppercase tracking-[0.28em] text-[#0F4C45]/55 transition"
+            className="pointer-events-auto flex cursor-pointer flex-col items-center gap-2.5 text-[0.6rem] font-semibold uppercase tracking-[0.28em] text-[#0F4C45]/72 transition"
           >
             <span
               ref={cueDotRef}
-              className="block h-8 w-px bg-[#0F4C45]/30"
+              className="block h-8 w-px bg-[#0F4C45]/35"
             />
             <span ref={cueTextRef}>{t("hero.scroll")}</span>
           </a>
@@ -355,24 +411,21 @@ export default function Home() {
           <p className="mt-2 text-[1rem] font-extrabold tracking-tight text-[#162b26]">
             {t("hero.role")}
           </p>
-          <p className="mt-3 text-[0.68rem] font-semibold uppercase tracking-[0.14em] text-[#0F4C45]/50">
-            {(
-              [
-                "hero.chip.electronics",
-                "hero.chip.embedded",
-                "hero.chip.robotics",
-                "hero.chip.ai",
-              ] as const
-            )
-              .map((key) => t(key))
-              .join(" · ")}
-          </p>
           <div className="mt-7 flex flex-wrap items-center justify-center gap-5">
             <a
               href="mailto:2260032001@student.must.edu.mo"
               className="text-[0.85rem] font-semibold text-[#0F4C45] underline-offset-4 hover:underline"
             >
               Email
+            </a>
+            <a
+              href="/Jason-Chen-Resume.pdf"
+              download="Jason-Chen-Resume.pdf"
+              target="_blank"
+              rel="noreferrer"
+              className="text-[0.85rem] font-semibold text-[#0F4C45] underline-offset-4 hover:underline"
+            >
+              {t("nav.cv")}
             </a>
             {socialLinks.map((link) => (
               <a
