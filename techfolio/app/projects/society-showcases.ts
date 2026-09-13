@@ -125,4 +125,171 @@ export const societyShowcases: SocietyShowcase[] = [
 			},
 		],
 	},
+	{
+		id: "safe-campus-service",
+		title: "Safe Campus Service Team",
+		subtitle: "Campus safety · Public service · Team duty",
+		preview: [
+			"Campus safety and public-service shifts",
+			"Showing up on schedule with the team",
+			"Steady support for shared campus routines",
+		],
+		cardImage: {
+			src: "/experience/society/volunteer.webp",
+			alt: "Safe Campus Service Team on duty",
+			width: 1600,
+			height: 900,
+		},
+		spreads: [
+			{
+				type: "product-hero",
+				kicker: "01 · Service",
+				title: "Safe Campus Service Team",
+				subtitle:
+					"Campus safety and public-service duty — standing posts, guiding people, and keeping shared routines running with the team.",
+				image: {
+					src: "/experience/society/volunteer.webp",
+					alt: "Safe Campus Service Team activity",
+					width: 1600,
+					height: 900,
+					caption: "On duty — with the campus service team.",
+				},
+			},
+			{
+				type: "prose",
+				eyebrow: "02 · Role",
+				heading: "What the work looked like",
+				body: [
+					"Safe Campus Service Team shifts meant being present for public campus moments — guiding, explaining, and keeping order when schedules were shared and visible.",
+					"The emphasis was reliability: arrive on time, stay through the post, and work as one unit with classmates under real campus pressure.",
+				],
+			},
+			{
+				type: "duo",
+				eyebrow: "03 · On site",
+				heading: "People-facing duty",
+				body: [
+					"From one-to-one guidance to harder public days — service that asked for steadiness more than speeches.",
+				],
+				tone: "soft",
+				mediaFit: "cover",
+				images: [
+					{
+						src: "/experience/society/volunteer-guide.webp",
+						alt: "Guiding a resident during campus service",
+						width: 1600,
+						height: 900,
+						caption: "Guidance — helping on site",
+					},
+					{
+						src: "/experience/society/volunteer-ppe.webp",
+						alt: "Public-service duty in protective gear",
+						width: 1600,
+						height: 900,
+						caption: "Public duty — when showing up mattered most",
+					},
+				],
+			},
+			{
+				type: "feature-list",
+				heading: "Focus",
+				items: [
+					"Campus safety and public-service posts",
+					"Team coordination under real schedules",
+					"Clear, calm help for people on campus",
+				],
+			},
+		],
+	},
+	{
+		id: "drone-workstation",
+		title: "Drone Workstation",
+		subtitle: "UAV lab · Outreach & flight safety",
+		preview: [
+			"Publicity and public-facing demos",
+			"Flight safety briefings",
+			"Making UAVs approachable on campus",
+		],
+		cardImage: {
+			src: "/experience/university/drone/workshop.webp",
+			alt: "Students assembling a drone at the workstation bench",
+			width: 1024,
+			height: 768,
+		},
+		spreads: [
+			{
+				type: "product-hero",
+				kicker: "01 · Workstation",
+				title: "Drone Workstation",
+				subtitle:
+					"Bench builds, safety-minded demos, and campus outreach around UAVs.",
+				image: {
+					src: "/experience/university/drone/workshop.webp",
+					alt: "Team soldering and assembling a quadcopter on the bench",
+					width: 1024,
+					height: 768,
+					caption: "Bench — drone build in progress",
+				},
+			},
+			{
+				type: "prose",
+				eyebrow: "02 · Role",
+				heading: "What I did",
+				body: [
+					"At the drone workstation I helped with publicity and public-facing work — introducing flight safety, demos, and how the team presents robotics to a wider campus audience.",
+					"It connected engineering practice with outreach: explain carefully, keep people safe, and make UAVs approachable without dumbing them down.",
+				],
+			},
+			{
+				type: "duo",
+				eyebrow: "03 · Practice",
+				heading: "Bench and briefing",
+				body: [
+					"Close work on the airframe, then turning that craft into a clear story for classmates and visitors.",
+				],
+				tone: "soft",
+				mediaFit: "cover",
+				images: [
+					{
+						src: "/experience/university/drone/soldering-close.webp",
+						alt: "Close-up of soldering a drone power board",
+						width: 1024,
+						height: 1024,
+						caption: "Detail — soldering the board",
+					},
+					{
+						src: "/experience/university/drone/presentation.webp",
+						alt: "Presenting drone workstation materials at the podium",
+						width: 1024,
+						height: 768,
+						caption: "Briefing — workstation presentation",
+					},
+				],
+			},
+			{
+				type: "image-full",
+				eyebrow: "04 · Team",
+				heading: "The people behind the frames",
+				body: [
+					"The workstation is a crew first — then the drones.",
+				],
+				image: {
+					src: "/experience/university/drone/team.webp",
+					alt: "Drone workstation team group photo",
+					width: 1024,
+					height: 768,
+					caption: "Team — workstation crew",
+				},
+			},
+			{
+				type: "feature-list",
+				heading: "Focus",
+				items: [
+					"Workstation publicity and demos",
+					"Safety briefings for public audiences",
+					"Bridging UAV tech with campus outreach",
+				],
+			},
+		],
+	},
 ];

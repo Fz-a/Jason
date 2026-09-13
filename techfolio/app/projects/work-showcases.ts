@@ -23,7 +23,7 @@ export const workShowcases: WorkShowcase[] = [
 	{
 		id: "zongheng-robot",
 		title: "Zongheng Robot",
-		subtitle: "实讯小车 · VXS-100 · IoT teaching",
+		subtitle: "Education robot · IoT teaching",
 		cardImage: {
 			src: "/experience/work/zongheng/robot-dock.webp",
 			alt: "Zongheng robot with docking station",
@@ -34,9 +34,9 @@ export const workShowcases: WorkShowcase[] = [
 			{
 				type: "product-hero",
 				kicker: "01 · Product",
-				title: "Zongheng Robot + 实讯小车",
+				title: "Zongheng Robot",
 				subtitle:
-					"Education robot paired with the Shixun training car — IoT / Inventing System and embedded fundamentals for university students.",
+					"Education robot for university IoT / Inventing System labs — docking, fleet bring-up, and embedded fundamentals.",
 				image: {
 					src: "/experience/work/zongheng/robot-dock.webp",
 					alt: "Zongheng robot with docking station",
@@ -47,52 +47,10 @@ export const workShowcases: WorkShowcase[] = [
 			},
 			{
 				type: "duo",
-				eyebrow: "02 · Platform",
-				heading: "Robot + 实讯小车",
-				body: [
-					"The Zongheng education robot pairs with the Shixun (实讯) Mecanum training car — docking / charge support for classroom fleets and hands-on IoT labs.",
-				],
-				tone: "soft",
-				mediaFit: "contain",
-				images: [
-					{
-						src: "/experience/work/zongheng/robot-dock.webp",
-						alt: "Zongheng robot with docking station",
-						width: 636,
-						height: 553,
-						caption: "Robot — with dock / charge station",
-					},
-					{
-						src: "/experience/work/zongheng/shixun-car.webp",
-						alt: "Shixun Mecanum training car chassis",
-						width: 1024,
-						height: 1024,
-						caption: "实讯小车 — Mecanum training platform",
-					},
-				],
-			},
-			{
-				type: "image-full",
-				eyebrow: "03 · Control",
-				heading: "VXS-100 handheld voice module",
-				body: [
-					"VX-X / VXS-100 is the handheld control unit used to operate the Shixun car and Zongheng robots — the bridge between instructor demos and student labs.",
-				],
-				image: {
-					src: "/experience/work/zongheng/vxs-100.webp",
-					alt: "VXS-100 handheld voice modules from Zongheng Robotics",
-					width: 1024,
-					height: 768,
-					caption: "VXS-100 — handheld control for robot & 实讯小车.",
-				},
-				imageTone: "light",
-			},
-			{
-				type: "duo",
-				eyebrow: "04 · Teaching",
+				eyebrow: "02 · Teaching",
 				heading: "Lectures around the robot",
 				body: [
-					"Classroom talks and lab sessions center on Zongheng Robot — IoT / Inventing System practice plus embedded fundamentals for university students.",
+					"Classroom talks and lab sessions center on Zongheng Robot — IoT practice plus embedded fundamentals for university students.",
 				],
 				tone: "soft",
 				mediaFit: "cover",
@@ -106,11 +64,99 @@ export const workShowcases: WorkShowcase[] = [
 					},
 					{
 						src: "/experience/work/zongheng/lab-teaching.webp",
-						alt: "Students learning around Shixun car and laptops",
+						alt: "Students learning around robots and laptops",
 						width: 1024,
 						height: 768,
-						caption: "Lab class — hands-on with 实讯小车",
+						caption: "Lab class — hands-on with the education fleet",
 					},
+				],
+			},
+		],
+	},
+	{
+		id: "shixun-car",
+		title: "实讯小车",
+		subtitle: "Shixun · Mecanum training car",
+		cardImage: {
+			src: "/experience/work/zongheng/shixun-car.webp",
+			alt: "Shixun Mecanum training car chassis",
+			width: 1024,
+			height: 1024,
+		},
+		spreads: [
+			{
+				type: "product-hero",
+				kicker: "01 · Product",
+				title: "实讯小车",
+				subtitle:
+					"Mecanum training platform for classroom fleets — paired with Zongheng robots for hands-on IoT and motion labs.",
+				image: {
+					src: "/experience/work/zongheng/shixun-car.webp",
+					alt: "Shixun Mecanum training car chassis",
+					width: 1024,
+					height: 1024,
+					caption: "实讯小车 — Mecanum training platform",
+				},
+			},
+			{
+				type: "prose",
+				eyebrow: "02 · Role",
+				heading: "What it is for",
+				body: [
+					"The Shixun car is the student-facing chassis in the teaching line — docking and charge support for classroom fleets, and a clear platform for embedded / IoT exercises.",
+					"It sits beside the Zongheng robot as a separate product in the same education stack, not a single bundled unit.",
+				],
+			},
+			{
+				type: "image-full",
+				eyebrow: "03 · Lab",
+				heading: "In the teaching room",
+				body: [
+					"Lab sessions put students around the chassis and laptops — path control, sensing, and bring-up on a real mecanum platform.",
+				],
+				image: {
+					src: "/experience/work/zongheng/lab-teaching.webp",
+					alt: "Students learning around Shixun car and laptops",
+					width: 1024,
+					height: 768,
+					caption: "Lab class — hands-on with 实讯小车",
+				},
+				imageTone: "light",
+			},
+		],
+	},
+	{
+		id: "vxs-100",
+		title: "VXS-100",
+		subtitle: "Handheld voice module · Robot & 实讯 control",
+		cardImage: {
+			src: "/experience/work/zongheng/vxs-100.webp",
+			alt: "VXS-100 handheld voice modules from Zongheng Robotics",
+			width: 1024,
+			height: 768,
+		},
+		spreads: [
+			{
+				type: "product-hero",
+				kicker: "01 · Product",
+				title: "VXS-100 handheld module",
+				subtitle:
+					"VX-X / VXS-100 handheld control unit for Shixun cars and Zongheng robots — the bridge between instructor demos and student labs.",
+				image: {
+					src: "/experience/work/zongheng/vxs-100.webp",
+					alt: "VXS-100 handheld voice modules from Zongheng Robotics",
+					width: 1024,
+					height: 768,
+					caption: "VXS-100 — handheld control for robot & 实讯小车.",
+				},
+			},
+			{
+				type: "prose",
+				eyebrow: "02 · Role",
+				heading: "Why it stands alone",
+				body: [
+					"VXS-100 is the instructor / operator remote in the education stack — voice and control for demos, not a sub-part of the robot photo.",
+					"Splitting it out keeps the robot, the training car, and the handheld module readable as three clear products.",
 				],
 			},
 		],

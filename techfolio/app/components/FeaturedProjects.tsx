@@ -96,6 +96,7 @@ function buildCatalog(isZh: boolean, t: (k: string) => string): NavItem[] {
 		});
 	}
 	for (const c of workCompanies) {
+		if (c.id === "moore") continue;
 		if (workShowcases.some((w) => w.id === c.id)) continue;
 		work.push({
 			key: c.id,
@@ -196,7 +197,7 @@ function NavButton({
 			data-nav-id={item.id}
 			onClick={() => onSelect(item.id)}
 			className={`project-nav__item relative z-[1] block w-full text-left transition-colors ${
-				compact ? "project-nav__item--compact whitespace-nowrap px-2.5 py-1.5" : "px-2.5 py-[0.34rem]"
+				compact ? "project-nav__item--compact whitespace-nowrap px-2.5 py-1.5" : "px-2.5 py-[0.2rem]"
 			} ${
 				active
 					? "text-[#043439]"
@@ -260,15 +261,15 @@ function DiyGrid({
 function DiyCollagePreview({ items }: { items: MakeDiyItem[] }) {
 	const tiles = items.slice(0, 9);
 	return (
-		<div className="grid aspect-square w-full grid-cols-3 gap-1 bg-[#E8E2D8] p-1 sm:gap-1.5 sm:p-1.5">
+		<div className="grid h-full w-full grid-cols-3 grid-rows-3 gap-1 bg-[#E8E2D8] p-1 sm:gap-1.5 sm:p-1.5">
 			{tiles.map((diy) => (
-				<div key={diy.id} className="relative overflow-hidden bg-[#DDD6CC]">
+				<div key={diy.id} className="relative min-h-0 overflow-hidden bg-[#DDD6CC]">
 					<Image
 						src={diy.image.src}
 						alt=""
 						fill
 						sizes="120px"
-						className="object-cover"
+						className="object-cover object-center"
 					/>
 				</div>
 			))}
@@ -340,19 +341,19 @@ export function FeaturedProjects() {
 	}, []);
 
 	useEffect(() => {
-		if (!panelOpen && !diyFocus) return;
+		const locked = panelOpen || Boolean(diyFocus);
 		const onKey = (e: KeyboardEvent) => {
-			if (e.key === "Escape") {
-				if (diyFocus) setDiyFocus(null);
-				else setPanelOpen(false);
-			}
+			if (e.key !== "Escape") return;
+			if (diyFocus) setDiyFocus(null);
+			else if (panelOpen) setPanelOpen(false);
 		};
-		const prev = document.body.style.overflow;
-		document.body.style.overflow = "hidden";
-		window.addEventListener("keydown", onKey);
+
+		document.body.style.overflow = locked ? "hidden" : "";
+		if (locked) window.addEventListener("keydown", onKey);
+
 		return () => {
-			document.body.style.overflow = prev;
 			window.removeEventListener("keydown", onKey);
+			document.body.style.overflow = "";
 		};
 	}, [panelOpen, diyFocus]);
 
@@ -422,10 +423,10 @@ export function FeaturedProjects() {
 								height: pill.height,
 							}}
 						/>
-						<div className="space-y-[1.15rem]">
+						<div className="project-nav__groups">
 							{groups.map((group) => (
-								<div key={group.id}>
-									<p className="mb-1.5 px-2.5 text-[0.56rem] font-semibold uppercase tracking-[0.16em] text-[#0F4C45]/42">
+								<div key={group.id} className="project-nav__group-block">
+									<p className="project-nav__group-label px-2.5 text-[0.56rem] font-semibold uppercase tracking-[0.16em] text-[#0F4C45]/42">
 										{t(group.labelKey)}
 									</p>
 									<ul className="project-nav__list">
@@ -474,7 +475,7 @@ export function FeaturedProjects() {
 					</nav>
 
 					{selected ? (
-						<article key={selected.id} className="project-stage">
+						<article className="project-stage">
 							<header className="project-stage__head">
 								<p className="project-stage__eyebrow">
 									{selected.section}
@@ -488,22 +489,24 @@ export function FeaturedProjects() {
 							<button
 								type="button"
 								onClick={() => (canOpen ? setPanelOpen(true) : undefined)}
-								className={`project-stage__media group ${
-									selected.kind === "diy" ? "project-stage__media--diy" : ""
-								}`}
+								className="project-stage__media group"
 							>
 								{selected.kind === "diy" && selected.diyItems ? (
-									<div className="absolute inset-0 transition duration-700 group-hover:scale-[1.02]">
+									<div
+										key={selected.id}
+										className="project-stage__media-inner absolute inset-0 transition duration-700 group-hover:scale-[1.02]"
+									>
 										<DiyCollagePreview items={selected.diyItems} />
 									</div>
 								) : (
 									<Image
+										key={selected.id}
 										src={selected.imageSrc}
 										alt={selected.imageAlt}
 										fill
-										sizes="(max-width: 900px) 100vw, 55vw"
+										sizes="(max-width: 900px) 100vw, 544px"
 										priority
-										className="object-cover transition duration-700 group-hover:scale-[1.02]"
+										className="object-cover object-center transition duration-700 group-hover:scale-[1.02]"
 									/>
 								)}
 							</button>

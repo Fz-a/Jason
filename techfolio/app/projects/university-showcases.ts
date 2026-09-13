@@ -610,8 +610,8 @@ export const universityDepartmentShowcases: UniversityShowcase[] = [
 	},
 	{
 		id: "drone-workstation",
-		title: "无人机工作站",
-		subtitle: "Drone workstation · Outreach & safety",
+		title: "Drone Workstation",
+		subtitle: "UAV lab · Outreach & flight safety",
 		preview: [
 			"Publicity and public-facing demos",
 			"Flight safety briefings",
@@ -626,10 +626,10 @@ export const universityDepartmentShowcases: UniversityShowcase[] = [
 		spreads: [
 			{
 				type: "product-hero",
-				kicker: "01 · Department",
-				title: "无人机工作站",
+				kicker: "01 · Workstation",
+				title: "Drone Workstation",
 				subtitle:
-					"Drone workstation — bench builds, safety-minded demos, and campus outreach around UAVs.",
+					"Bench builds, safety-minded demos, and campus outreach around UAVs.",
 				image: {
 					src: "/experience/university/drone/workshop.webp",
 					alt: "Team soldering and assembling a quadcopter on the blue bench",

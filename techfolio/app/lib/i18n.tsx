@@ -36,7 +36,7 @@ const en: Dict = {
 	"hero.chip.ai": "AI",
 	"hero.chip.uav": "UAV",
 	"hero.projects": "Projects",
-	"hero.contact": "Target",
+	"hero.contact": "Contact",
 	"hero.resume": "Resume",
 	"hero.scroll": "Scroll",
 	"core.kicker": "01 — Projects",

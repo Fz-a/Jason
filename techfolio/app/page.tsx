@@ -284,33 +284,17 @@ export default function Home() {
 
             <div className="mt-8 flex flex-wrap items-center gap-3">
               <a
-                href="#experience"
-                onClick={(event) => handleNavClick(event, "#experience")}
-                className="cursor-pointer rounded-full bg-[#043439] px-6 py-2.5 text-sm font-semibold text-white transition hover:opacity-90"
-              >
-                {t("hero.projects")}
-              </a>
-              <a
                 href="#target"
                 onClick={(event) => handleNavClick(event, "#target")}
-                className="cursor-pointer text-[0.82rem] font-semibold text-[#0F4C45] underline-offset-4 hover:underline"
+                className="cursor-pointer rounded-full bg-[#043439] px-6 py-2.5 text-sm font-semibold text-white transition hover:opacity-90"
               >
                 {t("hero.contact")}
-              </a>
-              <a
-                href="/Jason-Chen-Resume.pdf"
-                download="Jason-Chen-Resume.pdf"
-                target="_blank"
-                rel="noreferrer"
-                className="text-[0.78rem] font-semibold text-[#0F4C45]/55 underline-offset-4 hover:text-[#0F4C45] hover:underline"
-              >
-                {t("hero.resume")}
               </a>
             </div>
           </div>
 
           <div className="order-1 flex items-center justify-center lg:order-2">
-            <div className="hero-avatar relative aspect-square w-full max-w-[200px] sm:max-w-[300px] lg:max-w-[360px]">
+            <div className="hero-avatar relative aspect-square w-full max-w-[240px] sm:max-w-[340px] lg:max-w-[420px]">
               <div className="hero-avatar__frame relative h-full w-full overflow-hidden rounded-full">
                 <Image
                   src={
@@ -320,7 +304,7 @@ export default function Home() {
                   }
                   alt="Jason Chen"
                   fill
-                  sizes="(max-width: 640px) 200px, 360px"
+                  sizes="(max-width: 640px) 240px, 420px"
                   priority
                   className="hero-avatar__img object-cover"
                   style={

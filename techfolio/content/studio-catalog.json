@@ -80,8 +80,20 @@
 		},
 		{
 			"id": "campus-depts",
-			"title": "校园部门",
+			"title": "Campus Departments",
 			"group": "社会",
+			"source": "showcase"
+		},
+		{
+			"id": "shixun-car",
+			"title": "实讯小车",
+			"group": "项目",
+			"source": "showcase"
+		},
+		{
+			"id": "vxs-100",
+			"title": "VXS-100",
+			"group": "项目",
 			"source": "showcase"
 		}
 	],

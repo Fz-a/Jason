@@ -1092,16 +1092,17 @@ button,
 	max-width: 9.5ch;
 }
 
+/* Fixed stage frame — every project uses the same box */
 .project-stage__media {
 	grid-area: media;
 	position: relative;
+	box-sizing: border-box;
 	display: block;
-	width: 100%;
-	max-width: min(100%, 38rem);
-	aspect-ratio: 4 / 3;
-	max-height: min(46vh, 26rem);
-	justify-self: stretch;
-	margin-top: -0.65rem;
+	width: min(100%, 34rem);
+	height: min(40vh, 22.5rem);
+	justify-self: end;
+	align-self: start;
+	margin: 0;
 	overflow: hidden;
 	border: 0;
 	border-radius: 0;
@@ -1109,13 +1110,11 @@ button,
 	background: #e8e2d8;
 	cursor: pointer;
 	text-align: left;
+	isolation: isolate;
 }
 
-.project-stage__media--diy {
-	aspect-ratio: 1 / 1;
-	max-width: min(100%, 22rem);
-	max-height: none;
-	justify-self: end;
+.project-stage__media-inner {
+	inset: 0;
 }
 
 /* Left edge flush with title; extends a bit further under the image */
@@ -1191,14 +1190,9 @@ button,
 	}
 
 	.project-stage__media {
-		max-width: 100%;
-		max-height: min(38vh, 20rem);
-	}
-
-	.project-stage__media--diy {
-		max-width: min(100%, 17rem);
-		margin-inline: auto;
-		justify-self: center;
+		width: 100%;
+		height: min(36vh, 18rem);
+		justify-self: stretch;
 	}
 
 	.project-stage__body {
@@ -1208,15 +1202,35 @@ button,
 	}
 }
 
-/* Projects right rail — full-bleed sliding capsule */
+/* Projects right rail — denser list, clearer group breaks */
+.project-nav {
+	padding-block: 0.4rem;
+}
+
 .project-nav__track {
 	position: relative;
+}
+
+.project-nav__groups {
+	display: flex;
+	flex-direction: column;
+	gap: 0.35rem;
+}
+
+.project-nav__group-block + .project-nav__group-block {
+	margin-top: 0.45rem;
+	padding-top: 0.85rem;
+	border-top: 1px solid rgb(15 76 69 / 0.09);
+}
+
+.project-nav__group-label {
+	margin: 0 0 0.35rem;
 }
 
 .project-nav__list {
 	display: flex;
 	flex-direction: column;
-	gap: 0.18rem;
+	gap: 0.02rem;
 }
 
 .project-nav__pill {
