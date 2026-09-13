@@ -11,7 +11,11 @@ import { HeroNameFlip } from "./components/HeroNameFlip";
 import { LangSwitch } from "./components/LangSwitch";
 import { SkillMarquee } from "./components/SkillMarquee";
 import { FeaturedProjects } from "./components/FeaturedProjects";
-import { EngineeringPath } from "./components/EngineeringPath";
+import { ConnectionSection } from "./components/ConnectionSection";
+import { TargetSection } from "./components/TargetSection";
+import { ResearchSection } from "./components/ResearchSection";
+import { ResearchFitNext } from "./components/ResearchFitNext";
+import { StoryProgress, STORY_STAGES } from "./components/StoryProgress";
 import { ExperienceStrip } from "./components/ExperienceStrip";
 import { useLocale } from "./lib/i18n";
 import avatarSettings from "../content/avatar.json";
@@ -22,10 +26,14 @@ const montserrat = Montserrat({
 
 const navItems = [
   { key: "nav.home", href: "#home" },
-  { key: "nav.about", href: "#about" },
-  { key: "nav.projects", href: "#projects" },
+  { key: "nav.experience", href: "#experience" },
+  { key: "nav.direction", href: "#target" },
+  { key: "nav.research", href: "#research" },
+  { key: "nav.archive", href: "#archive" },
   { key: "nav.contact", href: "#contact" },
 ] as const;
+
+const STORY_IDS = STORY_STAGES.map((s) => s.id);
 
 const socialLinks = [
   {
@@ -137,6 +145,19 @@ export default function Home() {
   const cueDotRef = useRef<HTMLSpanElement>(null);
   const cueTextRef = useRef<HTMLSpanElement>(null);
   const homeTapRef = useRef({ count: 0, lastAt: 0 });
+  const activeSectionRef = useRef(activeSection);
+
+  useEffect(() => {
+    activeSectionRef.current = activeSection;
+  }, [activeSection]);
+
+  const storyProgressId = STORY_IDS.includes(
+    activeSection as (typeof STORY_IDS)[number],
+  )
+    ? activeSection
+    : activeSection === "archive" || activeSection === "contact"
+      ? "next"
+      : "home";
 
   const scrollToSection = (sectionId: string) => {
     const target = document.getElementById(sectionId);
@@ -186,10 +207,18 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    const homeSection = document.getElementById("home");
-    const aboutSection = document.getElementById("about");
-    const projectsSection = document.getElementById("projects");
-    const contactSection = document.getElementById("contact");
+    const sections = [
+      "home",
+      "experience",
+      "connection",
+      "target",
+      "research",
+      "next",
+      "archive",
+      "contact",
+    ]
+      .map((id) => document.getElementById(id))
+      .filter((el): el is HTMLElement => Boolean(el));
 
     const cue = scrollCueRef.current;
     const cueDot = cueDotRef.current;
@@ -201,29 +230,29 @@ export default function Home() {
       const nearPageBottom =
         window.innerHeight + window.scrollY >=
         document.documentElement.scrollHeight - 32;
-      const scrollMarker = window.scrollY + 140;
+      const scrollMarker = window.scrollY + 160;
 
-      if (
-        nearPageBottom ||
-        (contactSection && scrollMarker >= contactSection.offsetTop)
-      ) {
+      if (nearPageBottom) {
         setActiveSection("contact");
         return;
       }
 
-      if (projectsSection && scrollMarker >= projectsSection.offsetTop) {
-        setActiveSection("projects");
+      let current = "home";
+      for (const section of sections) {
+        if (scrollMarker >= section.offsetTop) {
+          current = section.id;
+        }
+      }
+
+      // Map archive/contact to story progress stages
+      if (current === "archive" || current === "contact") {
+        // keep nav highlight accurate; story progress uses last story stage near end
+        if (current === "archive") setActiveSection("archive");
+        else setActiveSection("contact");
         return;
       }
 
-      if (aboutSection && scrollMarker >= aboutSection.offsetTop) {
-        setActiveSection("about");
-        return;
-      }
-
-      if (homeSection) {
-        setActiveSection("home");
-      }
+      setActiveSection(current);
     };
 
     if (cue && cueDot && cueText) {
@@ -294,10 +323,43 @@ export default function Home() {
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", updateActiveSection);
 
+    const onKey = (e: KeyboardEvent) => {
+      const tag = (e.target as HTMLElement | null)?.tagName;
+      if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
+
+      const current = activeSectionRef.current;
+      const storyActive = STORY_IDS.includes(
+        current as (typeof STORY_IDS)[number],
+      )
+        ? current
+        : current === "archive" || current === "contact"
+          ? "next"
+          : "home";
+      const idx = STORY_IDS.indexOf(
+        storyActive as (typeof STORY_IDS)[number],
+      );
+
+      if (e.key === "ArrowDown" || e.key === "PageDown") {
+        e.preventDefault();
+        const next = STORY_IDS[Math.min(idx + 1, STORY_IDS.length - 1)];
+        scrollToSection(next);
+      } else if (e.key === "ArrowUp" || e.key === "PageUp") {
+        e.preventDefault();
+        const prev = STORY_IDS[Math.max(idx - 1, 0)];
+        scrollToSection(prev);
+      } else if (/^[1-6]$/.test(e.key)) {
+        const stage = STORY_IDS[Number(e.key) - 1];
+        if (stage) scrollToSection(stage);
+      }
+    };
+
+    window.addEventListener("keydown", onKey);
+
     return () => {
       animations.forEach((animation) => animation.kill());
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", updateActiveSection);
+      window.removeEventListener("keydown", onKey);
     };
   }, []);
 
@@ -306,6 +368,10 @@ export default function Home() {
       className={`${montserrat.className} min-h-screen bg-[#F7F1E8] text-[#162b26]`}
     >
       <HomeScrollPreloader />
+      <StoryProgress
+        activeId={storyProgressId}
+        onNavigate={scrollToSection}
+      />
       <header className="pointer-events-none fixed inset-x-0 top-0 z-50 safe-pt px-3 sm:px-6 sm:pt-5 lg:px-8">
         <div className="relative mx-auto flex max-w-[calc(100vw-1.5rem)] items-center justify-center sm:max-w-none">
           <div className="pointer-events-auto nav-scroll max-w-full overflow-x-auto rounded-full border border-[#0F4C45]/15 bg-[#F7F1E8]/92 p-1 shadow-[0_14px_40px_rgba(22,43,38,0.08)] backdrop-blur-md sm:p-1.5">
@@ -376,8 +442,8 @@ export default function Home() {
 
             <div className="mt-6 flex flex-wrap items-center gap-2.5 sm:mt-7 sm:gap-3">
               <a
-                href="#projects"
-                onClick={(event) => handleNavClick(event, "#projects")}
+                href="#experience"
+                onClick={(event) => handleNavClick(event, "#experience")}
                 className="cursor-pointer rounded-full bg-[#043439] px-5 py-2.5 text-sm font-semibold text-white transition hover:opacity-90 sm:px-6 lg:px-7 lg:py-3 lg:text-[0.92rem]"
               >
                 {t("hero.projects")}
@@ -450,8 +516,8 @@ export default function Home() {
         <div className="pointer-events-none absolute inset-x-0 bottom-6 flex justify-center sm:bottom-12">
           <a
             ref={scrollCueRef}
-            href="#about"
-            onClick={(event) => handleNavClick(event, "#about")}
+            href="#experience"
+            onClick={(event) => handleNavClick(event, "#experience")}
             className="pointer-events-auto flex cursor-pointer flex-col items-center gap-2.5 text-[0.6rem] font-semibold uppercase tracking-[0.28em] text-[#0F4C45]/72 transition"
           >
             <span
@@ -463,30 +529,19 @@ export default function Home() {
         </div>
       </section>
 
-      <section
-        id="about"
-        className="scroll-mt-10 bg-[#F7F1E8] pb-6 pt-6 sm:scroll-mt-14 sm:pb-8 sm:pt-8 lg:pb-10 lg:pt-10"
-      >
-        <div className="mx-auto w-full max-w-[1100px] px-6 sm:px-8 md:px-10 lg:px-12 xl:max-w-[1160px] xl:px-14">
-          <p className="text-[0.68rem] font-semibold uppercase tracking-[0.26em] text-[#0F4C45] sm:text-[0.74rem]">
-            {t("about.kicker")}
-          </p>
-          <h2 className="mt-3 max-w-[18ch] text-[1.55rem] font-extrabold tracking-tight text-[#162b26] sm:text-[1.9rem] lg:text-[2.1rem]">
-            {t("about.title")}
-          </h2>
-          <p className="mt-4 max-w-[40rem] text-[0.92rem] leading-7 text-[#3E514D] sm:text-[0.96rem] lg:leading-[1.8rem]">
-            {t("about.body")}
-          </p>
-        </div>
-      </section>
+      <FeaturedProjects onOpenArchive={() => scrollToSection("archive")} />
 
-      <FeaturedProjects />
+      <ConnectionSection />
 
-      <EngineeringPath />
+      <TargetSection />
+
+      <ResearchSection />
+
+      <ResearchFitNext />
 
       <section
-        id="journey"
-        className="scroll-mt-10 bg-[#F7F1E8] pb-10 pt-4 sm:scroll-mt-14 sm:pb-12 sm:pt-6 lg:pb-14"
+        id="archive"
+        className="scroll-mt-24 bg-[#F7F1E8] pb-10 pt-4 sm:scroll-mt-28 sm:pb-12 sm:pt-6 lg:pb-14"
       >
         <div className="mx-auto w-full max-w-[1100px] px-6 sm:px-8 md:px-10 lg:px-12 xl:max-w-[1160px] xl:px-14">
           <JourneyHub />
