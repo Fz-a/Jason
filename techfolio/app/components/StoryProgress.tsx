@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { useLocale } from "../lib/i18n";
 
-/** Six story chapters — hero is separate. */
 export const STORY_STAGES = [
 	{ id: "experience", key: "story.01", short: "01" },
 	{ id: "direction", key: "story.02", short: "02" },
@@ -33,10 +32,9 @@ export function StoryProgress({ activeId, onNavigate }: Props) {
 
 	return (
 		<>
-			{/* Desktop: number + full chapter title */}
 			<nav
 				aria-label="Presentation progress"
-				className={`pointer-events-none fixed left-4 top-1/2 z-40 hidden max-w-[11rem] -translate-y-1/2 flex-col gap-0.5 transition-opacity duration-500 xl:flex ${
+				className={`pointer-events-none fixed left-4 top-1/2 z-40 hidden max-w-[10.5rem] -translate-y-1/2 flex-col gap-0.5 transition-opacity duration-500 xl:flex ${
 					visible ? "opacity-100" : "opacity-0"
 				}`}
 			>
@@ -74,7 +72,6 @@ export function StoryProgress({ activeId, onNavigate }: Props) {
 				})}
 			</nav>
 
-			{/* Mobile: compact — numbers with aria labels */}
 			<nav
 				aria-label="Presentation progress"
 				className={`pointer-events-none fixed inset-x-0 top-[3.25rem] z-40 flex justify-center px-3 transition-opacity duration-500 sm:top-[3.5rem] xl:hidden ${

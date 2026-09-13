@@ -2,11 +2,11 @@
 
 import { useLocale } from "../lib/i18n";
 
-const STREAMS = [
-	{ from: "conn.s1.from", to: "conn.s1.to" },
-	{ from: "conn.s2.from", to: "conn.s2.to" },
-	{ from: "conn.s3.from", to: "conn.s3.to" },
-	{ from: "conn.s4.from", to: "conn.s4.to" },
+const INPUTS = [
+	"conn.in1",
+	"conn.in2",
+	"conn.in3",
+	"conn.in4",
 ] as const;
 
 export function ConnectionSection() {
@@ -21,58 +21,43 @@ export function ConnectionSection() {
 				<p className="text-[0.68rem] font-semibold uppercase tracking-[0.28em] text-[#0F4C45]/70">
 					{t("conn.kicker")}
 				</p>
-				<h2 className="mt-4 max-w-[16ch] whitespace-pre-line text-[2.2rem] font-extrabold leading-[0.98] tracking-tight text-[#162b26] sm:text-[3rem] lg:text-[3.4rem]">
+
+				{/* Direction target — immediately visible */}
+				<h2 className="mt-8 max-w-[12ch] whitespace-pre-line text-[2.6rem] font-extrabold leading-[0.95] tracking-tight text-[#162b26] sm:mt-10 sm:text-[3.6rem] lg:text-[4.2rem]">
 					{t("conn.title")}
 				</h2>
 
-				<div className="mt-14 sm:mt-20">
-					<ul className="mx-auto max-w-xl space-y-0">
-						{STREAMS.map((s, i) => (
-							<li key={s.from} className="relative flex flex-col items-stretch">
-								<div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3 py-4 sm:gap-6">
-									<p className="text-right text-[0.95rem] font-medium text-[#4A5C58] sm:text-[1.05rem]">
-										{t(s.from)}
-									</p>
-									<span
-										aria-hidden
-										className="h-px w-8 bg-[#0F4C45]/30 sm:w-12"
-									/>
-									<p className="text-[1rem] font-extrabold tracking-tight text-[#162b26] sm:text-[1.15rem]">
-										{t(s.to)}
-									</p>
-								</div>
-								{i < STREAMS.length - 1 ? (
-									<div className="flex justify-center" aria-hidden>
-										<span className="h-3 w-px bg-[#0F4C45]/18" />
-									</div>
+				{/* Experience → UAV → Applications */}
+				<div className="mt-14 flex flex-col items-center text-center sm:mt-16">
+					<p className="flex flex-wrap items-center justify-center gap-x-2 gap-y-2 text-[0.82rem] font-semibold uppercase tracking-[0.14em] text-[#0F4C45]/70">
+						{INPUTS.map((key, i) => (
+							<span key={key} className="inline-flex items-center gap-2">
+								{t(key)}
+								{i < INPUTS.length - 1 ? (
+									<span aria-hidden className="text-[#0F4C45]/30">
+										+
+									</span>
 								) : null}
-							</li>
+							</span>
 						))}
-					</ul>
-
-					<div className="mt-2 flex flex-col items-center" aria-hidden>
-						<span className="h-10 w-px bg-[#0F4C45]/25" />
+					</p>
+					<div className="mt-4 flex flex-col items-center" aria-hidden>
+						<span className="h-8 w-px bg-[#0F4C45]/25" />
 						<span className="mt-1 text-[#0F4C45]/40">↓</span>
 					</div>
-
-					<div className="mt-4 text-center">
-						<p className="text-[0.68rem] font-semibold uppercase tracking-[0.22em] text-[#0F4C45]/55">
-							{t("conn.merge.kicker")}
-						</p>
-						<p className="mt-3 text-[1.45rem] font-extrabold tracking-tight text-[#162b26] sm:text-[1.85rem]">
-							{t("conn.merge.title")}
-						</p>
-						<div className="mt-3 flex flex-col items-center" aria-hidden>
-							<span className="h-8 w-px bg-[#0F4C45]/25" />
-							<span className="mt-1 text-[#0F4C45]/40">↓</span>
-						</div>
-						<p className="mt-3 text-[1.15rem] font-extrabold tracking-tight text-[#043439] sm:text-[1.35rem]">
-							{t("conn.merge.goal")}
-						</p>
+					<p className="mt-3 text-[1.25rem] font-extrabold tracking-tight text-[#162b26] sm:text-[1.45rem]">
+						{t("conn.mid")}
+					</p>
+					<div className="mt-3 flex flex-col items-center" aria-hidden>
+						<span className="h-8 w-px bg-[#0F4C45]/25" />
+						<span className="mt-1 text-[#0F4C45]/40">↓</span>
 					</div>
+					<p className="mt-3 max-w-[16ch] whitespace-pre-line text-[1.1rem] font-extrabold tracking-tight text-[#043439] sm:text-[1.3rem]">
+						{t("conn.apps")}
+					</p>
 				</div>
 
-				<p className="mx-auto mt-14 max-w-[38rem] text-center text-[1.1rem] font-semibold leading-8 tracking-tight text-[#162b26] sm:mt-16 sm:text-[1.3rem]">
+				<p className="mx-auto mt-14 max-w-[36rem] text-center text-[1.1rem] font-semibold leading-8 tracking-tight text-[#162b26] sm:mt-16 sm:text-[1.25rem]">
 					{t("conn.statement")}
 				</p>
 			</div>

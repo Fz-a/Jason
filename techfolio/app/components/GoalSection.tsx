@@ -21,12 +21,11 @@ export function GoalSection() {
 				<p className="text-[0.68rem] font-semibold uppercase tracking-[0.28em] text-white/45">
 					{t("goal.kicker")}
 				</p>
-				<h2 className="mx-auto mt-10 max-w-[11ch] whitespace-pre-line text-[3rem] font-extrabold leading-[0.92] tracking-tight sm:text-[4.4rem] lg:text-[5.2rem]">
+
+				{/* Strongest visual moment — not repeating Direction title */}
+				<h2 className="mx-auto mt-12 max-w-[10ch] whitespace-pre-line text-[3.2rem] font-extrabold leading-[0.92] tracking-tight sm:mt-14 sm:text-[4.8rem] lg:text-[5.6rem]">
 					{t("goal.title")}
 				</h2>
-				<p className="mt-10 text-[1.35rem] font-semibold tracking-tight text-white/75 sm:text-[1.65rem]">
-					{t("goal.tagline")}
-				</p>
 
 				<div className="mx-auto mt-16 flex max-w-sm flex-col items-center gap-0 sm:mt-20">
 					{FLOW.map((key, i) => (
