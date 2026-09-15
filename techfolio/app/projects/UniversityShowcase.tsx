@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useId, useState } from "react";
+import { createContext, useContext, useEffect, useId, useState } from "react";
 import { ZoomableFrame } from "../components/ImageLightbox";
 import type { ProjectImage } from "./project-data";
 import {
@@ -9,6 +9,25 @@ import {
   type UniversityShowcase,
   universityShowcases,
 } from "./university-showcases";
+
+const ShowcaseMediaCtx = createContext({ zoomable: true });
+
+function MediaFrame({
+  image,
+  children,
+  className = "",
+}: {
+  image: ProjectImage;
+  children: React.ReactNode;
+  className?: string;
+}) {
+  const { zoomable } = useContext(ShowcaseMediaCtx);
+  return (
+    <ZoomableFrame image={image} className={className} enabled={zoomable}>
+      {children}
+    </ZoomableFrame>
+  );
+}
 
 function Eyebrow({ children }: { children: string }) {
   return (
@@ -31,9 +50,10 @@ function DocImage({
   imgClassName?: string;
   priority?: boolean;
 }) {
+  const { zoomable } = useContext(ShowcaseMediaCtx);
   return (
     <figure className={className}>
-      <ZoomableFrame image={image} className="block w-full">
+      <ZoomableFrame image={image} className="block w-full" enabled={zoomable}>
         <div className={`overflow-hidden ${frameClassName}`}>
           <Image
             src={image.src}
@@ -200,7 +220,7 @@ function Spread({ spread }: { spread: ShowcaseSpread }) {
       if (soft) {
         return (
           <section className="border-b border-black/[0.06] bg-[#EEF0ED] px-5 py-14 sm:px-9 sm:py-16">
-            <div className="mx-auto max-w-[34rem] text-center">
+            <div className="mx-auto max-w-[36rem] text-center">
               {spread.eyebrow ? <Eyebrow>{spread.eyebrow}</Eyebrow> : null}
               {spread.heading ? (
                 <h3
@@ -218,15 +238,18 @@ function Spread({ spread }: { spread: ShowcaseSpread }) {
               ) : null}
             </div>
 
-            <div className="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5">
+            {/* Staggered pair — not flush side-by-side */}
+            <div className="mx-auto mt-12 grid max-w-[58rem] grid-cols-1 gap-8 sm:grid-cols-2 sm:gap-x-10 sm:gap-y-0 sm:items-start">
               {spread.images.map((image, index) => {
                 const [label, detail] = (image.caption ?? "")
                   .split(/\s*—\s*/)
                   .map((part) => part.trim());
+                const staggered =
+                  index === 0 ? "sm:mt-0 sm:translate-y-0" : "sm:mt-14";
                 return (
                   <article
                     key={image.src + (image.caption ?? "")}
-                    className="flex flex-col overflow-hidden rounded-[1.15rem] bg-white shadow-[0_18px_40px_rgba(22,43,38,0.07)] ring-1 ring-black/[0.04]"
+                    className={`flex flex-col overflow-hidden rounded-[1.15rem] bg-white shadow-[0_18px_40px_rgba(22,43,38,0.07)] ring-1 ring-black/[0.04] ${staggered}`}
                   >
                     <div className="flex items-center justify-between px-4 pt-4 sm:px-5 sm:pt-5">
                       <p className="text-[0.62rem] font-semibold uppercase tracking-[0.22em] text-[#8A9692]">
@@ -239,7 +262,7 @@ function Spread({ spread }: { spread: ShowcaseSpread }) {
                     <div
                       className={`relative ${cover ? "aspect-[4/5] sm:aspect-[3/4]" : "flex aspect-[4/3] items-center justify-center px-4 py-3 sm:px-5"}`}
                     >
-                      <ZoomableFrame image={image} className="absolute inset-0 block h-full w-full">
+                      <MediaFrame image={image} className="absolute inset-0 block h-full w-full">
                         <Image
                           src={image.src}
                           alt={image.alt}
@@ -251,7 +274,7 @@ function Spread({ spread }: { spread: ShowcaseSpread }) {
                               : "h-full w-full object-contain transition group-hover/zoom:opacity-95"
                           }
                         />
-                      </ZoomableFrame>
+                      </MediaFrame>
                     </div>
                     {detail || image.caption ? (
                       <div className="border-t border-black/[0.05] px-4 py-3.5 sm:px-5">
@@ -335,7 +358,7 @@ function Spread({ spread }: { spread: ShowcaseSpread }) {
                     </p>
                   </div>
                   <div className={`relative ${cover ? "aspect-[4/5]" : "aspect-[4/3]"}`}>
-                    <ZoomableFrame image={image} className="absolute inset-0 block h-full w-full">
+                    <MediaFrame image={image} className="absolute inset-0 block h-full w-full">
                       <Image
                         src={image.src}
                         alt={image.alt}
@@ -347,7 +370,7 @@ function Spread({ spread }: { spread: ShowcaseSpread }) {
                             : "h-full w-full object-contain p-2 transition group-hover/zoom:opacity-95"
                         }
                       />
-                    </ZoomableFrame>
+                    </MediaFrame>
                   </div>
                   {detail ? (
                     <div className="border-t border-black/[0.05] px-3 py-2.5 sm:px-4 sm:py-3">
@@ -490,7 +513,7 @@ function Spread({ spread }: { spread: ShowcaseSpread }) {
             </p>
           </div>
           <div className="relative aspect-[16/10] w-full bg-[#F4F4F4]">
-            <ZoomableFrame image={spread.image} className="absolute inset-0 block h-full w-full">
+            <MediaFrame image={spread.image} className="absolute inset-0 block h-full w-full">
               <Image
                 src={spread.image.src}
                 alt={spread.image.alt}
@@ -501,7 +524,7 @@ function Spread({ spread }: { spread: ShowcaseSpread }) {
                 sizes="(max-width: 720px) 100vw, 720px"
                 className="h-full w-full object-cover transition group-hover/zoom:opacity-95"
               />
-            </ZoomableFrame>
+            </MediaFrame>
           </div>
         </section>
       );
@@ -568,32 +591,37 @@ export function ShowcaseDocument({
   item,
   sectionLabel = "University",
   className = "",
+  zoomable = true,
 }: {
   item: UniversityShowcase;
   sectionLabel?: string;
   className?: string;
+  /** Studio preview: show photos as static figures (no lightbox). */
+  zoomable?: boolean;
 }) {
   return (
-    <article
-      className={`bg-white text-[#111] ${className || "shadow-[0_24px_80px_rgba(0,0,0,0.28)]"}`}
-    >
-      <div className="flex items-center justify-between border-b border-black/[0.06] px-6 py-3.5 sm:px-8">
-        <p className="text-[0.62rem] font-semibold uppercase tracking-[0.24em] text-[#8A9692]">
-          Product Brief
-        </p>
-        <p className="text-[0.62rem] font-medium tracking-[0.1em] text-[#8A9692]">
-          {sectionLabel}
-        </p>
-      </div>
-      {item.spreads.map((spread, index) => (
-        <Spread key={`${spread.type}-${index}`} spread={spread} />
-      ))}
-      <footer className="px-8 py-10 text-center sm:px-12">
-        <p className="text-[0.64rem] font-medium tracking-[0.16em] text-[#8A9692]">
-          End of brief
-        </p>
-      </footer>
-    </article>
+    <ShowcaseMediaCtx.Provider value={{ zoomable }}>
+      <article
+        className={`bg-white text-[#111] ${className || "shadow-[0_24px_80px_rgba(0,0,0,0.28)]"}`}
+      >
+        <div className="flex items-center justify-between border-b border-black/[0.06] px-6 py-3.5 sm:px-8">
+          <p className="text-[0.62rem] font-semibold uppercase tracking-[0.24em] text-[#8A9692]">
+            Product Brief
+          </p>
+          <p className="text-[0.62rem] font-medium tracking-[0.1em] text-[#8A9692]">
+            {sectionLabel}
+          </p>
+        </div>
+        {item.spreads.map((spread, index) => (
+          <Spread key={`${spread.type}-${index}`} spread={spread} />
+        ))}
+        <footer className="px-8 py-10 text-center sm:px-12">
+          <p className="text-[0.64rem] font-medium tracking-[0.16em] text-[#8A9692]">
+            End of brief
+          </p>
+        </footer>
+      </article>
+    </ShowcaseMediaCtx.Provider>
   );
 }
 
@@ -650,7 +678,7 @@ function ThemeStorySection({
 
       {heroImage ? (
         <div className="border-b border-[#0F4C45]/10 bg-[#F7F1E8]">
-          <ZoomableFrame image={heroImage} className="block w-full">
+          <MediaFrame image={heroImage} className="block w-full">
             <Image
               src={heroImage.src}
               alt={heroImage.alt}
@@ -658,7 +686,7 @@ function ThemeStorySection({
               height={heroImage.height}
               className="h-auto w-full object-cover transition group-hover/zoom:opacity-95"
             />
-          </ZoomableFrame>
+          </MediaFrame>
           {heroImage.caption ? (
             <p className="px-5 py-3 text-[0.72rem] leading-5 text-[#6A7A76] sm:px-7">
               {heroImage.caption}

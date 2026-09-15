@@ -6,12 +6,9 @@ import { isCapabilitiesRailActive } from "../lib/capabilities-rail";
 
 export const STORY_STAGES = [
 	{ id: "experience", key: "story.01", short: "01" },
-	{ id: "direction", key: "story.02", short: "02" },
-	{ id: "goal", key: "story.03", short: "03" },
-	{ id: "research", key: "story.04", short: "04" },
-	{ id: "fit", key: "story.05", short: "05" },
-	{ id: "next", key: "story.06", short: "06" },
-	{ id: "target", key: "story.07", short: "07" },
+	{ id: "goal", key: "story.02", short: "02" },
+	{ id: "research", key: "story.03", short: "03" },
+	{ id: "next", key: "story.04", short: "04" },
 ] as const;
 
 type Props = {

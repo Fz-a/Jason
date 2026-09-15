@@ -2,100 +2,136 @@
 	"items": [
 		{
 			"id": "zongheng-robot",
-			"title": "Zongheng Robot",
-			"group": "项目",
+			"title": "zongheng-robot",
+			"group": "工作",
+			"source": "showcase"
+		},
+		{
+			"id": "shixun-car",
+			"title": "shixun-car",
+			"group": "工作",
+			"source": "showcase"
+		},
+		{
+			"id": "vxs-100",
+			"title": "vxs-100",
+			"group": "工作",
 			"source": "showcase"
 		},
 		{
 			"id": "rtk",
-			"title": "RTK Positioning",
-			"group": "项目",
+			"title": "rtk",
+			"group": "工作",
 			"source": "showcase"
 		},
 		{
 			"id": "agv",
-			"title": "AGV & Remote",
-			"group": "项目",
-			"source": "showcase"
-		},
-		{
-			"id": "smart-clothes",
-			"title": "Smart Clothes for Elderly",
-			"group": "项目",
-			"source": "showcase"
-		},
-		{
-			"id": "fire-warning",
-			"title": "Early Fire Warning System",
-			"group": "项目",
+			"title": "agv",
+			"group": "工作",
 			"source": "showcase"
 		},
 		{
 			"id": "zongheng",
-			"title": "Guangzhou Zongheng",
-			"group": "公司",
-			"source": "company"
-		},
-		{
-			"id": "moore",
-			"title": "Shenzhen Moore Creative",
-			"group": "公司",
+			"title": "zongheng",
+			"group": "工作",
 			"source": "company"
 		},
 		{
 			"id": "cvte",
-			"title": "Guangzhou CVTE",
-			"group": "公司",
+			"title": "cvte",
+			"group": "工作",
 			"source": "company"
 		},
 		{
+			"id": "smart-clothes",
+			"title": "smart-clothes",
+			"group": "大学",
+			"source": "showcase"
+		},
+		{
+			"id": "fire-warning",
+			"title": "fire-warning",
+			"group": "大学",
+			"source": "showcase"
+		},
+		{
+			"id": "robotman",
+			"title": "robotman",
+			"group": "大学",
+			"source": "showcase"
+		},
+		{
+			"id": "safe-campus-service",
+			"title": "safe-campus-service",
+			"group": "大学",
+			"source": "showcase"
+		},
+		{
+			"id": "drone-workstation",
+			"title": "drone-workstation",
+			"group": "大学",
+			"source": "showcase"
+		},
+		{
 			"id": "smart-helmet",
-			"title": "Smart Helmet",
+			"title": "smart-helmet",
 			"group": "造物",
 			"source": "helmet"
 		},
 		{
-			"id": "make-diy",
-			"title": "DIY",
+			"id": "diy-wall",
+			"title": "diy-wall",
 			"group": "造物",
 			"source": "diy"
 		},
 		{
-			"id": "robotman",
-			"title": "Robotman Team",
+			"id": "volunteering",
+			"title": "volunteering",
 			"group": "社会",
 			"source": "showcase"
 		},
 		{
-			"id": "volunteering",
-			"title": "Volunteering",
+			"id": "xinghuo",
+			"title": "xinghuo",
+			"group": "社会",
+			"source": "showcase"
+		},
+		{
+			"id": "maker-meetings",
+			"title": "maker-meetings",
 			"group": "社会",
 			"source": "showcase"
 		},
 		{
 			"id": "exhibitions",
-			"title": "Exhibitions",
+			"title": "exhibitions",
 			"group": "社会",
-			"source": "showcase"
-		},
-		{
-			"id": "campus-depts",
-			"title": "Campus Departments",
-			"group": "社会",
-			"source": "showcase"
-		},
-		{
-			"id": "shixun-car",
-			"title": "实讯小车",
-			"group": "项目",
-			"source": "showcase"
-		},
-		{
-			"id": "vxs-100",
-			"title": "VXS-100",
-			"group": "项目",
 			"source": "showcase"
 		}
 	],
-	"hidden": []
+	"hidden": [],
+	"order": [
+		"zongheng-robot",
+		"shixun-car",
+		"vxs-100",
+		"rtk",
+		"agv",
+		"zongheng",
+		"cvte",
+		"smart-clothes",
+		"fire-warning",
+		"robotman",
+		"safe-campus-service",
+		"drone-workstation",
+		"smart-helmet",
+		"diy-wall",
+		"volunteering",
+		"xinghuo",
+		"maker-meetings",
+		"exhibitions"
+	],
+	"groups": {
+		"safe-campus-service": "university",
+		"drone-workstation": "university"
+	}
 }

@@ -1,0 +1,27 @@
+{
+	"order": [
+		"zongheng-robot",
+		"shixun-car",
+		"vxs-100",
+		"rtk",
+		"agv",
+		"zongheng",
+		"cvte",
+		"smart-clothes",
+		"fire-warning",
+		"robotman",
+		"safe-campus-service",
+		"drone-workstation",
+		"smart-helmet",
+		"diy-wall",
+		"volunteering",
+		"xinghuo",
+		"maker-meetings",
+		"exhibitions"
+	],
+	"hidden": [],
+	"groups": {
+		"safe-campus-service": "university",
+		"drone-workstation": "university"
+	}
+}

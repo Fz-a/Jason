@@ -13,6 +13,7 @@ export type BriefLocaleSlice = {
 	title: string;
 	subtitle?: string;
 	section?: string;
+	cardImage?: BriefImage;
 	blocks: BriefBlock[];
 };
 
@@ -33,24 +34,51 @@ function escAttr(s: string) {
 function imageLine(img: BriefImage): string {
 	const alt = escAttr(img.alt || "");
 	const cap = img.caption ? `|${escAttr(img.caption)}` : "";
-	return `![${alt}${cap}](${img.src})`;
+	const base = `![${alt}${cap}](${img.src})`;
+	const scale = img.scale ?? 1;
+	const tx = img.tx ?? 0;
+	const ty = img.ty ?? 0;
+	if (scale === 1 && tx === 0 && ty === 0) return base;
+	return `${base}{${Number(scale).toFixed(2)},${Number(tx).toFixed(1)},${Number(ty).toFixed(1)}}`;
 }
 
 function parseImageLine(line: string): BriefImage | null {
-	const m = line.match(/^!\[(.*?)\]\((.*?)\)$/);
+	const m = line.match(/^!\[(.*?)\]\((.*?)\)(?:\{([^}]*)\})?\s*$/);
 	if (!m) return null;
 	const rawAlt = m[1] ?? "";
 	const src = (m[2] ?? "").trim();
 	if (!src) return null;
-	const pipe = rawAlt.indexOf("|");
-	if (pipe >= 0) {
-		return {
-			src,
-			alt: rawAlt.slice(0, pipe).trim(),
-			caption: rawAlt.slice(pipe + 1).trim() || undefined,
-		};
+	const focusRaw = (m[3] ?? "").trim();
+	let scale: number | undefined;
+	let tx: number | undefined;
+	let ty: number | undefined;
+	if (focusRaw) {
+		const parts = focusRaw.split(/[,;]/).map((p) => p.trim());
+		const nums = parts
+			.map((p) => {
+				const kv = p.match(/^[sxy]=(.+)$/i);
+				return Number(kv ? kv[1] : p);
+			})
+			.filter((n) => Number.isFinite(n));
+		if (nums[0] != null) scale = nums[0];
+		if (nums[1] != null) tx = nums[1];
+		if (nums[2] != null) ty = nums[2];
 	}
-	return { src, alt: rawAlt.trim() };
+	const pipe = rawAlt.indexOf("|");
+	const base =
+		pipe >= 0
+			? {
+					src,
+					alt: rawAlt.slice(0, pipe).trim(),
+					caption: rawAlt.slice(pipe + 1).trim() || undefined,
+				}
+			: { src, alt: rawAlt.trim() };
+	return {
+		...base,
+		...(scale != null && scale !== 1 ? { scale } : {}),
+		...(tx != null && tx !== 0 ? { tx } : {}),
+		...(ty != null && ty !== 0 ? { ty } : {}),
+	};
 }
 
 function serializeBlocks(blocks: BriefBlock[], indent = ""): string {
@@ -101,6 +129,9 @@ function serializeBlocks(blocks: BriefBlock[], indent = ""): string {
 function serializeSlice(slice: BriefLocaleSlice): string {
 	const sub = slice.subtitle?.trim() ? slice.subtitle.trim() : "";
 	const section = slice.section?.trim() ? slice.section.trim() : "";
+	const cover = slice.cardImage?.src
+		? imageLine(slice.cardImage)
+		: "";
 	return [
 		`## Title`,
 		slice.title.trim() || "",
@@ -110,6 +141,9 @@ function serializeSlice(slice: BriefLocaleSlice): string {
 		``,
 		`## Section`,
 		section,
+		``,
+		`## Cover`,
+		cover,
 		``,
 		`## Blocks`,
 		``,
@@ -123,6 +157,9 @@ export function briefDocToSlice(doc: BriefDoc): BriefLocaleSlice {
 		title: doc.title,
 		subtitle: doc.subtitle,
 		section: doc.section,
+		cardImage: doc.cardImage
+			? structuredClone(doc.cardImage)
+			: undefined,
 		blocks: structuredClone(doc.blocks),
 	};
 }
@@ -133,6 +170,9 @@ export function sliceToBriefDoc(id: string, slice: BriefLocaleSlice): BriefDoc {
 		title: slice.title,
 		subtitle: slice.subtitle,
 		section: slice.section,
+		cardImage: slice.cardImage
+			? structuredClone(slice.cardImage)
+			: undefined,
 		blocks: structuredClone(slice.blocks),
 	};
 }
@@ -163,6 +203,10 @@ function stubSliceFrom(source: BriefLocaleSlice): BriefLocaleSlice {
 							caption: b.image.caption
 								? mapText(b.image.caption)
 								: undefined,
+							// keep focus geometry shared across locales
+							scale: b.image.scale,
+							tx: b.image.tx,
+							ty: b.image.ty,
 						},
 					};
 				case "duo":
@@ -177,6 +221,9 @@ function stubSliceFrom(source: BriefLocaleSlice): BriefLocaleSlice {
 								caption: b.images[0].caption
 									? mapText(b.images[0].caption)
 									: undefined,
+								scale: b.images[0].scale,
+								tx: b.images[0].tx,
+								ty: b.images[0].ty,
 							},
 							{
 								...b.images[1],
@@ -186,6 +233,9 @@ function stubSliceFrom(source: BriefLocaleSlice): BriefLocaleSlice {
 								caption: b.images[1].caption
 									? mapText(b.images[1].caption)
 									: undefined,
+								scale: b.images[1].scale,
+								tx: b.images[1].tx,
+								ty: b.images[1].ty,
 							},
 						],
 					};
@@ -207,6 +257,21 @@ function stubSliceFrom(source: BriefLocaleSlice): BriefLocaleSlice {
 		title: mapText(source.title) || "TODO",
 		subtitle: source.subtitle ? mapText(source.subtitle) : undefined,
 		section: source.section ? mapText(source.section) : undefined,
+		// Keep cover path shared across locales; only stub alt/caption text.
+		cardImage: source.cardImage
+			? {
+					src: source.cardImage.src,
+					alt: source.cardImage.alt
+						? mapText(source.cardImage.alt)
+						: "",
+					caption: source.cardImage.caption
+						? mapText(source.cardImage.caption)
+						: undefined,
+					scale: source.cardImage.scale,
+					tx: source.cardImage.tx,
+					ty: source.cardImage.ty,
+				}
+			: undefined,
 		blocks: mapBlocks(source.blocks),
 	};
 }
@@ -492,19 +557,28 @@ function parseLocaleSlice(sectionBody: string): BriefLocaleSlice {
 		/## Subtitle\s*\n([\s\S]*?)(?=\n## Section\b|$)/,
 	);
 	const secM = sectionBody.match(
-		/## Section\s*\n([\s\S]*?)(?=\n## Blocks\b|$)/,
+		/## Section\s*\n([\s\S]*?)(?=\n## (?:Cover|Blocks)\b|$)/,
+	);
+	const coverM = sectionBody.match(
+		/## Cover\s*\n([\s\S]*?)(?=\n## Blocks\b|$)/,
 	);
 	const blocksM = sectionBody.match(/## Blocks\s*\n([\s\S]*)$/);
 
 	const title = (titleM?.[1] ?? "").trim();
 	const subtitle = (subM?.[1] ?? "").trim();
 	const section = (secM?.[1] ?? "").trim();
+	const coverLine = (coverM?.[1] ?? "")
+		.split("\n")
+		.map((l) => l.trim())
+		.find((l) => l.startsWith("!["));
+	const cardImage = coverLine ? parseImageLine(coverLine) : null;
 	const blocks = parseBlocksSection(blocksM?.[1] ?? "");
 
 	return {
 		title: title || "Untitled",
 		subtitle: subtitle || undefined,
 		section: section || undefined,
+		cardImage: cardImage ?? undefined,
 		blocks:
 			blocks.length > 0
 				? blocks
@@ -588,6 +662,9 @@ source_locale: zh-Hans | en | zh-Hant
 ...
 ## Section
 ...
+## Cover
+![首页卡片图 alt](/path/to/card.webp)
+
 ## Blocks
 
 <!-- block:ID type:kicker|heading|subheading|pull|text -->
@@ -598,6 +675,8 @@ source_locale: zh-Hans | en | zh-Hant
 
 <!-- block:ID type:image -->
 ![alt|caption](/path.webp)
+![alt|caption](/path.webp){1.25,8.0,-4.0}
+（花括号可选：缩放,横向平移%,纵向平移%）
 
 <!-- block:ID type:duo -->
 ![左alt|左caption](/a.webp)

@@ -206,6 +206,9 @@ export function briefFromShowcase(
 		title: item.title,
 		subtitle: item.subtitle,
 		section,
+		cardImage: item.cardImage
+			? { src: item.cardImage.src, alt: item.cardImage.alt }
+			: undefined,
 		blocks,
 	};
 }

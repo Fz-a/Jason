@@ -17,8 +17,14 @@ import {
 	type MakeDiyItem,
 	type MakeImage,
 } from "../projects/make-essay";
+import { overrideCardImage } from "../lib/brief-card";
+import { imageFocusStyle } from "../lib/image-focus";
+import {
+	listProjectCatalog,
+	type ProjectCatalogGroup,
+} from "../projects/project-catalog";
 
-type GroupId = "work" | "university" | "diy" | "society";
+type GroupId = ProjectCatalogGroup;
 
 const GROUP_META: { id: GroupId; labelKey: string }[] = [
 	{ id: "work", labelKey: "core.group.work" },
@@ -34,6 +40,9 @@ type NavItem = {
 	section: string;
 	imageSrc: string;
 	imageAlt: string;
+	imageScale?: number;
+	imageTx?: number;
+	imageTy?: number;
 	subtitle?: string;
 	summary?: string;
 	showcase?: UniversityShowcase;
@@ -80,105 +89,130 @@ function firstSpreadBlurb(
 }
 
 function buildCatalog(isZh: boolean, t: (k: string) => string): NavItem[] {
-	const work: NavItem[] = [];
-	for (const s of workShowcases) {
-		work.push({
-			key: s.id,
-			id: s.id,
-			label: s.title,
-			section: "Work",
-			imageSrc: s.cardImage.src,
-			imageAlt: s.cardImage.alt,
-			subtitle: s.subtitle,
-			summary: firstSpreadBlurb(s),
-			showcase: s,
-			kind: "showcase",
-			group: "work",
-		});
-	}
-	for (const c of workCompanies) {
-		if (c.id === "moore") continue;
-		if (workShowcases.some((w) => w.id === c.id)) continue;
-		work.push({
-			key: c.id,
-			id: c.id,
-			label: isZh ? c.companyZh : c.company,
-			section: c.role,
-			imageSrc: c.image.src,
-			imageAlt: c.image.alt,
-			subtitle: isZh ? c.company : c.companyZh,
-			summary: c.brief?.[0] ? `${c.summary} ${c.brief[0]}` : c.summary,
-			body: [...c.brief],
-			kind: "company",
-			group: "work",
-		});
-	}
-
-	const university: NavItem[] = universityProjectShowcases.map((s) => ({
-		key: s.id,
-		id: s.id,
-		label: s.title,
-		section: "University",
-		imageSrc: s.cardImage.src,
-		imageAlt: s.cardImage.alt,
-		subtitle: s.subtitle,
-		summary: firstSpreadBlurb(s),
-		showcase: s,
-		kind: "showcase" as const,
-		group: "university" as const,
-	}));
-
-	const diy: NavItem[] = [];
+	const workById = new Map(workShowcases.map((s) => [s.id, s]));
+	const uniById = new Map(universityProjectShowcases.map((s) => [s.id, s]));
+	const societyById = new Map(societyShowcases.map((s) => [s.id, s]));
+	const companyById = new Map<string, (typeof workCompanies)[number]>(
+		workCompanies.map((c) => [c.id, c]),
+	);
 	const helmet = makeEssay.find((b) => b.type === "helmet");
-	if (helmet && helmet.type === "helmet") {
-		diy.push({
-			key: "smart-helmet",
-			id: "smart-helmet",
-			label: isZh ? helmet.titleZh : helmet.title,
-			section: "MAKE",
-			imageSrc: helmet.images[0]?.src ?? "/experience/make/helmet-product.webp",
-			imageAlt: helmet.images[0]?.alt ?? helmet.title,
-			subtitle: isZh ? helmet.title : helmet.titleZh,
-			summary: helmet.pull,
-			pull: helmet.pull,
-			body: helmet.body,
-			helmetImages: [...helmet.images],
-			kind: "helmet",
-			group: "diy",
-		});
-	}
 	const diyWall = makeEssay.find((b) => b.type === "diy-wall");
-	if (diyWall && diyWall.type === "diy-wall") {
-		diy.push({
-			key: "diy-wall",
-			id: "diy-wall",
-			label: isZh ? diyWall.titleZh : diyWall.title,
-			section: "MAKE · DIY",
-			imageSrc: diyWall.items[4]?.image.src ?? diyWall.items[0]?.image.src ?? "",
-			imageAlt: diyWall.items[0]?.image.alt ?? diyWall.title,
-			subtitle: isZh ? diyWall.title : diyWall.titleZh,
-			summary: t("core.diy.lede"),
-			diyItems: [...diyWall.items],
-			kind: "diy",
-			group: "diy",
-		});
+
+	const items: NavItem[] = [];
+
+	for (const entry of listProjectCatalog()) {
+		const cover = overrideCardImage(entry.id);
+
+		if (entry.kind === "showcase") {
+			const s =
+				workById.get(entry.id) ??
+				uniById.get(entry.id) ??
+				societyById.get(entry.id);
+			if (!s) continue;
+			items.push({
+				key: s.id,
+				id: s.id,
+				label: s.title,
+				section:
+					entry.group === "work"
+						? "Work"
+						: entry.group === "university"
+							? "University"
+							: entry.group === "diy"
+								? "MAKE"
+								: "Society",
+				imageSrc: cover?.src ?? s.cardImage.src,
+				imageAlt: cover?.alt || s.cardImage.alt,
+				imageScale: cover?.scale,
+				imageTx: cover?.tx,
+				imageTy: cover?.ty,
+				subtitle: s.subtitle,
+				summary: firstSpreadBlurb(s),
+				showcase: s,
+				kind: "showcase",
+				group: entry.group,
+			});
+			continue;
+		}
+
+		if (entry.kind === "company") {
+			const c = companyById.get(entry.id);
+			if (!c) continue;
+			items.push({
+				key: c.id,
+				id: c.id,
+				label: isZh ? c.companyZh : c.company,
+				section: c.role,
+				imageSrc: cover?.src ?? c.image.src,
+				imageAlt: cover?.alt || c.image.alt,
+				imageScale: cover?.scale,
+				imageTx: cover?.tx,
+				imageTy: cover?.ty,
+				subtitle: isZh ? c.company : c.companyZh,
+				summary: c.brief?.[0] ? `${c.summary} ${c.brief[0]}` : c.summary,
+				body: [...c.brief],
+				kind: "company",
+				group: entry.group,
+			});
+			continue;
+		}
+
+		if (entry.kind === "helmet" && helmet && helmet.type === "helmet") {
+			const hCover = cover ?? overrideCardImage("smart-helmet");
+			items.push({
+				key: "smart-helmet",
+				id: "smart-helmet",
+				label: isZh ? helmet.titleZh : helmet.title,
+				section: "MAKE",
+				imageSrc:
+					hCover?.src ??
+					helmet.images[0]?.src ??
+					"/experience/make/helmet-product.webp",
+				imageAlt: hCover?.alt || helmet.images[0]?.alt || helmet.title,
+				imageScale: hCover?.scale,
+				imageTx: hCover?.tx,
+				imageTy: hCover?.ty,
+				subtitle: isZh ? helmet.title : helmet.titleZh,
+				summary: helmet.pull,
+				pull: helmet.pull,
+				body: helmet.body,
+				helmetImages: [...helmet.images],
+				kind: "helmet",
+				group: entry.group,
+			});
+			continue;
+		}
+
+		if (entry.kind === "diy" && diyWall && diyWall.type === "diy-wall") {
+			const dCover =
+				cover ??
+				overrideCardImage("make-diy") ??
+				overrideCardImage("diy-wall");
+			items.push({
+				key: "diy-wall",
+				id: "diy-wall",
+				label: isZh ? diyWall.titleZh : diyWall.title,
+				section: "MAKE · DIY",
+				imageSrc:
+					dCover?.src ??
+					diyWall.items[4]?.image.src ??
+					diyWall.items[0]?.image.src ??
+					"",
+				imageAlt:
+					dCover?.alt || diyWall.items[0]?.image.alt || diyWall.title,
+				imageScale: dCover?.scale,
+				imageTx: dCover?.tx,
+				imageTy: dCover?.ty,
+				subtitle: isZh ? diyWall.title : diyWall.titleZh,
+				summary: t("core.diy.lede"),
+				diyItems: [...diyWall.items],
+				kind: "diy",
+				group: entry.group,
+			});
+		}
 	}
 
-	const society: NavItem[] = societyShowcases.map((s) => ({
-		key: s.id,
-		id: s.id,
-		label: s.title,
-		section: "Society",
-		imageSrc: s.cardImage.src,
-		imageAlt: s.cardImage.alt,
-		subtitle: s.subtitle,
-		summary: firstSpreadBlurb(s),
-		showcase: s,
-		kind: "showcase" as const,
-		group: "society" as const,
-	}));
-
-	return [...work, ...university, ...diy, ...society];
+	return items;
 }
 
 function NavButton({
@@ -500,15 +534,24 @@ export function FeaturedProjects() {
 										<DiyCollagePreview items={selected.diyItems} />
 									</div>
 								) : (
-									<Image
+									<div
 										key={selected.id}
-										src={selected.imageSrc}
-										alt={selected.imageAlt}
-										fill
-										sizes="(max-width: 900px) 100vw, 544px"
-										priority
-										className="object-cover object-center transition duration-700 group-hover:scale-[1.02]"
-									/>
+										className="absolute inset-0 transition duration-700 group-hover:scale-[1.02]"
+									>
+										<Image
+											src={selected.imageSrc}
+											alt={selected.imageAlt}
+											fill
+											sizes="(max-width: 900px) 100vw, 544px"
+											priority
+											className="object-cover object-center"
+											style={imageFocusStyle({
+												scale: selected.imageScale,
+												tx: selected.imageTx,
+												ty: selected.imageTy,
+											})}
+										/>
+									</div>
 								)}
 							</button>
 
@@ -609,54 +652,129 @@ export function FeaturedProjects() {
 										{selected.label}
 									</h3>
 									{selected.pull ? (
-										<p className="mt-5 text-[1rem] font-medium leading-8 text-[#0F4C45]">
+										<p className="mt-5 max-w-[36rem] text-[1rem] font-medium leading-8 text-[#0F4C45]">
 											{selected.pull}
 										</p>
 									) : null}
 									{selected.body?.map((line) => (
 										<p
 											key={line.slice(0, 24)}
-											className="mt-3.5 text-[0.95rem] leading-7 text-[#3E514D]"
+											className="mt-3.5 max-w-[40rem] text-[0.95rem] leading-7 text-[#3E514D]"
 										>
 											{line}
 										</p>
 									))}
-									{selected.helmetImages?.length ? (
-										<div className="mt-7 grid gap-3 sm:grid-cols-2">
-											{selected.helmetImages.map((image) => (
-												<figure
-													key={image.src}
-													className="overflow-hidden bg-[#E8E2D8]"
-												>
-													<ZoomableFrame
-														image={{
-															src: image.src,
-															alt: image.alt,
-															width: 960,
-															height: 720,
-															caption: image.caption,
-														}}
-														className="block w-full"
-													>
-														<div className="relative aspect-[4/3]">
-															<Image
-																src={image.src}
-																alt={image.alt}
-																fill
-																sizes="320px"
-																className="object-cover transition group-hover/zoom:opacity-95"
-															/>
+
+									{(() => {
+										const [product, camp, crew] =
+											selected.helmetImages ?? [];
+										return (
+											<div className="mt-9 space-y-10">
+												{product ? (
+													<figure className="overflow-hidden bg-[#E8E2D8]">
+														<ZoomableFrame
+															image={{
+																src: product.src,
+																alt: product.alt,
+																width: product.width,
+																height: product.height,
+																caption: product.caption,
+															}}
+															className="block w-full"
+														>
+															<div className="relative aspect-[16/10] sm:aspect-[2/1]">
+																<Image
+																	src={product.src}
+																	alt={product.alt}
+																	fill
+																	sizes="(max-width: 720px) 100vw, 640px"
+																	className="object-cover transition group-hover/zoom:opacity-95"
+																	priority
+																/>
+															</div>
+														</ZoomableFrame>
+														{product.caption ? (
+															<figcaption className="px-3 py-2.5 text-[0.74rem] text-[#6A7A76]">
+																{product.caption}
+															</figcaption>
+														) : null}
+													</figure>
+												) : null}
+
+												{(camp || crew) ? (
+													<section>
+														<p className="font-mono text-[0.62rem] font-semibold tracking-[0.22em] text-[#8A9692]">
+															Booth
+														</p>
+														<p className="mt-2 max-w-[32rem] text-[0.88rem] leading-6 text-[#5A6561]">
+															Exhibition floor and roadside stall — the
+															same helmet, two public tests.
+														</p>
+														<div className="mt-5 grid grid-cols-1 items-start gap-5 sm:grid-cols-12 sm:gap-6">
+															{camp ? (
+																<figure className="overflow-hidden bg-[#E8E2D8] sm:col-span-5 sm:mt-0">
+																	<ZoomableFrame
+																		image={{
+																			src: camp.src,
+																			alt: camp.alt,
+																			width: camp.width,
+																			height: camp.height,
+																			caption: camp.caption,
+																		}}
+																		className="block w-full"
+																	>
+																		<div className="relative aspect-[3/4]">
+																			<Image
+																				src={camp.src}
+																				alt={camp.alt}
+																				fill
+																				sizes="280px"
+																				className="object-cover transition group-hover/zoom:opacity-95"
+																			/>
+																		</div>
+																	</ZoomableFrame>
+																	{camp.caption ? (
+																		<figcaption className="px-3 py-2.5 text-[0.74rem] text-[#6A7A76]">
+																			{camp.caption}
+																		</figcaption>
+																	) : null}
+																</figure>
+															) : null}
+															{crew ? (
+																<figure className="overflow-hidden bg-[#E8E2D8] sm:col-span-7 sm:mt-10">
+																	<ZoomableFrame
+																		image={{
+																			src: crew.src,
+																			alt: crew.alt,
+																			width: crew.width,
+																			height: crew.height,
+																			caption: crew.caption,
+																		}}
+																		className="block w-full"
+																	>
+																		<div className="relative aspect-[4/3]">
+																			<Image
+																				src={crew.src}
+																				alt={crew.alt}
+																				fill
+																				sizes="360px"
+																				className="object-cover transition group-hover/zoom:opacity-95"
+																			/>
+																		</div>
+																	</ZoomableFrame>
+																	{crew.caption ? (
+																		<figcaption className="px-3 py-2.5 text-[0.74rem] text-[#6A7A76]">
+																			{crew.caption}
+																		</figcaption>
+																	) : null}
+																</figure>
+															) : null}
 														</div>
-													</ZoomableFrame>
-													{image.caption ? (
-														<figcaption className="px-3 py-2.5 text-[0.74rem] text-[#6A7A76]">
-															{image.caption}
-														</figcaption>
-													) : null}
-												</figure>
-											))}
-										</div>
-									) : null}
+													</section>
+												) : null}
+											</div>
+										);
+									})()}
 								</article>
 							) : null}
 

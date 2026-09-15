@@ -2,6 +2,11 @@ export type BriefImage = {
 	src: string;
 	alt: string;
 	caption?: string;
+	/** Cover-frame zoom (1 = default). */
+	scale?: number;
+	/** Pan as % of frame (positive = right / down). */
+	tx?: number;
+	ty?: number;
 };
 
 export type BriefBlock =
@@ -24,6 +29,8 @@ export type BriefDoc = {
 	title: string;
 	subtitle?: string;
 	section?: string;
+	/** Homepage / Projects stage card image (not a body block). */
+	cardImage?: BriefImage;
 	blocks: BriefBlock[];
 };
 

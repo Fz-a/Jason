@@ -26,6 +26,8 @@ import { workCompanies, workShowcases } from "../projects/work-showcases";
 import briefsStore from "../../content/briefs.json";
 import { BriefDocument } from "./BriefDocument";
 import type { BriefStore } from "../lib/brief-types";
+import { overrideCardImage } from "../lib/brief-card";
+import { imageFocusStyle } from "../lib/image-focus";
 import { useLocale } from "../lib/i18n";
 
 
@@ -63,14 +65,25 @@ type CardMeta = {
 	title: string;
 	subtitle: string;
 	kindLabel: string;
-	image?: { src: string; alt: string; width: number; height: number };
+	image?: {
+		src: string;
+		alt: string;
+		width: number;
+		height: number;
+		scale?: number;
+		tx?: number;
+		ty?: number;
+	};
 };
 
 const SOCIETY_SECTION: Record<string, string> = {
 	robotman: "Society · Team",
 	"defense-education": "Society · Dept",
 	"drone-workstation": "Society · Dept",
+	"safe-campus-service": "Society · Service",
 	volunteering: "Society · Volunteer",
+	xinghuo: "Society · Maker",
+	"maker-meetings": "Society · Maker",
 	exhibitions: "Society · Exhibit",
 };
 
@@ -78,7 +91,10 @@ const SOCIETY_SECTION_ZH: Record<string, string> = {
 	robotman: "社会 · 团队",
 	"defense-education": "社会 · 部门",
 	"drone-workstation": "社会 · 部门",
+	"safe-campus-service": "社会 · 服务",
 	volunteering: "社会 · 志愿",
+	xinghuo: "社会 · 创客",
+	"maker-meetings": "社会 · 创客",
 	exhibitions: "社会 · 展览",
 };
 
@@ -86,7 +102,10 @@ const SOCIETY_SECTION_ZH_HANT: Record<string, string> = {
 	robotman: "社會 · 團隊",
 	"defense-education": "社會 · 部門",
 	"drone-workstation": "社會 · 部門",
+	"safe-campus-service": "社會 · 服務",
 	volunteering: "社會 · 志願",
+	xinghuo: "社會 · 創客",
+	"maker-meetings": "社會 · 創客",
 	exhibitions: "社會 · 展覽",
 };
 
@@ -133,19 +152,42 @@ function cardMeta(
 					: (sectionZh[card.item.id] ??
 						(locale === "zh-Hant" ? "社會" : "社会"))
 				: card.section;
+			const cover = overrideCardImage(card.item.id);
 			return {
 				title: card.item.title,
 				subtitle: card.item.subtitle,
-				image: card.item.cardImage,
+				image: cover
+					? {
+							src: cover.src,
+							alt: cover.alt || card.item.cardImage.alt,
+							width: card.item.cardImage.width,
+							height: card.item.cardImage.height,
+							scale: cover.scale,
+							tx: cover.tx,
+							ty: cover.ty,
+						}
+					: card.item.cardImage,
 				kindLabel: section,
 			};
 		}
-		case "company":
+		case "company": {
+			const cover = overrideCardImage(card.item.id);
+			const image = cover
+				? {
+						src: cover.src,
+						alt: cover.alt || card.item.image.alt,
+						width: card.item.image.width,
+						height: card.item.image.height,
+						scale: cover.scale,
+						tx: cover.tx,
+						ty: cover.ty,
+					}
+				: card.item.image;
 			return isZh
 				? {
 						title: card.item.companyZh,
 						subtitle: card.item.company,
-						image: card.item.image,
+						image,
 						kindLabel:
 							card.item.role === "Full-time"
 								? locale === "zh-Hant"
@@ -158,14 +200,27 @@ function cardMeta(
 				: {
 						title: card.item.company,
 						subtitle: card.item.companyZh,
-						image: card.item.image,
+						image,
 						kindLabel: card.item.role,
 					};
-		case "helmet":
+		}
+		case "helmet": {
+			const cover = overrideCardImage("smart-helmet");
+			const fallback = card.item.images[0];
 			return {
 				title: isZh ? card.item.titleZh : card.item.title,
 				subtitle: isZh ? card.item.title : card.item.titleZh,
-				image: card.item.images[0],
+				image: cover
+					? {
+							src: cover.src,
+							alt: cover.alt || fallback?.alt || card.item.title,
+							width: fallback?.width ?? 1024,
+							height: fallback?.height ?? 768,
+							scale: cover.scale,
+							tx: cover.tx,
+							ty: cover.ty,
+						}
+					: fallback,
 				kindLabel:
 					locale === "zh-Hant"
 						? "造物 · 創業"
@@ -173,6 +228,7 @@ function cardMeta(
 							? "造物 · 创业"
 							: "MAKE · Venture",
 			};
+		}
 		case "diy":
 			return {
 				title: "DIY",
@@ -456,6 +512,7 @@ function MomentCard({
 						fill
 						sizes="340px"
 						className="journey-moment__image object-cover"
+						style={imageFocusStyle(meta.image)}
 					/>
 				) : null}
 				<span aria-hidden className="journey-moment__veil" />
@@ -774,6 +831,8 @@ function StageRail({
 }
 
 function HelmetBrief({ item }: { item: HelmetBlock }) {
+	const [product, camp, crew] = item.images;
+
 	return (
 		<article className="bg-white/90 px-7 py-9 text-[#111] sm:px-11 sm:py-11">
 			<p className="text-[0.68rem] font-semibold uppercase tracking-[0.24em] text-[#8A9692]">
@@ -786,36 +845,88 @@ function HelmetBrief({ item }: { item: HelmetBlock }) {
 				{item.title}
 			</h3>
 			<p className="mt-1.5 text-[0.95rem] text-[#6A7A76]">{item.titleZh}</p>
-			<p className="mt-5 text-[1.02rem] font-medium leading-8 text-[#0F4C45]">
+			<p className="mt-5 max-w-[36rem] text-[1.02rem] font-medium leading-8 text-[#0F4C45]">
 				{item.pull}
 			</p>
 			{item.body.map((paragraph) => (
 				<p
 					key={paragraph.slice(0, 28)}
-					className="mt-3.5 text-[1rem] leading-8 text-[#333]"
+					className="mt-3.5 max-w-[40rem] text-[1rem] leading-8 text-[#333]"
 				>
 					{paragraph}
 				</p>
 			))}
-			<div className="mt-7 grid gap-3.5 sm:grid-cols-2">
-				{item.images.map((image) => (
-					<figure key={image.src} className="overflow-hidden bg-[#F5F5F3]">
-						<div className="relative aspect-[4/3]">
+
+			<div className="mt-9 space-y-10">
+				{product ? (
+					<figure className="overflow-hidden bg-[#F5F5F3]">
+						<div className="relative aspect-[16/10] sm:aspect-[2/1]">
 							<Image
-								src={image.src}
-								alt={image.alt}
+								src={product.src}
+								alt={product.alt}
 								fill
-								sizes="320px"
+								sizes="(max-width: 720px) 100vw, 640px"
 								className="object-cover"
+								priority
 							/>
 						</div>
-						{image.caption ? (
+						{product.caption ? (
 							<figcaption className="px-3 py-2.5 text-[0.74rem] text-[#8A9692]">
-								{image.caption}
+								{product.caption}
 							</figcaption>
 						) : null}
 					</figure>
-				))}
+				) : null}
+
+				{(camp || crew) ? (
+					<section>
+						<p className="font-mono text-[0.62rem] font-semibold tracking-[0.22em] text-[#8A9692]">
+							Booth
+						</p>
+						<p className="mt-2 max-w-[32rem] text-[0.88rem] leading-6 text-[#5A6561]">
+							Exhibition floor and roadside stall — the same helmet, two
+							public tests.
+						</p>
+						<div className="mt-5 grid grid-cols-1 items-start gap-5 sm:grid-cols-12 sm:gap-6">
+							{camp ? (
+								<figure className="overflow-hidden bg-[#F5F5F3] sm:col-span-5">
+									<div className="relative aspect-[3/4]">
+										<Image
+											src={camp.src}
+											alt={camp.alt}
+											fill
+											sizes="280px"
+											className="object-cover"
+										/>
+									</div>
+									{camp.caption ? (
+										<figcaption className="px-3 py-2.5 text-[0.74rem] text-[#8A9692]">
+											{camp.caption}
+										</figcaption>
+									) : null}
+								</figure>
+							) : null}
+							{crew ? (
+								<figure className="overflow-hidden bg-[#F5F5F3] sm:col-span-7 sm:mt-10">
+									<div className="relative aspect-[4/3]">
+										<Image
+											src={crew.src}
+											alt={crew.alt}
+											fill
+											sizes="360px"
+											className="object-cover"
+										/>
+									</div>
+									{crew.caption ? (
+										<figcaption className="px-3 py-2.5 text-[0.74rem] text-[#8A9692]">
+											{crew.caption}
+										</figcaption>
+									) : null}
+								</figure>
+							) : null}
+						</div>
+					</section>
+				) : null}
 			</div>
 		</article>
 	);

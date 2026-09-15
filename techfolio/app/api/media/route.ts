@@ -24,6 +24,19 @@ function safeStem(name: string) {
 	return cleaned || "image";
 }
 
+export async function GET() {
+	try {
+		const mediaPath = path.join(process.cwd(), "content", "media.json");
+		const raw = await readFile(mediaPath, "utf8");
+		const list = JSON.parse(raw) as string[];
+		return NextResponse.json({
+			paths: Array.isArray(list) ? list : [],
+		});
+	} catch {
+		return NextResponse.json({ paths: [] });
+	}
+}
+
 export async function POST(req: Request) {
 	try {
 		const form = await req.formData();

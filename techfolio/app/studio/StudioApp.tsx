@@ -2,8 +2,9 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type PointerEvent as ReactPointerEvent } from "react";
 import { BriefDocument } from "../components/BriefDocument";
+import { ShowcaseDocument } from "../projects/UniversityShowcase";
 import { briefFromShowcase } from "../lib/brief-from-legacy";
 import {
 	createEmptyBlock,
@@ -24,11 +25,26 @@ import {
 	type BriefLocale,
 	type BriefMdBundle,
 } from "../lib/brief-md";
+import {
+	IMAGE_FOCUS_MAX,
+	IMAGE_FOCUS_MIN,
+	clampFocus,
+	imageFocusStyle,
+	normalizeImageFocus,
+	panLimit,
+	withFocus,
+} from "../lib/image-focus";
 import { makeEssay } from "../projects/make-essay";
 import {
-	universityDepartmentShowcases,
-	universityProjectShowcases,
-} from "../projects/university-showcases";
+	groupOverridesFromCatalog,
+	listProjectCatalog,
+	orderIdsFromCatalog,
+	PROJECT_GROUP_LABEL_ZH,
+	PROJECT_GROUP_ORDER,
+	PROJECT_GROUP_ZH_TO_ID,
+	type ProjectCatalogGroup,
+} from "../projects/project-catalog";
+import { universityProjectShowcases } from "../projects/university-showcases";
 import { societyShowcases } from "../projects/society-showcases";
 import { workCompanies, workShowcases } from "../projects/work-showcases";
 import seedBriefs from "../../content/briefs.json";
@@ -49,147 +65,116 @@ type CatalogEntry = {
 type CatalogPersist = {
 	items: CatalogEntry[];
 	hidden: string[];
-	/** @deprecated legacy */
+	/** Shared with site via content/project-order.json */
 	order?: string[];
+	/** id → en group id (work/university/diy/society) */
+	groups?: Record<string, ProjectCatalogGroup>;
 	customs?: CatalogEntry[];
 };
 
-const CATALOG_LS_KEY = "techfolio-studio-catalog-v1";
+const CATALOG_LS_KEY = "techfolio-studio-catalog-v4";
 const LONG_PRESS_MS = 360;
-const GROUPS = ["项目", "公司", "造物", "社会"] as const;
+/** Must match FeaturedProjects groups via project-catalog */
+const GROUPS = PROJECT_GROUP_ORDER.map((g) => PROJECT_GROUP_LABEL_ZH[g]);
 
-function buildCatalog(): CatalogEntry[] {
-	const entries: CatalogEntry[] = [];
-	for (const item of workShowcases) {
-		entries.push({
-			id: item.id,
-			title: item.title,
-			group: "项目",
-			source: "showcase",
-		});
+function catalogTitle(id: string, kind: CatalogEntry["source"]): string {
+	if (kind === "company") {
+		return workCompanies.find((c) => c.id === id)?.company ?? id;
 	}
-	for (const item of universityProjectShowcases.filter((p) =>
-		["smart-clothes", "fire-warning"].includes(p.id),
-	)) {
-		entries.push({
-			id: item.id,
-			title: item.title,
-			group: "项目",
-			source: "showcase",
-		});
+	if (kind === "helmet") {
+		return makeEssay.find((b) => b.type === "helmet")?.title ?? id;
 	}
-	for (const company of workCompanies) {
-		entries.push({
-			id: company.id,
-			title: company.company,
-			group: "公司",
-			source: "company",
-		});
+	if (kind === "diy") {
+		return makeEssay.find((b) => b.type === "diy-wall")?.title ?? id;
 	}
-	const helmet = makeEssay.find((b) => b.type === "helmet");
-	const diy = makeEssay.find((b) => b.type === "diy-wall");
-	if (helmet) {
-		entries.push({
-			id: "smart-helmet",
-			title: helmet.title,
-			group: "造物",
-			source: "helmet",
-		});
-	}
-	if (diy) {
-		entries.push({ id: "make-diy", title: "DIY", group: "造物", source: "diy" });
-	}
-	for (const item of [
-		...universityProjectShowcases.filter((p) => p.id === "robotman"),
-		...societyShowcases.filter((p) =>
-			["volunteering", "exhibitions"].includes(p.id),
-		),
-	]) {
-		entries.push({
-			id: item.id,
-			title: item.title,
-			group: "社会",
-			source: "showcase",
-		});
-	}
-	entries.push({
-		id: "campus-depts",
-		title: "校园部门",
-		group: "社会",
-		source: "showcase",
-	});
-	return entries;
+	const showcase = [
+		...workShowcases,
+		...universityProjectShowcases,
+		...societyShowcases,
+	].find((s) => s.id === id);
+	return showcase?.title ?? id;
 }
 
+function buildCatalog(
+	override?: {
+		order?: string[];
+		hidden?: string[];
+		groups?: Record<string, ProjectCatalogGroup>;
+	} | null,
+): CatalogEntry[] {
+	return listProjectCatalog(override).map((e) => ({
+		id: e.id,
+		title: catalogTitle(e.id, e.kind),
+		group: PROJECT_GROUP_LABEL_ZH[e.group],
+		source: e.kind,
+	}));
+}
+
+/**
+ * Built-in membership from site catalog; order/group/hidden from shared file.
+ * Customs stay Studio-only.
+ */
 function hydrateCatalog(persist: CatalogPersist | null): {
 	items: CatalogEntry[];
 	hidden: string[];
 } {
-	const base = buildCatalog();
-	const byId = new Map<string, CatalogEntry>(base.map((e) => [e.id, e]));
-	for (const c of persist?.customs ?? []) {
-		if (!c?.id) continue;
-		byId.set(c.id, {
-			id: c.id,
-			title: c.title || "未命名",
-			group: c.group || "项目",
-			source: "custom",
-		});
-	}
-
-	const hidden = new Set(persist?.hidden ?? []);
-
-	if (persist?.items?.length) {
-		const items: CatalogEntry[] = [];
-		const seen = new Set<string>();
-		for (const raw of persist.items) {
-			if (!raw?.id || hidden.has(raw.id) || seen.has(raw.id)) continue;
-			const baseE = byId.get(raw.id);
-			if (raw.source === "custom" || raw.id.startsWith("custom_")) {
-				items.push({
-					id: raw.id,
-					title: raw.title || "未命名",
-					group: raw.group || "项目",
-					source: "custom",
-				});
-				seen.add(raw.id);
-				continue;
-			}
-			if (baseE) {
-				items.push({
-					...baseE,
-					title: raw.title || baseE.title,
-					group: raw.group || baseE.group,
-				});
-				seen.add(raw.id);
-			}
-		}
-		for (const e of byId.values()) {
-			if (seen.has(e.id) || hidden.has(e.id)) continue;
-			items.push(e);
-		}
-		return { items, hidden: [...hidden] };
-	}
-
 	const order =
 		persist?.order?.length && persist.order.length > 0
 			? persist.order
-			: base.map((e) => e.id);
+			: undefined;
+	const hiddenList = persist?.hidden ?? [];
 
-	const items: CatalogEntry[] = [];
-	const seen = new Set<string>();
-	for (const id of order) {
-		if (hidden.has(id) || seen.has(id)) continue;
-		const e = byId.get(id);
-		if (!e) continue;
-		items.push(e);
-		seen.add(id);
+	// Prefer explicit groups map; else migrate zh groups from items
+	let groups = persist?.groups;
+	if (!groups || Object.keys(groups).length === 0) {
+		const migrated: Record<string, ProjectCatalogGroup> = {};
+		for (const raw of persist?.items ?? []) {
+			if (!raw?.id || raw.source === "custom") continue;
+			const gid = PROJECT_GROUP_ZH_TO_ID[raw.group];
+			if (gid) migrated[raw.id] = gid;
+		}
+		if (Object.keys(migrated).length > 0) groups = migrated;
 	}
-	for (const e of byId.values()) {
-		if (seen.has(e.id) || hidden.has(e.id)) continue;
-		items.push(e);
-		seen.add(e.id);
+
+	const base = buildCatalog({
+		order,
+		hidden: hiddenList,
+		groups,
+	});
+	const byId = new Map<string, CatalogEntry>(base.map((e) => [e.id, e]));
+
+	const customs: CatalogEntry[] = [];
+	for (const c of persist?.customs ?? []) {
+		if (!c?.id) continue;
+		customs.push({
+			id: c.id,
+			title: c.title || "未命名",
+			group: GROUPS.includes(c.group) ? c.group : "工作",
+			source: "custom",
+		});
 	}
+	for (const raw of persist?.items ?? []) {
+		if (!raw?.id) continue;
+		if (raw.source === "custom" || raw.id.startsWith("custom_")) {
+			if (customs.some((c) => c.id === raw.id)) continue;
+			customs.push({
+				id: raw.id,
+				title: raw.title || "未命名",
+				group: GROUPS.includes(raw.group) ? raw.group : "工作",
+				source: "custom",
+			});
+		}
+	}
+
+	const hidden = new Set(hiddenList);
+	for (const id of [...hidden]) {
+		if (!byId.has(id) && !id.startsWith("custom_")) hidden.delete(id);
+	}
+
+	const items = [
+		...base.filter((e) => !hidden.has(e.id)),
+		...customs.filter((e) => !hidden.has(e.id)),
+	];
 	return { items, hidden: [...hidden] };
 }
 
@@ -207,10 +192,71 @@ function blankDoc(id: string, title: string, group: string): BriefDoc {
 	};
 }
 
+function lookupDefaultCardImage(id: string): BriefImage | undefined {
+	const showcase = [
+		...workShowcases,
+		...universityProjectShowcases,
+		...societyShowcases,
+	].find((s) => s.id === id);
+	if (showcase?.cardImage) {
+		return { src: showcase.cardImage.src, alt: showcase.cardImage.alt };
+	}
+	const company = workCompanies.find((c) => c.id === id);
+	if (company) {
+		return { src: company.image.src, alt: company.image.alt };
+	}
+	if (id === "smart-helmet") {
+		const h = makeEssay.find((b) => b.type === "helmet");
+		if (h && h.type === "helmet" && h.images[0]) {
+			return { src: h.images[0].src, alt: h.images[0].alt };
+		}
+	}
+	if (id === "make-diy" || id === "diy-wall") {
+		const diy = makeEssay.find((b) => b.type === "diy-wall");
+		if (diy && diy.type === "diy-wall") {
+			const shot = diy.items[4]?.image ?? diy.items[0]?.image;
+			if (shot) return { src: shot.src, alt: shot.alt };
+		}
+	}
+	return undefined;
+}
+
+/** Ensure docs always carry a homepage cover when a showcase default exists. */
+function withCardImage(doc: BriefDoc): BriefDoc {
+	if (doc.cardImage?.src) return doc;
+	const fallback = lookupDefaultCardImage(doc.id);
+	return fallback ? { ...doc, cardImage: fallback } : doc;
+}
+
+function resolveLiveShowcase(
+	entry: CatalogEntry | undefined,
+): { item: (typeof workShowcases)[number]; section: string } | null {
+	if (!entry || entry.source !== "showcase") return null;
+	const section =
+		entry.group === "工作"
+			? "Work"
+			: entry.group === "大学"
+				? "University"
+				: entry.group === "造物"
+					? "MAKE"
+					: entry.group === "社会"
+						? "Society"
+						: entry.group;
+	const item = [
+		...workShowcases,
+		...universityProjectShowcases,
+		...societyShowcases,
+	].find((s) => s.id === entry.id);
+	return item ? { item, section } : null;
+}
+
 function toPersist(
 	items: CatalogEntry[],
 	hidden: string[],
 ): CatalogPersist {
+	const customs = items.filter(
+		(e) => e.source === "custom" || e.id.startsWith("custom_"),
+	);
 	return {
 		items: items.map((e) => ({
 			id: e.id,
@@ -219,6 +265,9 @@ function toPersist(
 			source: e.source,
 		})),
 		hidden,
+		order: orderIdsFromCatalog(items),
+		groups: groupOverridesFromCatalog(items),
+		customs,
 	};
 }
 
@@ -232,10 +281,10 @@ function moveCatalogItem(
 	const from = items.findIndex((e) => e.id === fromId);
 	const to = items.findIndex((e) => e.id === toId);
 	if (from < 0 || to < 0) return items;
-	const next = [...items];
-	const [moved] = next.splice(from, 1);
-	if (!moved) return items;
+	const moved = items[from]!;
 	const target = items[to]!;
+	const next = [...items];
+	next.splice(from, 1);
 	const updated = { ...moved, group: target.group };
 	let insertAt = next.findIndex((e) => e.id === toId);
 	if (insertAt < 0) return items;
@@ -244,11 +293,46 @@ function moveCatalogItem(
 	return next;
 }
 
+/** Move item into a group (append). Used for empty-group drops. */
+function moveCatalogItemToGroup(
+	items: CatalogEntry[],
+	fromId: string,
+	group: string,
+): CatalogEntry[] {
+	const from = items.findIndex((e) => e.id === fromId);
+	if (from < 0) return items;
+	const moved = items[from]!;
+	if (moved.group === group) return items;
+	const next = items.filter((e) => e.id !== fromId);
+	const lastInGroup = [...next].reverse().findIndex((e) => e.group === group);
+	const updated = { ...moved, group };
+	if (lastInGroup < 0) {
+		// Insert before first item of next group, or at end
+		const groupIdx = GROUPS.indexOf(group as (typeof GROUPS)[number]);
+		let insertAt = next.length;
+		for (let i = groupIdx + 1; i < GROUPS.length; i++) {
+			const g = GROUPS[i]!;
+			const idx = next.findIndex((e) => e.group === g);
+			if (idx >= 0) {
+				insertAt = idx;
+				break;
+			}
+		}
+		next.splice(insertAt, 0, updated);
+	} else {
+		const idxFromEnd = lastInGroup;
+		const insertAt = next.length - idxFromEnd;
+		next.splice(insertAt, 0, updated);
+	}
+	return next;
+}
+
 function CatalogNav({
 	items,
 	activeId,
 	onSelect,
 	onReorder,
+	onMoveToGroup,
 	onAdd,
 	onRemove,
 }: {
@@ -260,6 +344,7 @@ function CatalogNav({
 		toId: string,
 		place: "before" | "after",
 	) => void;
+	onMoveToGroup: (fromId: string, group: string) => void;
 	onAdd: (group: string) => void;
 	onRemove: (id: string) => void;
 }) {
@@ -268,11 +353,13 @@ function CatalogNav({
 		id: string;
 		place: "before" | "after";
 	} | null>(null);
+	const [overGroup, setOverGroup] = useState<string | null>(null);
 	const pressTimer = useRef<number | null>(null);
 	const dragIdRef = useRef<string | null>(null);
 	const overRef = useRef<{ id: string; place: "before" | "after" } | null>(
 		null,
 	);
+	const overGroupRef = useRef<string | null>(null);
 	const didDrag = useRef(false);
 	const suppressClick = useRef(false);
 
@@ -287,14 +374,29 @@ function CatalogNav({
 		clearPress();
 		dragIdRef.current = null;
 		overRef.current = null;
+		overGroupRef.current = null;
 		setDragId(null);
 		setOver(null);
+		setOverGroup(null);
 		didDrag.current = false;
 	};
 
 	const setOverState = (v: { id: string; place: "before" | "after" } | null) => {
 		overRef.current = v;
 		setOver(v);
+		if (v) {
+			overGroupRef.current = null;
+			setOverGroup(null);
+		}
+	};
+
+	const setOverGroupState = (g: string | null) => {
+		overGroupRef.current = g;
+		setOverGroup(g);
+		if (g) {
+			overRef.current = null;
+			setOver(null);
+		}
 	};
 
 	const groups = useMemo(() => {
@@ -305,7 +407,15 @@ function CatalogNav({
 		<div className="flex h-full flex-col">
 			<div className="min-h-0 flex-1 space-y-2.5 overflow-y-auto p-2">
 				{groups.map(([group, list]) => (
-					<div key={group}>
+					<div
+						key={group}
+						data-cat-group={group}
+						className={`rounded-md transition ${
+							overGroup === group
+								? "bg-[#0F4C45]/[0.07] ring-1 ring-[#0F4C45]/20"
+								: ""
+						}`}
+					>
 						<div className="mb-0.5 flex items-center gap-1 px-1.5">
 							<p className="min-w-0 flex-1 text-[0.56rem] font-semibold tracking-[0.14em] text-[#A0ADA9]">
 								{group}
@@ -384,24 +494,39 @@ function CatalogNav({
 													"[data-cat-id]",
 												) as HTMLElement | null;
 												const tid = row?.dataset.catId;
-												if (!tid || tid === dragIdRef.current) {
-													setOverState(null);
+												if (tid && tid !== dragIdRef.current) {
+													const rect = row.getBoundingClientRect();
+													const place =
+														e.clientY < rect.top + rect.height / 2
+															? "before"
+															: "after";
+													setOverState({ id: tid, place });
 													return;
 												}
-												const rect = row.getBoundingClientRect();
-												const place =
-													e.clientY < rect.top + rect.height / 2
-														? "before"
-														: "after";
-												setOverState({ id: tid, place });
+												const zone = el?.closest(
+													"[data-cat-group]",
+												) as HTMLElement | null;
+												const g = zone?.dataset.catGroup;
+												if (g) {
+													setOverGroupState(g);
+													return;
+												}
+												setOverState(null);
+												setOverGroupState(null);
 											}}
 											onPointerUp={() => {
 												clearPress();
 												const from = dragIdRef.current;
 												const drop = overRef.current;
-												if (from && drop && didDrag.current) {
-													onReorder(from, drop.id, drop.place);
-													suppressClick.current = true;
+												const dropGroup = overGroupRef.current;
+												if (from && didDrag.current) {
+													if (drop) {
+														onReorder(from, drop.id, drop.place);
+														suppressClick.current = true;
+													} else if (dropGroup) {
+														onMoveToGroup(from, dropGroup);
+														suppressClick.current = true;
+													}
 												}
 												endDrag();
 												window.setTimeout(() => {
@@ -447,56 +572,32 @@ function CatalogNav({
 								);
 							})}
 							{list.length === 0 ? (
-								<p className="px-2 py-1 text-[0.68rem] text-[#B0BBB7]">空</p>
+								<p
+									className={`px-2 py-2 text-[0.68rem] ${
+										overGroup === group
+											? "text-[#0F4C45]"
+											: "text-[#B0BBB7]"
+									}`}
+								>
+									空 · 拖到此处
+								</p>
 							) : null}
 						</ul>
 					</div>
 				))}
 			</div>
 			<p className="shrink-0 border-t border-[#0F4C45]/6 px-2.5 py-1.5 text-[0.6rem] leading-4 text-[#A0ADA9]">
-				长按拖动排序 · 悬停 × 移除
+				长按拖到其他组 · 与站点共用分组/顺序 · 悬停 × 移除
 			</p>
 		</div>
 	);
 }
 
-function loadDoc(entry: CatalogEntry, store: BriefStore): BriefDoc {
-	if (store[entry.id]) return structuredClone(store[entry.id]!);
-
-	if (entry.id === "campus-depts") {
-		return {
-			id: "campus-depts",
-			title: "Campus Departments",
-			subtitle: "国防教育教导队 · 无人机工作站",
-			section: "Society · Departments",
-			blocks: [
-				{ id: newBlockId(), type: "kicker", text: "Society · Departments" },
-				{ id: newBlockId(), type: "heading", text: "Campus Departments" },
-				{
-					id: newBlockId(),
-					type: "subheading",
-					text: "国防教育教导队 · 无人机工作站",
-				},
-				...universityDepartmentShowcases.flatMap((dept): BriefBlock[] => [
-					{ id: newBlockId(), type: "heading", text: dept.title },
-					{ id: newBlockId(), type: "subheading", text: dept.subtitle },
-					{
-						id: newBlockId(),
-						type: "image",
-						image: { src: dept.cardImage.src, alt: dept.cardImage.alt },
-					},
-					...(dept.preview ?? []).map(
-						(text): BriefBlock => ({ id: newBlockId(), type: "text", text }),
-					),
-				]),
-			],
-		};
-	}
-
+function buildDocFromSource(entry: CatalogEntry): BriefDoc | null {
+	// Content by id (group may have been moved in Studio)
 	const item = [
 		...workShowcases,
 		...universityProjectShowcases,
-		...universityDepartmentShowcases,
 		...societyShowcases,
 	].find((s) => s.id === entry.id);
 	if (item) return briefFromShowcase(item, entry.group);
@@ -509,6 +610,7 @@ function loadDoc(entry: CatalogEntry, store: BriefStore): BriefDoc {
 				title: company.company,
 				subtitle: company.companyZh,
 				section: company.role,
+				cardImage: { src: company.image.src, alt: company.image.alt },
 				blocks: [
 					{ id: newBlockId(), type: "heading", text: company.company },
 					{ id: newBlockId(), type: "subheading", text: company.companyZh },
@@ -527,40 +629,79 @@ function loadDoc(entry: CatalogEntry, store: BriefStore): BriefDoc {
 
 	if (entry.id === "smart-helmet") {
 		const h = makeEssay.find((b) => b.type === "helmet");
-		if (h) {
+		if (h && h.type === "helmet") {
+			const [product, camp, crew] = h.images;
 			return {
 				id: "smart-helmet",
 				title: h.title,
 				subtitle: h.titleZh,
 				section: "MAKE",
+				cardImage: product
+					? { src: product.src, alt: product.alt }
+					: undefined,
 				blocks: [
 					{ id: newBlockId(), type: "heading", text: h.title },
 					{ id: newBlockId(), type: "subheading", text: h.titleZh },
-					{ id: newBlockId(), type: "text", text: h.pull },
+					{ id: newBlockId(), type: "pull", text: h.pull },
 					...h.body.map(
 						(text): BriefBlock => ({ id: newBlockId(), type: "text", text }),
 					),
+					...(product
+						? [
+								{
+									id: newBlockId(),
+									type: "image" as const,
+									image: {
+										src: product.src,
+										alt: product.alt,
+										caption: product.caption,
+									},
+								},
+							]
+						: []),
+					{ id: newBlockId(), type: "kicker", text: "Booth" },
 					{
 						id: newBlockId(),
-						type: "duo",
-						images: [
-							{ src: h.images[0].src, alt: h.images[0].alt },
-							{ src: h.images[1].src, alt: h.images[1].alt },
-						],
+						type: "text",
+						text: "Exhibition floor and roadside stall — the same helmet, two public tests.",
 					},
+					...(camp && crew
+						? [
+								{
+									id: newBlockId(),
+									type: "duo" as const,
+									images: [
+										{
+											src: camp.src,
+											alt: camp.alt,
+											caption: camp.caption,
+										},
+										{
+											src: crew.src,
+											alt: crew.alt,
+											caption: crew.caption,
+										},
+									] as [BriefImage, BriefImage],
+								},
+							]
+						: []),
 				],
 			};
 		}
 	}
 
-	if (entry.id === "make-diy") {
+	if (entry.id === "diy-wall" || entry.id === "make-diy") {
 		const diy = makeEssay.find((b) => b.type === "diy-wall");
-		if (diy) {
+		if (diy && diy.type === "diy-wall") {
+			const cover = diy.items[4]?.image ?? diy.items[0]?.image;
 			return {
-				id: "make-diy",
+				id: "diy-wall",
 				title: diy.title,
 				subtitle: diy.titleZh,
 				section: "MAKE · DIY",
+				cardImage: cover
+					? { src: cover.src, alt: cover.alt }
+					: undefined,
 				blocks: [
 					{ id: newBlockId(), type: "heading", text: diy.title },
 					{ id: newBlockId(), type: "subheading", text: diy.titleZh },
@@ -580,14 +721,45 @@ function loadDoc(entry: CatalogEntry, store: BriefStore): BriefDoc {
 		}
 	}
 
-	return {
+	return null;
+}
+
+/**
+ * Site showcase/make data is canonical for structure.
+ * Studio store only keeps cover framing (cardImage scale/pan) for non-custom entries.
+ */
+function loadDoc(entry: CatalogEntry, store: BriefStore): BriefDoc {
+	const saved =
+		store[entry.id] ??
+		(entry.id === "diy-wall" ? store["make-diy"] : undefined);
+
+	if (entry.source === "custom") {
+		return withCardImage(
+			saved
+				? structuredClone(saved)
+				: blankDoc(entry.id, entry.title, entry.group),
+		);
+	}
+
+	const fromSource = buildDocFromSource(entry);
+	if (fromSource) {
+		const cardImage =
+			saved?.cardImage?.src != null
+				? structuredClone(saved.cardImage)
+				: fromSource.cardImage;
+		return withCardImage({ ...fromSource, cardImage });
+	}
+
+	if (saved) return withCardImage(structuredClone(saved));
+
+	return withCardImage({
 		id: entry.id,
 		title: entry.title,
 		blocks: [
 			{ id: newBlockId(), type: "heading", text: entry.title },
 			{ id: newBlockId(), type: "text", text: "点这里改文字" },
 		],
-	};
+	});
 }
 
 function downloadJson(data: unknown) {
@@ -677,29 +849,139 @@ function LiveImage({
 	image,
 	onPick,
 	onCaption,
+	onChange,
+	aspectClass = "aspect-[4/3]",
 }: {
 	image: BriefImage;
 	onPick: () => void;
 	onCaption?: (v: string) => void;
+	onChange?: (image: BriefImage) => void;
+	aspectClass?: string;
 }) {
+	const focus = normalizeImageFocus(image);
+	const drag = useRef<{
+		px: number;
+		py: number;
+		otx: number;
+		oty: number;
+	} | null>(null);
+	const moved = useRef(false);
+
+	const setFocus = (next: { scale: number; tx: number; ty: number }) => {
+		onChange?.(withFocus(image, next));
+	};
+
+	const onPointerDown = (e: ReactPointerEvent<HTMLDivElement>) => {
+		if (!onChange) return;
+		if ((e.target as HTMLElement).closest("[data-pick]")) return;
+		e.currentTarget.setPointerCapture(e.pointerId);
+		moved.current = false;
+		drag.current = {
+			px: e.clientX,
+			py: e.clientY,
+			otx: focus.tx,
+			oty: focus.ty,
+		};
+	};
+
+	const onPointerMove = (e: ReactPointerEvent<HTMLDivElement>) => {
+		if (!onChange || !drag.current) return;
+		const dx = e.clientX - drag.current.px;
+		const dy = e.clientY - drag.current.py;
+		if (Math.hypot(dx, dy) > 3) moved.current = true;
+		const rect = e.currentTarget.getBoundingClientRect();
+		const limit = panLimit(focus.scale);
+		setFocus({
+			scale: focus.scale,
+			tx: clampFocus(
+				drag.current.otx + (dx / Math.max(rect.width, 1)) * 100,
+				-limit,
+				limit,
+			),
+			ty: clampFocus(
+				drag.current.oty + (dy / Math.max(rect.height, 1)) * 100,
+				-limit,
+				limit,
+			),
+		});
+	};
+
+	const onPointerUp = () => {
+		drag.current = null;
+	};
+
 	return (
 		<figure className="group/img relative overflow-hidden bg-[#F5F5F3]">
-			<button
-				type="button"
-				onClick={onPick}
-				className="relative block aspect-[4/3] w-full cursor-pointer"
+			<div
+				className={`relative block w-full overflow-hidden ${aspectClass} ${
+					onChange ? "cursor-grab active:cursor-grabbing" : ""
+				}`}
+				style={{ touchAction: onChange ? "none" : undefined }}
+				onPointerDown={onPointerDown}
+				onPointerMove={onPointerMove}
+				onPointerUp={onPointerUp}
+				onPointerCancel={onPointerUp}
 			>
-				<Image
+				{/* eslint-disable-next-line @next/next/no-img-element */}
+				<img
 					src={image.src}
 					alt={image.alt || ""}
-					fill
-					sizes="420px"
-					className="object-cover"
+					draggable={false}
+					className="pointer-events-none absolute inset-0 h-full w-full select-none object-cover"
+					style={imageFocusStyle(image)}
 				/>
-				<span className="absolute inset-0 flex items-center justify-center bg-[#162b26]/0 text-[0.78rem] font-semibold text-white opacity-0 transition group-hover/img:bg-[#162b26]/35 group-hover/img:opacity-100">
+				<button
+					type="button"
+					data-pick
+					onClick={(e) => {
+						e.stopPropagation();
+						if (moved.current) return;
+						onPick();
+					}}
+					className="absolute right-2 top-2 z-[1] rounded-full bg-[#162b26]/72 px-2.5 py-1 text-[0.68rem] font-semibold text-white opacity-0 backdrop-blur-sm transition group-hover/img:opacity-100"
+				>
 					换图
-				</span>
-			</button>
+				</button>
+				{onChange ? (
+					<p className="pointer-events-none absolute bottom-2 left-2 rounded-full bg-[#162b26]/55 px-2 py-0.5 text-[0.6rem] font-medium text-white/90 opacity-0 backdrop-blur-sm transition group-hover/img:opacity-100">
+						拖动平移 · 下方缩放
+					</p>
+				) : null}
+			</div>
+			{onChange ? (
+				<div className="flex items-center gap-2 border-t border-black/[0.05] bg-white/70 px-3 py-2">
+					<span className="shrink-0 text-[0.62rem] font-semibold text-[#8A9692]">
+						缩放
+					</span>
+					<input
+						type="range"
+						min={IMAGE_FOCUS_MIN}
+						max={IMAGE_FOCUS_MAX}
+						step={0.01}
+						value={focus.scale}
+						onChange={(e) => {
+							const scale = Number(e.target.value);
+							const limit = panLimit(scale);
+							setFocus({
+								scale,
+								tx: clampFocus(focus.tx, -limit, limit),
+								ty: clampFocus(focus.ty, -limit, limit),
+							});
+						}}
+						className="min-w-0 flex-1 accent-[#0F4C45]"
+					/>
+					<span className="w-9 shrink-0 text-right text-[0.62rem] font-semibold tabular-nums text-[#0F4C45]">
+						{focus.scale.toFixed(2)}×
+					</span>
+					<button
+						type="button"
+						onClick={() => setFocus({ scale: 1, tx: 0, ty: 0 })}
+						className="shrink-0 rounded-full px-2 py-0.5 text-[0.62rem] font-semibold text-[#0F4C45]/70 hover:bg-[#0F4C45]/8 hover:text-[#0F4C45]"
+					>
+						复位
+					</button>
+				</div>
+			) : null}
 			{onCaption ? (
 				<LiveText
 					value={image.caption ?? ""}
@@ -794,6 +1076,7 @@ function BlockRow({
 					<LiveImage
 						image={block.image}
 						onPick={() => onPick("src")}
+						onChange={(image) => onChange({ ...block, image })}
 						onCaption={(caption) =>
 							onChange({
 								...block,
@@ -810,6 +1093,11 @@ function BlockRow({
 							key={`${block.id}-${idx}`}
 							image={image}
 							onPick={() => onPick(String(idx))}
+							onChange={(next) => {
+								const images = [...block.images] as typeof block.images;
+								images[idx] = next;
+								onChange({ ...block, images });
+							}}
 							onCaption={(caption) => {
 								const images = [...block.images] as typeof block.images;
 								images[idx] = { ...images[idx], caption };
@@ -890,7 +1178,7 @@ export function StudioApp() {
 	const [doc, setDoc] = useState<BriefDoc>(() => {
 		const first = hydrateCatalog(null).items[0];
 		if (!first) {
-			return blankDoc("untitled", "未命名", "项目");
+			return blankDoc("untitled", "未命名", "工作");
 		}
 		return loadDoc(first, structuredClone(seedBriefs) as BriefStore);
 	});
@@ -905,6 +1193,7 @@ export function StudioApp() {
 	const [editLocale, setEditLocale] = useState<BriefLocale>("zh-Hans");
 	const [mdSource, setMdSource] = useState<BriefLocale>("zh-Hans");
 	const [mdBusy, setMdBusy] = useState(false);
+	const [saving, setSaving] = useState(false);
 	const mdBundleRef = useRef<BriefMdBundle | null>(null);
 	const editLocaleRef = useRef<BriefLocale>("zh-Hans");
 	const docRef = useRef(doc);
@@ -934,6 +1223,15 @@ export function StudioApp() {
 		return list;
 	}, [media, mediaQ]);
 
+	const activeEntry = useMemo(
+		() => catalog.find((c) => c.id === activeId),
+		[catalog, activeId],
+	);
+	const liveShowcase = useMemo(
+		() => resolveLiveShowcase(activeEntry),
+		[activeEntry],
+	);
+
 	useEffect(() => {
 		let cancelled = false;
 		const apply = (persist: CatalogPersist | null) => {
@@ -943,21 +1241,33 @@ export function StudioApp() {
 			setHiddenIds(h.hidden);
 			setCatalogReady(true);
 		};
-		try {
-			const raw = localStorage.getItem(CATALOG_LS_KEY);
-			if (raw) {
-				apply(JSON.parse(raw) as CatalogPersist);
-				return () => {
-					cancelled = true;
-				};
-			}
-		} catch {
-			/* ignore */
-		}
+		// Shared disk order is canonical (same file the site imports)
 		void fetch("/api/catalog/")
 			.then((r) => (r.ok ? r.json() : null))
-			.then((data) => apply((data as CatalogPersist) ?? null))
-			.catch(() => apply(null));
+			.then((data) => {
+				if (data) {
+					apply(data as CatalogPersist);
+					return;
+				}
+				try {
+					const raw = localStorage.getItem(CATALOG_LS_KEY);
+					if (raw) {
+						apply(JSON.parse(raw) as CatalogPersist);
+						return;
+					}
+				} catch {
+					/* ignore */
+				}
+				apply(null);
+			})
+			.catch(() => {
+				try {
+					const raw = localStorage.getItem(CATALOG_LS_KEY);
+					apply(raw ? (JSON.parse(raw) as CatalogPersist) : null);
+				} catch {
+					apply(null);
+				}
+			});
 		return () => {
 			cancelled = true;
 		};
@@ -1003,6 +1313,18 @@ export function StudioApp() {
 			if (e.key === "Escape") setPickToken(null);
 		};
 		window.addEventListener("keydown", onKey);
+		// Refresh gallery from disk so new uploads appear after reload
+		void fetch("/api/media/")
+			.then((r) => (r.ok ? r.json() : null))
+			.then((data: { paths?: string[] } | null) => {
+				if (!data?.paths?.length) return;
+				setExtraMedia((prev) => {
+					const seen = new Set(prev);
+					const fresh = data.paths!.filter((p) => !seen.has(p));
+					return fresh.length ? [...fresh, ...prev] : prev;
+				});
+			})
+			.catch(() => undefined);
 		return () => window.removeEventListener("keydown", onKey);
 	}, [pickToken]);
 
@@ -1012,6 +1334,10 @@ export function StudioApp() {
 		},
 		[],
 	);
+
+	const moveCatalogToGroup = useCallback((fromId: string, group: string) => {
+		setCatalog((prev) => moveCatalogItemToGroup(prev, fromId, group));
+	}, []);
 
 	const addCatalogItem = useCallback((group: string) => {
 		const id = `custom_${Date.now().toString(36)}`;
@@ -1103,46 +1429,92 @@ export function StudioApp() {
 	const applyImage = (path: string) => {
 		if (!pickToken) return;
 		const parts = pickToken.split("::");
+
+		// Homepage / Projects stage cover
+		if (parts[0] === "meta" && parts[1] === "cardImage") {
+			setDoc((prev) => ({
+				...prev,
+				cardImage: {
+					src: path,
+					alt: prev.cardImage?.alt || prev.title,
+					caption: prev.cardImage?.caption,
+					// Reset framing when swapping the file — new crop
+					scale: undefined,
+					tx: undefined,
+					ty: undefined,
+				},
+			}));
+			setPickToken(null);
+			setMediaQ("");
+			return;
+		}
+
 		// formats: blockId::src | blockId::0 | blockId::childId::src
 		if (parts.length === 2) {
 			const [blockId, field] = parts;
 			if (!blockId) return;
-			setBlocks(
-				patchBlock(doc.blocks, blockId, (block) => {
+			setDoc((prev) => ({
+				...prev,
+				blocks: patchBlock(prev.blocks, blockId, (block) => {
 					if (block.type === "image") {
-						return { ...block, image: { ...block.image, src: path } };
+						return {
+							...block,
+							image: {
+								...block.image,
+								src: path,
+								scale: undefined,
+								tx: undefined,
+								ty: undefined,
+							},
+						};
 					}
 					if (block.type === "duo" && (field === "0" || field === "1")) {
 						const images = [...block.images] as typeof block.images;
 						images[Number(field)] = {
 							...images[Number(field)],
 							src: path,
+							scale: undefined,
+							tx: undefined,
+							ty: undefined,
 						};
 						return { ...block, images };
 					}
 					return block;
 				}),
-			);
+			}));
 		} else if (parts.length === 3) {
 			const [parentHint, childId, field] = parts;
 			void parentHint;
 			if (!childId) return;
-			setBlocks(
-				patchBlock(doc.blocks, childId, (block) => {
+			setDoc((prev) => ({
+				...prev,
+				blocks: patchBlock(prev.blocks, childId, (block) => {
 					if (block.type === "image") {
-						return { ...block, image: { ...block.image, src: path } };
+						return {
+							...block,
+							image: {
+								...block.image,
+								src: path,
+								scale: undefined,
+								tx: undefined,
+								ty: undefined,
+							},
+						};
 					}
 					if (block.type === "duo" && (field === "0" || field === "1")) {
 						const images = [...block.images] as typeof block.images;
 						images[Number(field)] = {
 							...images[Number(field)],
 							src: path,
+							scale: undefined,
+							tx: undefined,
+							ty: undefined,
 						};
 						return { ...block, images };
 					}
 					return block;
 				}),
-			);
+			}));
 		}
 		setPickToken(null);
 		setMediaQ("");
@@ -1198,7 +1570,7 @@ export function StudioApp() {
 
 	const loadLocaleDoc = useCallback(
 		(bundle: BriefMdBundle, locale: BriefLocale) => {
-			const next = bundleToActiveDoc(bundle, locale);
+			const next = withCardImage(bundleToActiveDoc(bundle, locale));
 			setDoc(next);
 			setStore((prev) => ({ ...prev, [next.id]: next }));
 		},
@@ -1246,8 +1618,36 @@ export function StudioApp() {
 
 	const download = () => {
 		downloadJson({ ...store, [doc.id]: doc });
-		setTip("已下载 · 覆盖 content/briefs.json 即可");
+		setTip("已下载 JSON · 也可点「写入」保存到磁盘");
 		window.setTimeout(() => setTip(null), 2500);
+	};
+
+	const saveToDisk = async () => {
+		setSaving(true);
+		try {
+			const payload = { ...store, [doc.id]: doc };
+			const res = await fetch("/api/briefs/", {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify(payload),
+			});
+			const data = (await res.json()) as { path?: string; error?: string };
+			if (!res.ok) throw new Error(data.error || "写入失败");
+			setStore(payload);
+			const bundle = flushDocIntoBundle(editLocale, doc, mdSource);
+			const markdown = serializeBriefMd(bundle);
+			await fetch("/api/brief-md/", {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ id: doc.id, markdown }),
+			});
+			setTip(`已写入 ${data.path}`);
+		} catch (err) {
+			setTip(err instanceof Error ? err.message : "写入失败");
+		} finally {
+			setSaving(false);
+			window.setTimeout(() => setTip(null), 2500);
+		}
 	};
 
 	const enterMdPane = async () => {
@@ -1388,7 +1788,7 @@ export function StudioApp() {
 		return () => window.clearTimeout(t);
 	}, [mdText, mdPane, loadLocaleDoc]);
 
-	// 切换卡片时带上 MD 包
+	// 切换卡片：正文跟站点展台同步；MD 只更新缓冲，不反写旧内容
 	const switchCard = (id: string) => {
 		if (id === activeId) return;
 		const entry = catalog.find((c) => c.id === id);
@@ -1399,11 +1799,13 @@ export function StudioApp() {
 		setDoc(nextDoc);
 		setMdPane(false);
 		void ensureBundleForDoc(nextDoc).then((bundle) => {
-			const loc = bundle.locales[editLocale]
-				? editLocale
-				: bundle.source_locale;
-			setEditLocale(loc);
-			if (bundle.locales[loc]) loadLocaleDoc(bundle, loc);
+			mdBundleRef.current = bundle;
+			setMdSource(bundle.source_locale);
+			setMdText(serializeBriefMd(bundle));
+			// Stay on source locale so stale translated stubs cannot replace the live doc
+			if (editLocaleRef.current !== bundle.source_locale) {
+				setEditLocale(bundle.source_locale);
+			}
 		});
 	};
 
@@ -1531,9 +1933,17 @@ export function StudioApp() {
 							<button
 								type="button"
 								onClick={download}
-								className="rounded-full bg-[#043439] px-3 py-1 text-[0.7rem] font-semibold text-white"
+								className="rounded-full px-2.5 py-1 text-[0.7rem] font-semibold text-[#0F4C45] hover:bg-white/70"
 							>
-								保存
+								下载
+							</button>
+							<button
+								type="button"
+								disabled={saving}
+								onClick={() => void saveToDisk()}
+								className="rounded-full bg-[#043439] px-3 py-1 text-[0.7rem] font-semibold text-white disabled:opacity-60"
+							>
+								{saving ? "写入中…" : "写入"}
 							</button>
 						</>
 					) : (
@@ -1572,6 +1982,7 @@ export function StudioApp() {
 							activeId={activeId}
 							onSelect={switchCard}
 							onReorder={reorderCatalog}
+							onMoveToGroup={moveCatalogToGroup}
 							onAdd={addCatalogItem}
 							onRemove={removeCatalogItem}
 						/>
@@ -1735,6 +2146,59 @@ export function StudioApp() {
 									</div>
 
 									<div className="space-y-1">
+										{/* Homepage / Projects stage cover */}
+										<div className="mb-6 overflow-hidden rounded-2xl bg-[#F7F1E8] ring-1 ring-[#0F4C45]/8">
+											<div className="flex items-center justify-between px-3.5 py-2.5">
+												<div>
+													<p className="text-[0.62rem] font-semibold uppercase tracking-[0.2em] text-[#0F4C45]/45">
+														首页卡片图
+													</p>
+													<p className="mt-0.5 text-[0.68rem] text-[#8A9692]">
+														Projects 舞台主图 · 与正文图片分开
+													</p>
+												</div>
+												<button
+													type="button"
+													onClick={() => setPickToken("meta::cardImage")}
+													className="rounded-full bg-white px-2.5 py-1 text-[0.68rem] font-semibold text-[#0F4C45] ring-1 ring-[#0F4C45]/12 transition hover:bg-[#043439] hover:text-white"
+												>
+													换图
+												</button>
+											</div>
+											{doc.cardImage?.src ? (
+												<LiveImage
+													image={doc.cardImage}
+													aspectClass="aspect-[16/10]"
+													onPick={() => setPickToken("meta::cardImage")}
+													onChange={(cardImage) =>
+														setDoc((p) => ({ ...p, cardImage }))
+													}
+													onCaption={(caption) =>
+														setDoc((p) =>
+															p.cardImage
+																? {
+																		...p,
+																		cardImage: {
+																			...p.cardImage,
+																			caption:
+																				caption || undefined,
+																		},
+																	}
+																: p,
+														)
+													}
+												/>
+											) : (
+												<button
+													type="button"
+													onClick={() => setPickToken("meta::cardImage")}
+													className="flex aspect-[16/10] w-full items-center justify-center bg-[#EFE8DE] text-[0.8rem] font-semibold text-[#0F4C45]/55 transition hover:bg-[#E8E0D4]"
+												>
+													点击设置首页图
+												</button>
+											)}
+										</div>
+
 										{!hasKicker && doc.section ? (
 											<LiveText
 												value={doc.section}
@@ -1836,10 +2300,10 @@ export function StudioApp() {
 								</div>
 							</div>
 						) : (
-							<div className="studio-preview-drawer flex max-h-[min(100%,42rem)] w-full max-w-[26rem] flex-col overflow-hidden 2xl:max-w-[30rem]">
+							<div className="studio-preview-drawer flex max-h-[min(100%,48rem)] w-full max-w-[28rem] flex-col overflow-hidden 2xl:max-w-[34rem]">
 								<div className="flex shrink-0 items-center justify-between px-5 py-3">
 									<p className="text-[0.65rem] font-semibold uppercase tracking-[0.22em] text-[#0F4C45]/45">
-										Brief ·{" "}
+										站点预览 ·{" "}
 										{editLocale === "zh-Hans"
 											? "简"
 											: editLocale === "zh-Hant"
@@ -1847,13 +2311,40 @@ export function StudioApp() {
 												: "EN"}
 									</p>
 									<span className="text-[0.72rem] font-medium text-[#0F4C45]/30">
-										实时预览
+										与 Projects 一致
 									</span>
 								</div>
 								<div className="mx-4 mb-2 h-px bg-[#0F4C45]/[0.08]" />
 								<div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-1 pb-2">
 									<div className="studio-preview-body">
-										<BriefDocument doc={doc} />
+										{liveShowcase ? (
+											<ShowcaseDocument
+												item={liveShowcase.item}
+												sectionLabel={liveShowcase.section}
+												className="shadow-none"
+												zoomable={false}
+											/>
+										) : (
+											<>
+												{doc.cardImage?.src ? (
+													<figure className="mx-4 mb-3 overflow-hidden rounded-xl bg-[#F5F5F3] ring-1 ring-black/[0.04]">
+														<div className="relative aspect-[16/10] w-full overflow-hidden">
+															{/* eslint-disable-next-line @next/next/no-img-element */}
+															<img
+																src={doc.cardImage.src}
+																alt={doc.cardImage.alt || doc.title}
+																className="absolute inset-0 h-full w-full object-cover"
+																style={imageFocusStyle(doc.cardImage)}
+															/>
+														</div>
+														<figcaption className="px-3 py-2 text-center text-[0.62rem] font-medium tracking-[0.08em] text-[#8A9692]">
+															首页卡片
+														</figcaption>
+													</figure>
+												) : null}
+												<BriefDocument doc={doc} />
+											</>
+										)}
 									</div>
 								</div>
 							</div>
@@ -1866,7 +2357,9 @@ export function StudioApp() {
 				<div className="fixed inset-0 z-50 flex items-end justify-center bg-[#162b26]/35 backdrop-blur-[2px] sm:items-center sm:p-4">
 					<div className="flex max-h-[82vh] w-full max-w-md flex-col overflow-hidden rounded-t-2xl bg-[#F7F1E8] shadow-2xl sm:rounded-2xl">
 						<div className="flex items-center justify-between px-4 py-3">
-							<p className="text-[0.9rem] font-semibold text-[#0F4C45]">换图</p>
+							<p className="text-[0.9rem] font-semibold text-[#0F4C45]">
+								{pickToken === "meta::cardImage" ? "换首页卡片图" : "换图"}
+							</p>
 							<button
 								type="button"
 								onClick={() => setPickToken(null)}

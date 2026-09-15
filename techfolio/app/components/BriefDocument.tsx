@@ -3,17 +3,19 @@
 import Image from "next/image";
 import { useState } from "react";
 import type { BriefBlock, BriefDoc, BriefImage } from "../lib/brief-types";
+import { imageFocusStyle } from "../lib/image-focus";
 
 function Figure({ image }: { image: BriefImage }) {
 	return (
 		<figure className="overflow-hidden bg-[#F5F5F3]">
-			<div className="relative aspect-[4/3]">
+			<div className="relative aspect-[4/3] overflow-hidden">
 				<Image
 					src={image.src}
 					alt={image.alt || ""}
 					fill
 					sizes="420px"
 					className="object-cover"
+					style={imageFocusStyle(image)}
 				/>
 			</div>
 			{image.caption ? (

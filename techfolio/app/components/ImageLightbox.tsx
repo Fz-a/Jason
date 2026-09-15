@@ -103,12 +103,19 @@ export function ZoomableFrame({
 	image,
 	children,
 	className = "",
+	enabled = true,
 }: {
 	image: LightboxImage;
 	children: ReactNode;
 	className?: string;
+	/** When false, render as a plain figure — no lightbox click. */
+	enabled?: boolean;
 }) {
 	const [open, setOpen] = useState(false);
+
+	if (!enabled) {
+		return <div className={className}>{children}</div>;
+	}
 
 	return (
 		<>

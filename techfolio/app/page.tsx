@@ -8,7 +8,7 @@ import { useEffect, useRef, useState } from "react";
 import { HomeScrollPreloader } from "./components/HomeScrollPreloader";
 import { HeroNameFlip } from "./components/HeroNameFlip";
 import { FeaturedProjects } from "./components/FeaturedProjects";
-import { ConnectionSection } from "./components/ConnectionSection";
+import { AgendaSection } from "./components/AgendaSection";
 import { GoalSection } from "./components/GoalSection";
 import { ResearchSection } from "./components/ResearchSection";
 import { ResearchFitNext } from "./components/ResearchFitNext";
@@ -21,6 +21,8 @@ const montserrat = Montserrat({
 });
 
 const STORY_IDS = STORY_STAGES.map((s) => s.id);
+/** Full deck order including agenda (between home and Projects). */
+const DECK_IDS = ["agenda", ...STORY_IDS] as const;
 
 const socialLinks = [
   { label: "GitHub", href: "https://github.com/Fz-a" },
@@ -92,13 +94,12 @@ export default function Home() {
   useEffect(() => {
     const sections = [
       "home",
+      "agenda",
       "experience",
-      "direction",
       "goal",
       "research",
-      "fit",
       "next",
-      "target",
+      "contact",
     ]
       .map((id) => document.getElementById(id))
       .filter((el): el is HTMLElement => Boolean(el));
@@ -116,7 +117,7 @@ export default function Home() {
       const scrollMarker = window.scrollY + window.innerHeight * 0.45;
 
       if (nearPageBottom) {
-        setActiveSection("target");
+        setActiveSection("contact");
         return;
       }
 
@@ -195,27 +196,30 @@ export default function Home() {
       if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
 
       const current = activeSectionRef.current;
-      const storyActive = STORY_IDS.includes(
-        current as (typeof STORY_IDS)[number],
+      const deckActive = DECK_IDS.includes(
+        current as (typeof DECK_IDS)[number],
       )
         ? current
-        : "experience";
-      const idx = STORY_IDS.indexOf(
-        storyActive as (typeof STORY_IDS)[number],
-      );
+        : current === "home"
+          ? "home"
+          : "agenda";
+      const idx =
+        deckActive === "home"
+          ? -1
+          : DECK_IDS.indexOf(deckActive as (typeof DECK_IDS)[number]);
 
       if (e.key === "ArrowDown" || e.key === "PageDown") {
         e.preventDefault();
-        const next = STORY_IDS[Math.min(Math.max(idx, 0) + 1, STORY_IDS.length - 1)];
-        scrollToSection(next);
+        const next = DECK_IDS[Math.min(Math.max(idx, -1) + 1, DECK_IDS.length - 1)];
+        if (next) scrollToSection(next);
       } else if (e.key === "ArrowUp" || e.key === "PageUp") {
         e.preventDefault();
         if (idx <= 0) {
           scrollToSection("home");
         } else {
-          scrollToSection(STORY_IDS[idx - 1]);
+          scrollToSection(DECK_IDS[idx - 1]!);
         }
-      } else if (/^[1-6]$/.test(e.key)) {
+      } else if (/^[1-4]$/.test(e.key)) {
         const stage = STORY_IDS[Number(e.key) - 1];
         if (stage) scrollToSection(stage);
       }
@@ -284,8 +288,8 @@ export default function Home() {
 
             <div className="mt-8 flex flex-wrap items-center gap-3">
               <a
-                href="#target"
-                onClick={(event) => handleNavClick(event, "#target")}
+                href="#contact"
+                onClick={(event) => handleNavClick(event, "#contact")}
                 className="cursor-pointer rounded-full bg-[#043439] px-6 py-2.5 text-sm font-semibold text-white transition hover:opacity-90"
               >
                 {t("hero.contact")}
@@ -326,8 +330,8 @@ export default function Home() {
         <div className="pointer-events-none absolute inset-x-0 bottom-6 z-10 flex justify-center sm:bottom-10">
           <a
             ref={scrollCueRef}
-            href="#experience"
-            onClick={(event) => handleNavClick(event, "#experience")}
+            href="#agenda"
+            onClick={(event) => handleNavClick(event, "#agenda")}
             className="pointer-events-auto flex cursor-pointer flex-col items-center gap-2.5 text-[0.6rem] font-semibold uppercase tracking-[0.28em] text-[#0F4C45]/72 transition"
           >
             <span
@@ -339,18 +343,18 @@ export default function Home() {
         </div>
       </section>
 
+      <AgendaSection onNavigate={scrollToSection} />
       <FeaturedProjects />
-      <ConnectionSection />
       <GoalSection />
       <ResearchSection />
       <ResearchFitNext />
 
-      {/* 06 — Target (+ footer inside same viewport so snap stays aligned) */}
-      <section id="target" className="story-slide bg-[#F7F1E8]">
+      {/* Contact (+ footer inside same viewport so snap stays aligned) */}
+      <section id="contact" className="story-slide bg-[#F7F1E8]">
         <div className="story-slide__body px-6 py-10 sm:px-8 md:px-10 lg:px-12">
           <div className="mx-auto flex w-full max-w-[1100px] flex-col items-center justify-center text-center xl:max-w-[1160px]">
             <p className="text-[0.68rem] font-semibold uppercase tracking-[0.28em] text-[#0F4C45]/70">
-              {t("target.kicker")}
+              {t("contact.kicker")}
             </p>
             <p className="mt-4 text-[1.15rem] font-extrabold tracking-tight text-[#162b26] sm:text-[1.35rem]">
               Jason Chen
