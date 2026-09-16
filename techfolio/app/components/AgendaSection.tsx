@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useLocale } from "../lib/i18n";
+import { LayoutText } from "../lib/use-page-layout";
 
 const STEPS = [
 	{
@@ -13,7 +14,7 @@ const STEPS = [
 		tone: "a",
 	},
 	{
-		id: "goal",
+		id: "research",
 		num: "02",
 		titleKey: "agenda.c2.title",
 		blurbKey: "agenda.c2.blurb",
@@ -21,7 +22,7 @@ const STEPS = [
 		tone: "b",
 	},
 	{
-		id: "research",
+		id: "goal",
 		num: "03",
 		titleKey: "agenda.c3.title",
 		blurbKey: "agenda.c3.blurb",
@@ -75,11 +76,10 @@ export function AgendaSection({ onNavigate }: Props) {
 			}`}
 		>
 			<div className="story-slide__body relative z-[1] flex flex-col px-0 py-0">
-				{/* Title strip */}
 				<div className="agenda-slide__head shrink-0 px-6 pt-7 sm:px-10 sm:pt-9 lg:px-14">
 					<p className="flex items-baseline gap-3">
 						<span className="text-[1.85rem] font-extrabold tracking-tight text-white sm:text-[2.35rem]">
-							{t("agenda.word")}
+							<LayoutText k="agenda.word" />
 						</span>
 						<span className="text-[0.72rem] font-semibold uppercase tracking-[0.28em] text-white/40">
 							/ {t("agenda.wordEn")}
@@ -87,7 +87,6 @@ export function AgendaSection({ onNavigate }: Props) {
 					</p>
 				</div>
 
-				{/* Chevron flow */}
 				<nav
 					aria-label={t("agenda.nav")}
 					className="agenda-chevrons relative mt-5 flex min-h-0 flex-1 items-stretch px-0 sm:mt-6"
@@ -123,7 +122,7 @@ export function AgendaSection({ onNavigate }: Props) {
 											step.tone === "d" ? "text-[#123834]" : "text-white"
 										}`}
 									>
-										{t(step.titleKey)}
+										<LayoutText k={step.titleKey} />
 									</span>
 									<span
 										className={`mt-3 max-w-[13rem] text-[0.72rem] font-medium leading-5 tracking-[0.02em] sm:mt-3.5 sm:text-[0.78rem] sm:leading-6 ${
@@ -132,7 +131,7 @@ export function AgendaSection({ onNavigate }: Props) {
 												: "text-white/32"
 										}`}
 									>
-										{t(step.blurbKey)}
+										<LayoutText k={step.blurbKey} multiline />
 									</span>
 								</span>
 							</button>

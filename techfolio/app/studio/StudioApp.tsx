@@ -54,6 +54,7 @@ import {
 	type AvatarEditorHandle,
 	type AvatarPreview,
 } from "./AvatarEditor";
+import { PageLayoutEditor } from "./PageLayoutEditor";
 
 type CatalogEntry = {
 	id: string;
@@ -69,6 +70,8 @@ type CatalogPersist = {
 	order?: string[];
 	/** id → en group id (work/university/diy/society) */
 	groups?: Record<string, ProjectCatalogGroup>;
+	/** Highlighted project ids (star in site nav). */
+	starred?: string[];
 	customs?: CatalogEntry[];
 };
 
@@ -100,6 +103,7 @@ function buildCatalog(
 		order?: string[];
 		hidden?: string[];
 		groups?: Record<string, ProjectCatalogGroup>;
+		starred?: string[];
 	} | null,
 ): CatalogEntry[] {
 	return listProjectCatalog(override).map((e) => ({
@@ -111,18 +115,22 @@ function buildCatalog(
 }
 
 /**
- * Built-in membership from site catalog; order/group/hidden from shared file.
+ * Built-in membership from site catalog; order/group/hidden/starred from shared file.
  * Customs stay Studio-only.
  */
 function hydrateCatalog(persist: CatalogPersist | null): {
 	items: CatalogEntry[];
 	hidden: string[];
+	starred: string[];
 } {
 	const order =
 		persist?.order?.length && persist.order.length > 0
 			? persist.order
 			: undefined;
 	const hiddenList = persist?.hidden ?? [];
+	const starredList = (persist?.starred ?? []).filter(
+		(id) => typeof id === "string",
+	);
 
 	// Prefer explicit groups map; else migrate zh groups from items
 	let groups = persist?.groups;
@@ -140,6 +148,7 @@ function hydrateCatalog(persist: CatalogPersist | null): {
 		order,
 		hidden: hiddenList,
 		groups,
+		starred: starredList,
 	});
 	const byId = new Map<string, CatalogEntry>(base.map((e) => [e.id, e]));
 
@@ -171,11 +180,16 @@ function hydrateCatalog(persist: CatalogPersist | null): {
 		if (!byId.has(id) && !id.startsWith("custom_")) hidden.delete(id);
 	}
 
+	const starred = new Set(starredList);
+	for (const id of [...starred]) {
+		if (!byId.has(id) && !customs.some((c) => c.id === id)) starred.delete(id);
+	}
+
 	const items = [
 		...base.filter((e) => !hidden.has(e.id)),
 		...customs.filter((e) => !hidden.has(e.id)),
 	];
-	return { items, hidden: [...hidden] };
+	return { items, hidden: [...hidden], starred: [...starred] };
 }
 
 function blankDoc(id: string, title: string, group: string): BriefDoc {
@@ -253,6 +267,7 @@ function resolveLiveShowcase(
 function toPersist(
 	items: CatalogEntry[],
 	hidden: string[],
+	starred: string[],
 ): CatalogPersist {
 	const customs = items.filter(
 		(e) => e.source === "custom" || e.id.startsWith("custom_"),
@@ -265,6 +280,7 @@ function toPersist(
 			source: e.source,
 		})),
 		hidden,
+		starred,
 		order: orderIdsFromCatalog(items),
 		groups: groupOverridesFromCatalog(items),
 		customs,
@@ -330,14 +346,17 @@ function moveCatalogItemToGroup(
 function CatalogNav({
 	items,
 	activeId,
+	starredIds,
 	onSelect,
 	onReorder,
 	onMoveToGroup,
 	onAdd,
 	onRemove,
+	onToggleStar,
 }: {
 	items: CatalogEntry[];
 	activeId: string;
+	starredIds: string[];
 	onSelect: (id: string) => void;
 	onReorder: (
 		fromId: string,
@@ -347,6 +366,7 @@ function CatalogNav({
 	onMoveToGroup: (fromId: string, group: string) => void;
 	onAdd: (group: string) => void;
 	onRemove: (id: string) => void;
+	onToggleStar: (id: string) => void;
 }) {
 	const [dragId, setDragId] = useState<string | null>(null);
 	const [over, setOver] = useState<{
@@ -451,7 +471,11 @@ function CatalogNav({
 											onPointerDown={(e) => {
 												if (e.button !== 0) return;
 												const target = e.target as HTMLElement;
-												if (target.closest("[data-nav-x]")) return;
+												if (
+													target.closest("[data-nav-x]") ||
+													target.closest("[data-nav-star]")
+												)
+													return;
 												didDrag.current = false;
 												suppressClick.current = false;
 												clearPress();
@@ -554,6 +578,26 @@ function CatalogNav({
 											</button>
 											<button
 												type="button"
+												data-nav-star
+												title={
+													starredIds.includes(c.id)
+														? "取消星标"
+														: "星标突出（展示页静态显示）"
+												}
+												onClick={(e) => {
+													e.stopPropagation();
+													onToggleStar(c.id);
+												}}
+												className={`mr-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded text-[0.68rem] transition ${
+													starredIds.includes(c.id)
+														? "text-[#0F4C45] opacity-100"
+														: "text-[#0F4C45]/40 opacity-0 group-hover/nav:opacity-100 hover:bg-[#0F4C45]/8 hover:text-[#0F4C45]"
+												}`}
+											>
+												{starredIds.includes(c.id) ? "★" : "☆"}
+											</button>
+											<button
+												type="button"
 												data-nav-x
 												title="移出列表"
 												onClick={(e) => {
@@ -587,7 +631,7 @@ function CatalogNav({
 				))}
 			</div>
 			<p className="shrink-0 border-t border-[#0F4C45]/6 px-2.5 py-1.5 text-[0.6rem] leading-4 text-[#A0ADA9]">
-				长按拖到其他组 · 与站点共用分组/顺序 · 悬停 × 移除
+				长按拖组 · ★ 星标 · 悬停 × 移除 · 与站点共用
 			</p>
 		</div>
 	);
@@ -1167,8 +1211,9 @@ export function StudioApp() {
 		() => hydrateCatalog(null).items,
 	);
 	const [hiddenIds, setHiddenIds] = useState<string[]>([]);
+	const [starredIds, setStarredIds] = useState<string[]>([]);
 	const [catalogReady, setCatalogReady] = useState(false);
-	const [mode, setMode] = useState<"briefs" | "avatar">("briefs");
+	const [mode, setMode] = useState<"briefs" | "avatar" | "page">("briefs");
 	const [store, setStore] = useState<BriefStore>(
 		() => structuredClone(seedBriefs) as BriefStore,
 	);
@@ -1239,6 +1284,7 @@ export function StudioApp() {
 			const h = hydrateCatalog(persist);
 			setCatalog(h.items);
 			setHiddenIds(h.hidden);
+			setStarredIds(h.starred);
 			setCatalogReady(true);
 		};
 		// Shared disk order is canonical (same file the site imports)
@@ -1276,7 +1322,7 @@ export function StudioApp() {
 	// Persist catalog (local + disk)
 	useEffect(() => {
 		if (!catalogReady) return;
-		const payload = toPersist(catalog, hiddenIds);
+		const payload = toPersist(catalog, hiddenIds, starredIds);
 		try {
 			localStorage.setItem(CATALOG_LS_KEY, JSON.stringify(payload));
 		} catch {
@@ -1290,7 +1336,7 @@ export function StudioApp() {
 			});
 		}, 450);
 		return () => window.clearTimeout(t);
-	}, [catalog, hiddenIds, catalogReady]);
+	}, [catalog, hiddenIds, starredIds, catalogReady]);
 
 	// Keep sidebar title in sync with edited doc
 	useEffect(() => {
@@ -1378,6 +1424,7 @@ export function StudioApp() {
 			};
 			const next = catalog.filter((c) => c.id !== id);
 			setCatalog(next);
+			setStarredIds((s) => s.filter((x) => x !== id));
 			if (entry.source !== "custom") {
 				setHiddenIds((h) => (h.includes(id) ? h : [...h, id]));
 			} else {
@@ -1841,6 +1888,17 @@ export function StudioApp() {
 					</button>
 					<button
 						type="button"
+						onClick={() => setMode("page")}
+						className={`rounded-full px-2.5 py-0.5 text-[0.7rem] font-semibold transition ${
+							mode === "page"
+								? "bg-white text-[#043439] shadow-sm"
+								: "text-[#0F4C45]/70 hover:text-[#0F4C45]"
+						}`}
+					>
+						版型
+					</button>
+					<button
+						type="button"
 						onClick={() => setMode("avatar")}
 						className={`rounded-full px-2.5 py-0.5 text-[0.7rem] font-semibold transition ${
 							mode === "avatar"
@@ -1881,6 +1939,10 @@ export function StudioApp() {
 								{doc.title}
 							</span>
 						</>
+					) : mode === "page" ? (
+						<span className="truncate text-[0.75rem] text-[#6A7A76]">
+							边预览边改 · 点文字出红框
+						</span>
 					) : (
 						<span className="truncate text-[0.75rem] text-[#6A7A76]">头像</span>
 					)}
@@ -1946,7 +2008,7 @@ export function StudioApp() {
 								{saving ? "写入中…" : "写入"}
 							</button>
 						</>
-					) : (
+					) : mode === "avatar" ? (
 						<>
 							<button
 								type="button"
@@ -1963,7 +2025,7 @@ export function StudioApp() {
 								保存
 							</button>
 						</>
-					)}
+					) : null}
 					<Link
 						href="/#home"
 						className="rounded-full px-2 py-1 text-[0.7rem] font-medium text-[#8A9692] hover:text-[#0F4C45]"
@@ -1974,17 +2036,31 @@ export function StudioApp() {
 			</header>
 
 			<div className="studio-workspace flex min-h-0 flex-1 gap-2.5 p-2.5 pt-2 sm:gap-3.5 sm:p-3.5 sm:pt-2.5">
+				{mode === "page" ? (
+					<section className="studio-panel studio-panel--editor min-w-0 flex-1 overflow-hidden">
+						<PageLayoutEditor onTip={setTip} />
+					</section>
+				) : (
+					<>
 				{/* Left nav card */}
 				<aside className="studio-panel studio-panel--nav hidden w-[12rem] shrink-0 flex-col overflow-hidden lg:flex xl:w-[13rem]">
 					{mode === "briefs" ? (
 						<CatalogNav
 							items={catalog}
 							activeId={activeId}
+							starredIds={starredIds}
 							onSelect={switchCard}
 							onReorder={reorderCatalog}
 							onMoveToGroup={moveCatalogToGroup}
 							onAdd={addCatalogItem}
 							onRemove={removeCatalogItem}
+							onToggleStar={(id) => {
+								setStarredIds((prev) =>
+									prev.includes(id)
+										? prev.filter((x) => x !== id)
+										: [...prev, id],
+								);
+							}}
 						/>
 					) : (
 						<p className="px-3 py-4 text-[0.74rem] leading-5 text-[#6A7A76]">
@@ -2351,6 +2427,8 @@ export function StudioApp() {
 						)}
 					</div>
 				</aside>
+					</>
+				)}
 			</div>
 
 			{pickToken ? (

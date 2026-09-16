@@ -20,6 +20,15 @@
 		"exhibitions"
 	],
 	"hidden": [],
+	"starred": [
+		"zongheng-robot",
+		"shixun-car",
+		"rtk",
+		"agv",
+		"smart-clothes",
+		"fire-warning",
+		"smart-helmet"
+	],
 	"groups": {
 		"safe-campus-service": "university",
 		"drone-workstation": "university"

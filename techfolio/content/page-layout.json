@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "order": [
+    "home",
+    "agenda",
+    "experience",
+    "research",
+    "goal",
+    "next",
+    "contact"
+  ],
+  "hidden": [],
+  "sections": {},
+  "elements": {},
+  "copy": {}
+}

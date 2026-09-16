@@ -17,26 +17,26 @@ const en: Dict = {
 	"nav.archive": "Archive",
 	"nav.cv": "CV",
 	"story.01": "Projects",
-	"story.02": "Goal",
-	"story.03": "Explore",
+	"story.02": "Explore",
+	"story.03": "Goal",
 	"story.04": "Next Steps",
 	"agenda.kicker": "Session · Flow",
 	"agenda.word": "Agenda",
 	"agenda.wordEn": "CONTENT",
 	"agenda.title": "How this talk moves.",
 	"agenda.blurb":
-		"Start from what I have built, then the agricultural goal, what I want to explore, and the next steps ahead.",
+		"Start from what I have built, then what I want to explore, the longer goal, and the next steps ahead.",
 	"agenda.nav": "Talk flow",
 	"agenda.hint": "Slow unfold from the left — tap a step to jump",
 	"agenda.c1.title": "Projects",
 	"agenda.c1.tag": "Experience",
 	"agenda.c1.blurb": "Work, campus, make — what I have built.",
-	"agenda.c2.title": "Goal",
-	"agenda.c2.tag": "Agriculture",
-	"agenda.c2.blurb": "Why agricultural systems, and what that goal is.",
-	"agenda.c3.title": "Explore",
-	"agenda.c3.tag": "Research",
-	"agenda.c3.blurb": "What I want to explore once the goal is clear.",
+	"agenda.c2.title": "Explore",
+	"agenda.c2.tag": "Research",
+	"agenda.c2.blurb": "What I want to explore in research.",
+	"agenda.c3.title": "Goal",
+	"agenda.c3.tag": "Direction",
+	"agenda.c3.blurb": "Where this path is heading — and why.",
 	"agenda.c4.title": "Next Steps",
 	"agenda.c4.tag": "Path",
 	"agenda.c4.blurb": "What I do next on the path forward.",
@@ -111,16 +111,103 @@ const en: Dict = {
 	"conn.bridge": "These projects can converge into one system.",
 	"conn.statement":
 		"I see UAVs as the next system where my previous engineering experience can converge.",
-	"goal.kicker": "02 — Goal",
-	"goal.title": "From Flying\nto Working",
-	"goal.body":
-		"Move from UAV platforms that simply fly toward intelligent systems capable of perception, decision-making and useful agricultural task execution.",
-	"goal.flow1": "Position",
-	"goal.flow2": "Perceive",
-	"goal.flow3": "Decide",
-	"goal.flow4": "Act",
-	"research.kicker": "03 — Explore",
-	"research.title": "What I want to explore.",
+	"goal.kicker": "03 — Goal",
+	"goal.title": "My Goal.",
+	"goal.headline": "My Goal.",
+	"goal.display.my": "My",
+	"goal.display.goal": "Goal.",
+	"goal.title.from": "From Experience",
+	"goal.title.to": "To Impact.",
+	"goal.display.from": "From",
+	"goal.display.experience": "Experience",
+	"goal.display.to": "To",
+	"goal.display.impact": "Impact.",
+	"goal.lede":
+		"Turn engineering experience into meaningful research,\nand eventually into products that matter.",
+	"goal.path.current": "Now",
+	"goal.path.grad": "Graduate",
+	"goal.path.vision": "Vision",
+	"goal.current.kicker": "Current Transition",
+	"goal.current.title": "From Engineering\nto Intelligent Agriculture",
+	"goal.current.body":
+		"This is not a sudden career change. It is a reorientation of what I already know — bringing embedded systems, positioning, robotics and AI into intelligent agricultural applications.",
+	"goal.current.from": "Engineering Experience",
+	"goal.current.stack": "RTK · Embedded · Robotics · AI · Sensors",
+	"goal.current.reorient": "Reorientation",
+	"goal.current.to": "Current Research Direction",
+	"goal.current.dest": "Intelligent Agricultural UAV Systems",
+	"goal.current.note":
+		"Agriculture here is the bridge into graduate research — not the boundary of what I will build for life.",
+	"goal.grad.kicker": "Graduate Study",
+	"goal.grad.title": "Build the Foundation.",
+	"goal.grad.lede":
+		"Not a checklist of scores — a complete foundation for research: papers, academics, language, and the discipline to go further.",
+	"goal.g1.title": "Publish Papers",
+	"goal.g1.body": "Build real research experience and produce academic publications.",
+	"goal.g2.title": "CET-6 550+",
+	"goal.g2.body": "Reach CET-6 score of 550 or above.",
+	"goal.g3.title": "IELTS 6.5",
+	"goal.g3.body": "Continue improving academic English and reach IELTS 6.5.",
+	"goal.g4.title": "GPA A",
+	"goal.g4.body": "Maintain strong academic performance and aim for an A-level GPA.",
+	"goal.phd.kicker": "Result",
+	"goal.phd.title": "PhD-Ready",
+	"goal.phd.body":
+		"Build the research experience, academic performance and language ability needed to pursue a PhD.",
+	"goal.vision.kicker": "Long-Term Vision",
+	"goal.vision.bridge": "From Research  →  Real-World Impact",
+	"goal.vision.title": "Create something people are happy to have.",
+	"goal.vision.p1":
+		"Products that bring people a genuine sense of happiness and usefulness.",
+	"goal.vision.p2":
+		"A product that can be truly helpful when people need it — and when they do not need it, they can simply put it aside without feeling anxious about it.",
+	"goal.vision.p3":
+		"Agricultural UAV and low-altitude systems are how I build capability now. The long-term aim is to carry that systems thinking into products with real human value.",
+	"goal.vision.motto": "Useful when needed.\nQuiet when not needed.",
+	"goal.close": "Close",
+	"goal.path.nav": "Goal stages",
+	"goal.flag.hint": "Select a stage",
+	"goal.flag.vision.blurb": "Life Goal.",
+	"goal.cue.now": "Engineering Experience →",
+	"goal.cue.grad": "Research Direction →",
+	"goal.cue.vision": "Product Philosophy →",
+	"goal.panel.now.title": "Engineering Experience",
+	"goal.panel.now.lede":
+		"From embedded systems to intelligent\nrobotics and UAV applications.",
+	"goal.panel.now.i1.title": "RTK Positioning",
+	"goal.panel.now.i1.tags": "Positioning · Communication · UAV",
+	"goal.panel.now.i2.title": "Intelligent AGV",
+	"goal.panel.now.i2.tags": "Embedded · ROS · Perception · AI",
+	"goal.panel.now.i3.title": "AI Interaction",
+	"goal.panel.now.i3.tags": "Voice · LLM · MQTT · Embedded",
+	"goal.panel.now.i4.title": "Smart Elderly Care",
+	"goal.panel.now.i4.tags": "Sensors · AI · IoT · Product Design",
+	"goal.panel.now.cta": "View Projects →",
+	"goal.panel.grad.title": "Build the Foundation.",
+	"goal.panel.grad.research.label": "Research",
+	"goal.panel.grad.research.body":
+		"Develop a research direction around\nlow-altitude systems, intelligent UAV\napplications and technology planning.",
+	"goal.panel.grad.academic.label": "Academic",
+	"goal.panel.grad.academic.l1": "→ Publish research papers",
+	"goal.panel.grad.academic.l2": "→ GPA A",
+	"goal.panel.grad.academic.l3": "→ Build a foundation for PhD study",
+	"goal.panel.grad.english.label": "English",
+	"goal.panel.grad.english.l1": "→ CET-6 550+",
+	"goal.panel.grad.english.l2": "→ IELTS 6.5",
+	"goal.panel.grad.direction.label": "Direction",
+	"goal.panel.grad.direction.chain":
+		"Engineering Experience\n↓\nLow-Altitude Technology\n↓\nResearch\n↓\nTechnology Planning",
+	"goal.panel.grad.footer": "→ PhD-Ready",
+	"goal.panel.vision.p1":
+		"I want to create products that genuinely bring people a sense of happiness and usefulness — tools that feel natural in everyday life.",
+	"goal.panel.vision.p2":
+		"Not something people need to constantly think about, manage, or feel anxious about when unused.",
+	"goal.panel.vision.p3":
+		"Something that simply works when the moment comes — helpful when needed, and easy to set aside when not.",
+	"goal.panel.vision.p4":
+		"Agricultural UAV and low-altitude systems are how I build capability now. The long-term aim is to carry that systems thinking into products with real human value.",
+	"research.kicker": "02 — Explore",
+	"research.title": "explore",
 	"research.d1.title": "Precise Positioning",
 	"research.d1.tech": "RTK + GNSS + Sensor Fusion",
 	"research.d1.body":
@@ -151,7 +238,8 @@ const en: Dict = {
 	"fit.recent": "Recent Work",
 	"fit.connect": "Potential Connection",
 	"next.kicker": "04 — Next Steps",
-	"next.title": "From Engineering\nto Research.",
+	"next.title": "Next Step.",
+	"next.sub": "From Engineering to Research.",
 	"next.blurb":
 		"My next step is not simply to learn more technologies. It is to turn engineering experience into research capability: identify a meaningful problem, build a system, experiment, and validate in realistic scenarios.",
 	"next.s1.title": "Engineering Experience",
@@ -217,26 +305,26 @@ const zhHans: Dict = {
 	"nav.archive": "档案",
 	"nav.cv": "简历",
 	"story.01": "项目",
-	"story.02": "目标",
-	"story.03": "Explore",
+	"story.02": "Explore",
+	"story.03": "目标",
 	"story.04": "下一步",
 	"agenda.kicker": "今日 · 流程",
 	"agenda.word": "目录",
 	"agenda.wordEn": "CONTENT",
 	"agenda.title": "今天怎么讲。",
 	"agenda.blurb":
-		"先讲经验和项目，再说明农业方向的目标，然后说我想探索什么，最后落到下一步。",
+		"先讲经验和项目，再说想探索什么，然后说明长期目标，最后落到下一步。",
 	"agenda.nav": "演讲流程",
 	"agenda.hint": "从左侧滑入 — 点击跳转",
 	"agenda.c1.title": "Projects",
 	"agenda.c1.tag": "经验",
 	"agenda.c1.blurb": "工作、校园、造物 — 我做过什么。",
-	"agenda.c2.title": "Goal",
-	"agenda.c2.tag": "农业方向",
-	"agenda.c2.blurb": "为什么选农业方向，目标是什么。",
-	"agenda.c3.title": "Explore",
-	"agenda.c3.tag": "探索",
-	"agenda.c3.blurb": "目标定了之后，我想探索什么。",
+	"agenda.c2.title": "Explore",
+	"agenda.c2.tag": "探索",
+	"agenda.c2.blurb": "我想在研究中探索什么。",
+	"agenda.c3.title": "Goal",
+	"agenda.c3.tag": "方向",
+	"agenda.c3.blurb": "这条路径最终要去哪里，以及为什么。",
 	"agenda.c4.title": "Next Steps",
 	"agenda.c4.tag": "下一步",
 	"agenda.c4.blurb": "探索之后，接下来要做什么。",
@@ -307,15 +395,101 @@ const zhHans: Dict = {
 	"conn.bridge": "这些项目可以汇入同一套系统。",
 	"conn.statement":
 		"我把无人机看成先前工程经验可以汇聚的下一个系统。",
-	"goal.kicker": "02 — 目标",
-	"goal.title": "从会飞\n到能干",
-	"goal.body":
-		"从只会飞的无人机平台，走向能感知、决策并执行有用农业任务的智能系统。",
-	"goal.flow1": "定位",
-	"goal.flow2": "感知",
-	"goal.flow3": "决策",
-	"goal.flow4": "执行",
-	"research.kicker": "03 — Explore",
+	"goal.kicker": "03 — 目标",
+	"goal.title": "My Goal.",
+	"goal.headline": "My Goal.",
+	"goal.display.my": "My",
+	"goal.display.goal": "Goal.",
+	"goal.title.from": "From Experience",
+	"goal.title.to": "To Impact.",
+	"goal.display.from": "From",
+	"goal.display.experience": "Experience",
+	"goal.display.to": "To",
+	"goal.display.impact": "Impact.",
+	"goal.lede":
+		"把工程经验转化为有意义的研究，并最终做成真正重要的产品。",
+	"goal.path.current": "Now",
+	"goal.path.grad": "Graduate",
+	"goal.path.vision": "Vision",
+	"goal.current.kicker": "Current Transition",
+	"goal.current.title": "From Engineering\nto Intelligent Agriculture",
+	"goal.current.body":
+		"这不是突然换赛道，而是把已经积累的嵌入式、定位、机器人与 AI 能力，重新定向到智能农业应用。",
+	"goal.current.from": "Engineering Experience",
+	"goal.current.stack": "RTK · Embedded · Robotics · AI · Sensors",
+	"goal.current.reorient": "Reorientation",
+	"goal.current.to": "Current Research Direction",
+	"goal.current.dest": "Intelligent Agricultural UAV Systems",
+	"goal.current.note":
+		"农业是进入研究生研究的桥梁，不是我一生产品边界的限定。",
+	"goal.grad.kicker": "Graduate Study",
+	"goal.grad.title": "Build the Foundation.",
+	"goal.grad.lede":
+		"不是成绩清单，而是完整的科研底座：论文、学业、语言，以及继续走下去的能力。",
+	"goal.g1.title": "Publish Papers",
+	"goal.g1.body": "建立真实的研究经验，产出学术论文。",
+	"goal.g2.title": "CET-6 550+",
+	"goal.g2.body": "英语六级达到 550 分及以上。",
+	"goal.g3.title": "IELTS 6.5",
+	"goal.g3.body": "持续提升学术英语，目标雅思 6.5。",
+	"goal.g4.title": "GPA A",
+	"goal.g4.body": "保持优秀学业表现，目标 A 级 GPA。",
+	"goal.phd.kicker": "Result",
+	"goal.phd.title": "PhD-Ready",
+	"goal.phd.body":
+		"建立攻读博士所需的研究经验、学业表现与语言能力。",
+	"goal.vision.kicker": "Long-Term Vision",
+	"goal.vision.bridge": "From Research  →  Real-World Impact",
+	"goal.vision.title": "Create something\npeople are happy\nto have.",
+	"goal.vision.p1": "创造真正给人幸福感与用处的产品。",
+	"goal.vision.p2":
+		"需要时真正有用；不需要时可以安心放下，不会带来负担或焦虑。",
+	"goal.vision.p3":
+		"农业无人机与低空系统是我现在建立能力的路径；长期要把这种系统思维迁移到真正有社会价值的产品创造中。",
+	"goal.vision.motto": "Useful when needed.\nQuiet when not needed.",
+	"goal.close": "关闭",
+	"goal.path.nav": "目标阶段",
+	"goal.flag.hint": "选择一个阶段",
+	"goal.flag.vision.blurb": "Happy to Have.",
+	"goal.cue.now": "Engineering Experience →",
+	"goal.cue.grad": "Research Direction →",
+	"goal.cue.vision": "Product Philosophy →",
+	"goal.panel.now.title": "Engineering Experience",
+	"goal.panel.now.lede":
+		"从嵌入式系统到智能机器人\n与无人机应用。",
+	"goal.panel.now.i1.title": "RTK Positioning",
+	"goal.panel.now.i1.tags": "Positioning · Communication · UAV",
+	"goal.panel.now.i2.title": "Intelligent AGV",
+	"goal.panel.now.i2.tags": "Embedded · ROS · Perception · AI",
+	"goal.panel.now.i3.title": "AI Interaction",
+	"goal.panel.now.i3.tags": "Voice · LLM · MQTT · Embedded",
+	"goal.panel.now.i4.title": "Smart Elderly Care",
+	"goal.panel.now.i4.tags": "Sensors · AI · IoT · Product Design",
+	"goal.panel.now.cta": "查看项目 →",
+	"goal.panel.grad.title": "Build the Foundation.",
+	"goal.panel.grad.research.label": "Research",
+	"goal.panel.grad.research.body":
+		"围绕低空系统、智能无人机应用\n与技术规划，建立研究方向。",
+	"goal.panel.grad.academic.label": "Academic",
+	"goal.panel.grad.academic.l1": "→ Publish research papers",
+	"goal.panel.grad.academic.l2": "→ GPA A",
+	"goal.panel.grad.academic.l3": "→ Build a foundation for PhD study",
+	"goal.panel.grad.english.label": "English",
+	"goal.panel.grad.english.l1": "→ CET-6 550+",
+	"goal.panel.grad.english.l2": "→ IELTS 6.5",
+	"goal.panel.grad.direction.label": "Direction",
+	"goal.panel.grad.direction.chain":
+		"Engineering Experience\n↓\nLow-Altitude Technology\n↓\nResearch\n↓\nTechnology Planning",
+	"goal.panel.grad.footer": "→ PhD-Ready",
+	"goal.panel.vision.p1":
+		"我想创造真正给人幸福感与用处的产品——能自然进入日常生活的东西。",
+	"goal.panel.vision.p2":
+		"不是需要人们时刻惦记、管理，或不使用就感到焦虑的负担。",
+	"goal.panel.vision.p3":
+		"而是在需要的那一刻刚好发挥作用——需要时有用，不需要时可以安静地放在一边。",
+	"goal.panel.vision.p4":
+		"农业无人机与低空系统是我现在建立能力的路径；长期要把这种系统思维迁移到真正有人价值的产品创造中。",
+	"research.kicker": "02 — Explore",
 	"research.title": "我想探索什么。",
 	"research.d1.title": "精准定位",
 	"research.d1.tech": "RTK + GNSS + 传感融合",
@@ -342,7 +516,8 @@ const zhHans: Dict = {
 	"fit.recent": "近期工作",
 	"fit.connect": "可能的连接",
 	"next.kicker": "04 — 下一步",
-	"next.title": "从工程\n到研究。",
+	"next.title": "Next Step.",
+	"next.sub": "从工程到研究。",
 	"next.blurb":
 		"下一步不是简单学更多技术，而是把工程经验转化为研究能力：找到有意义的问题，构建系统，做实验，并在真实场景验证。",
 	"next.s1.title": "工程经验",
@@ -404,26 +579,26 @@ const zhHant: Dict = {
 	"nav.archive": "檔案",
 	"nav.cv": "履歷",
 	"story.01": "專案",
-	"story.02": "目標",
-	"story.03": "Explore",
+	"story.02": "Explore",
+	"story.03": "目標",
 	"story.04": "下一步",
 	"agenda.kicker": "今日 · 流程",
 	"agenda.word": "目錄",
 	"agenda.wordEn": "CONTENT",
 	"agenda.title": "今天怎麼講。",
 	"agenda.blurb":
-		"先講經驗和專案，再說明農業方向的目標，然後說我想探索什麼，最後落到下一步。",
+		"先講經驗和專案，再說想探索什麼，然後說明長期目標，最後落到下一步。",
 	"agenda.nav": "演講流程",
 	"agenda.hint": "從左側滑入 — 點擊跳轉",
 	"agenda.c1.title": "Projects",
 	"agenda.c1.tag": "經驗",
 	"agenda.c1.blurb": "工作、校園、造物 — 我做過什麼。",
-	"agenda.c2.title": "Goal",
-	"agenda.c2.tag": "農業方向",
-	"agenda.c2.blurb": "為什麼選農業方向，目標是什麼。",
-	"agenda.c3.title": "Explore",
-	"agenda.c3.tag": "探索",
-	"agenda.c3.blurb": "目標定了之後，我想探索什麼。",
+	"agenda.c2.title": "Explore",
+	"agenda.c2.tag": "探索",
+	"agenda.c2.blurb": "我想在研究中探索什麼。",
+	"agenda.c3.title": "Goal",
+	"agenda.c3.tag": "方向",
+	"agenda.c3.blurb": "這條路徑最終要去哪裡，以及為什麼。",
 	"agenda.c4.title": "Next Steps",
 	"agenda.c4.tag": "下一步",
 	"agenda.c4.blurb": "探索之後，接下來要做什麼。",
@@ -494,15 +669,101 @@ const zhHant: Dict = {
 	"conn.bridge": "這些專案可以匯入同一套系統。",
 	"conn.statement":
 		"我把無人機看成先前工程經驗可以匯聚的下一個系統。",
-	"goal.kicker": "02 — 目標",
-	"goal.title": "從會飛\n到能幹",
-	"goal.body":
-		"從只會飛的無人機平台，走向能感知、決策並執行有用農業任務的智慧系統。",
-	"goal.flow1": "定位",
-	"goal.flow2": "感知",
-	"goal.flow3": "決策",
-	"goal.flow4": "執行",
-	"research.kicker": "03 — Explore",
+	"goal.kicker": "03 — 目標",
+	"goal.title": "My Goal.",
+	"goal.headline": "My Goal.",
+	"goal.display.my": "My",
+	"goal.display.goal": "Goal.",
+	"goal.title.from": "From Experience",
+	"goal.title.to": "To Impact.",
+	"goal.display.from": "From",
+	"goal.display.experience": "Experience",
+	"goal.display.to": "To",
+	"goal.display.impact": "Impact.",
+	"goal.lede":
+		"把工程經驗轉化為有意義的研究，並最終做成真正重要的產品。",
+	"goal.path.current": "Now",
+	"goal.path.grad": "Graduate",
+	"goal.path.vision": "Vision",
+	"goal.current.kicker": "Current Transition",
+	"goal.current.title": "From Engineering\nto Intelligent Agriculture",
+	"goal.current.body":
+		"這不是突然換賽道，而是把已經累積的嵌入式、定位、機器人與 AI 能力，重新定向到智慧農業應用。",
+	"goal.current.from": "Engineering Experience",
+	"goal.current.stack": "RTK · Embedded · Robotics · AI · Sensors",
+	"goal.current.reorient": "Reorientation",
+	"goal.current.to": "Current Research Direction",
+	"goal.current.dest": "Intelligent Agricultural UAV Systems",
+	"goal.current.note":
+		"農業是進入研究生研究的橋樑，不是我一生產品邊界的限定。",
+	"goal.grad.kicker": "Graduate Study",
+	"goal.grad.title": "Build the Foundation.",
+	"goal.grad.lede":
+		"不是成績清單，而是完整的科研底座：論文、學業、語言，以及繼續走下去的能力。",
+	"goal.g1.title": "Publish Papers",
+	"goal.g1.body": "建立真實的研究經驗，產出學術論文。",
+	"goal.g2.title": "CET-6 550+",
+	"goal.g2.body": "英語六級達到 550 分及以上。",
+	"goal.g3.title": "IELTS 6.5",
+	"goal.g3.body": "持續提升學術英語，目標雅思 6.5。",
+	"goal.g4.title": "GPA A",
+	"goal.g4.body": "保持優秀學業表現，目標 A 級 GPA。",
+	"goal.phd.kicker": "Result",
+	"goal.phd.title": "PhD-Ready",
+	"goal.phd.body":
+		"建立攻讀博士所需的研究經驗、學業表現與語言能力。",
+	"goal.vision.kicker": "Long-Term Vision",
+	"goal.vision.bridge": "From Research  →  Real-World Impact",
+	"goal.vision.title": "Create something\npeople are happy\nto have.",
+	"goal.vision.p1": "創造真正給人幸福感與用處的產品。",
+	"goal.vision.p2":
+		"需要時真正有用；不需要時可以安心放下，不會帶來負擔或焦慮。",
+	"goal.vision.p3":
+		"農業無人機與低空系統是我現在建立能力的路徑；長期要把這種系統思維遷移到真正有社會價值的產品創造中。",
+	"goal.vision.motto": "Useful when needed.\nQuiet when not needed.",
+	"goal.close": "關閉",
+	"goal.path.nav": "目標階段",
+	"goal.flag.hint": "選擇一個階段",
+	"goal.flag.vision.blurb": "Happy to Have.",
+	"goal.cue.now": "Engineering Experience →",
+	"goal.cue.grad": "Research Direction →",
+	"goal.cue.vision": "Product Philosophy →",
+	"goal.panel.now.title": "Engineering Experience",
+	"goal.panel.now.lede":
+		"從嵌入式系統到智慧機器人\n與無人機應用。",
+	"goal.panel.now.i1.title": "RTK Positioning",
+	"goal.panel.now.i1.tags": "Positioning · Communication · UAV",
+	"goal.panel.now.i2.title": "Intelligent AGV",
+	"goal.panel.now.i2.tags": "Embedded · ROS · Perception · AI",
+	"goal.panel.now.i3.title": "AI Interaction",
+	"goal.panel.now.i3.tags": "Voice · LLM · MQTT · Embedded",
+	"goal.panel.now.i4.title": "Smart Elderly Care",
+	"goal.panel.now.i4.tags": "Sensors · AI · IoT · Product Design",
+	"goal.panel.now.cta": "查看專案 →",
+	"goal.panel.grad.title": "Build the Foundation.",
+	"goal.panel.grad.research.label": "Research",
+	"goal.panel.grad.research.body":
+		"圍繞低空系統、智慧無人機應用\n與技術規劃，建立研究方向。",
+	"goal.panel.grad.academic.label": "Academic",
+	"goal.panel.grad.academic.l1": "→ Publish research papers",
+	"goal.panel.grad.academic.l2": "→ GPA A",
+	"goal.panel.grad.academic.l3": "→ Build a foundation for PhD study",
+	"goal.panel.grad.english.label": "English",
+	"goal.panel.grad.english.l1": "→ CET-6 550+",
+	"goal.panel.grad.english.l2": "→ IELTS 6.5",
+	"goal.panel.grad.direction.label": "Direction",
+	"goal.panel.grad.direction.chain":
+		"Engineering Experience\n↓\nLow-Altitude Technology\n↓\nResearch\n↓\nTechnology Planning",
+	"goal.panel.grad.footer": "→ PhD-Ready",
+	"goal.panel.vision.p1":
+		"我想創造真正給人幸福感與用處的產品——能自然進入日常生活的東西。",
+	"goal.panel.vision.p2":
+		"不是需要人們時刻惦記、管理，或不使用就感到焦慮的負擔。",
+	"goal.panel.vision.p3":
+		"而是在需要的那一刻剛好發揮作用——需要時有用，不需要時可以安靜地放在一邊。",
+	"goal.panel.vision.p4":
+		"農業無人機與低空系統是我現在建立能力的路徑；長期要把這種系統思維遷移到真正有人價值的產品創造中。",
+	"research.kicker": "02 — Explore",
 	"research.title": "我想探索什麼。",
 	"research.d1.title": "精準定位",
 	"research.d1.tech": "RTK + GNSS + 感測融合",
@@ -529,7 +790,8 @@ const zhHant: Dict = {
 	"fit.recent": "近期工作",
 	"fit.connect": "可能的連接",
 	"next.kicker": "04 — 下一步",
-	"next.title": "從工程\n到研究。",
+	"next.title": "Next Step.",
+	"next.sub": "從工程到研究。",
 	"next.blurb":
 		"下一步不是簡單學更多技術，而是把工程經驗轉化為研究能力：找到有意義的問題，構建系統，做實驗，並在真實場景驗證。",
 	"next.s1.title": "工程經驗",
@@ -607,6 +869,26 @@ type LocaleContextValue = {
 };
 
 const LocaleContext = createContext<LocaleContextValue | null>(null);
+const CopyOverrideContext = createContext<Dict>({});
+
+export function getDict(locale: Locale): Dict {
+	return dictionaries[locale];
+}
+
+/** Merge Studio / page-layout copy overrides into `t()`. */
+export function CopyOverrideProvider({
+	overrides,
+	children,
+}: {
+	overrides: Dict;
+	children: ReactNode;
+}) {
+	return (
+		<CopyOverrideContext.Provider value={overrides}>
+			{children}
+		</CopyOverrideContext.Provider>
+	);
+}
 
 export function LocaleProvider({ children }: { children: ReactNode }) {
 	const setLocale = useCallback((_next: Locale) => {
@@ -634,8 +916,13 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
 
 export function useLocale() {
 	const ctx = useContext(LocaleContext);
+	const overrides = useContext(CopyOverrideContext);
 	if (!ctx) {
 		throw new Error("useLocale must be used within LocaleProvider");
 	}
-	return ctx;
+	const t = useCallback(
+		(key: string) => overrides[key] ?? ctx.t(key),
+		[ctx, overrides],
+	);
+	return { ...ctx, t };
 }

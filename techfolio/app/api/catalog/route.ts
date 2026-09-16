@@ -25,8 +25,11 @@ type CatalogEntry = {
 export type CatalogPersist = {
 	items: CatalogEntry[];
 	hidden: string[];
+	/** Shared with site via content/project-order.json */
 	order?: string[];
 	groups?: Record<string, ProjectCatalogGroup>;
+	/** Highlighted project ids (star in site nav). */
+	starred?: string[];
 	customs?: CatalogEntry[];
 };
 
@@ -41,21 +44,23 @@ function normalizeGroups(
 	return out;
 }
 
+function normalizeIdList(raw: unknown): string[] {
+	if (!Array.isArray(raw)) return [];
+	return raw.filter((id): id is string => typeof id === "string");
+}
+
 async function readOrderFile(): Promise<ProjectOrderFile> {
 	try {
 		const raw = await readFile(ORDER_FILE, "utf8");
 		const data = JSON.parse(raw) as ProjectOrderFile;
 		return {
-			order: Array.isArray(data.order)
-				? data.order.filter((id) => typeof id === "string")
-				: [],
-			hidden: Array.isArray(data.hidden)
-				? data.hidden.filter((id) => typeof id === "string")
-				: [],
+			order: normalizeIdList(data.order),
+			hidden: normalizeIdList(data.hidden),
+			starred: normalizeIdList(data.starred),
 			groups: normalizeGroups(data.groups),
 		};
 	} catch {
-		return { order: [], hidden: [], groups: {} };
+		return { order: [], hidden: [], starred: [], groups: {} };
 	}
 }
 
@@ -75,6 +80,7 @@ export async function GET() {
 		hidden: order.hidden,
 		order: order.order,
 		groups: order.groups ?? {},
+		starred: order.starred ?? [],
 	} satisfies CatalogPersist);
 }
 
@@ -99,10 +105,12 @@ export async function POST(req: Request) {
 					: [];
 
 		const hidden = body.hidden.filter((id) => typeof id === "string");
+		const starred = normalizeIdList(body.starred);
 		const groups = normalizeGroups(body.groups);
 		const payload: ProjectOrderFile = {
 			order: orderFromBody,
 			hidden,
+			starred,
 			groups,
 		};
 		await writeFile(ORDER_FILE, `${JSON.stringify(payload, null, "\t")}\n`, "utf8");
@@ -113,6 +121,7 @@ export async function POST(req: Request) {
 			hidden,
 			order: payload.order,
 			groups: payload.groups,
+			starred: payload.starred,
 		};
 		await writeFile(
 			LEGACY_FILE,

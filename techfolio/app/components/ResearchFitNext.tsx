@@ -1,6 +1,6 @@
 "use client";
 
-import { useLocale } from "../lib/i18n";
+import { LayoutText } from "../lib/use-page-layout";
 
 const STEPS = [
 	"next.s1",
@@ -11,61 +11,66 @@ const STEPS = [
 	"next.s6",
 ] as const;
 
-/** Next Steps story slide (Fit section removed from main demo axis). */
+/** Next Steps: My Goal–sized title left, path stacked on the right. */
 export function ResearchFitNext() {
-	const { t } = useLocale();
-
 	return (
 		<section id="next" className="story-slide bg-[#F7F1E8]">
-			<div className="story-slide__body px-6 py-8 sm:px-8 md:px-10 lg:px-12">
-				<div className="mx-auto flex w-full max-w-[1100px] flex-col xl:max-w-[1160px]">
-					<p className="text-[0.68rem] font-semibold uppercase tracking-[0.28em] text-[#0F4C45]/70">
-						{t("next.kicker")}
-					</p>
-					<h2 className="mt-2 max-w-[12ch] whitespace-pre-line text-[1.75rem] font-extrabold leading-[0.98] tracking-tight text-[#162b26] sm:text-[2.3rem]">
-						{t("next.title")}
-					</h2>
-					<p className="mt-2 max-w-[36rem] text-[0.84rem] leading-6 text-[#4A5C58]">
-						{t("next.blurb")}
-					</p>
+			<div className="story-slide__body !justify-start px-5 py-6 sm:px-8 sm:py-7 md:px-11 lg:px-14 lg:py-9">
+				<div className="mx-auto flex h-full w-full max-w-[1180px] flex-col xl:max-w-[1260px]">
+					<div className="flex min-h-0 flex-1 flex-col gap-10 pt-[2.5vh] sm:pt-[3.5vh] lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:items-start lg:gap-0 lg:pt-[4.5vh]">
+						<header className="shrink-0 lg:pr-8 xl:pr-12">
+							<p className="text-[0.58rem] font-medium uppercase tracking-[0.3em] text-[#0F4C45]/55">
+								<LayoutText k="next.kicker" />
+							</p>
+							<h2 className="mt-3 text-[clamp(2.5rem,6.5vw,5.25rem)] font-semibold uppercase leading-[0.94] tracking-[-0.045em] text-[#162b26]">
+								<LayoutText k="next.title" />
+							</h2>
+							<p className="mt-4 max-w-[20rem] text-[0.95rem] font-semibold leading-snug tracking-[-0.015em] text-[#162b26]/80">
+								<LayoutText k="next.sub" />
+							</p>
+							<p className="mt-3 max-w-[22rem] text-[0.74rem] leading-[1.65] text-[#4A5C58]">
+								<LayoutText k="next.blurb" multiline />
+							</p>
+						</header>
 
-					<ol className="mt-6 max-w-xl space-y-0 sm:mt-8">
-						{STEPS.map((key, i) => {
-							const last = i === STEPS.length - 1;
-							return (
-								<li key={key} className="flex gap-4">
-									<div className="flex flex-col items-center">
-										<span
-											className={`flex h-7 w-7 shrink-0 items-center justify-center font-mono text-[0.62rem] font-bold ${
-												last
-													? "bg-[#043439] text-white"
-													: "text-[#0F4C45]/45"
-											}`}
-										>
-											0{i + 1}
-										</span>
-										{!last ? (
+						<ol className="w-full max-w-[22rem] self-end translate-y-8 sm:translate-y-12 lg:ml-auto lg:mr-2 lg:max-w-[24rem] lg:-translate-x-[9.25rem] lg:translate-y-[11.875rem] lg:self-start xl:mr-8 2xl:mr-14">
+							{STEPS.map((key, i) => {
+								const last = i === STEPS.length - 1;
+								return (
+									<li key={key} className="flex gap-4">
+										<div className="flex flex-col items-center">
 											<span
-												aria-hidden
-												className="my-0.5 w-px flex-1 bg-[#0F4C45]/15"
-											/>
-										) : null}
-									</div>
-									<div className={!last ? "pb-4" : "pb-0"}>
-										<p
-											className={`pt-0.5 font-extrabold tracking-tight text-[#162b26] ${
-												last
-													? "text-[1.02rem] sm:text-[1.15rem]"
-													: "text-[0.9rem]"
-											}`}
-										>
-											{t(`${key}.title`)}
-										</p>
-									</div>
-								</li>
-							);
-						})}
-					</ol>
+												className={`flex h-7 w-7 shrink-0 items-center justify-center font-mono text-[0.62rem] font-bold ${
+													last
+														? "bg-[#043439] text-white"
+														: "text-[#0F4C45]/45"
+												}`}
+											>
+												0{i + 1}
+											</span>
+											{!last ? (
+												<span
+													aria-hidden
+													className="my-0.5 w-px flex-1 bg-[#0F4C45]/15"
+												/>
+											) : null}
+										</div>
+										<div className={!last ? "pb-9 sm:pb-10 lg:pb-12" : "pb-0"}>
+											<p
+												className={`pt-0.5 font-extrabold tracking-tight text-[#162b26] ${
+													last
+														? "text-[1.05rem] sm:text-[1.2rem]"
+														: "text-[0.92rem] sm:text-[1rem]"
+												}`}
+											>
+												<LayoutText k={`${key}.title`} />
+											</p>
+										</div>
+									</li>
+								);
+							})}
+						</ol>
+					</div>
 				</div>
 			</div>
 		</section>

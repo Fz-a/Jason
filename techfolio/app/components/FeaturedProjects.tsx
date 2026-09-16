@@ -52,6 +52,8 @@ type NavItem = {
 	diyItems?: MakeDiyItem[];
 	kind: "showcase" | "company" | "helmet" | "diy";
 	group: GroupId;
+	/** Static highlight from Studio (project-order starred). */
+	starred?: boolean;
 };
 
 function firstSpreadBlurb(
@@ -131,6 +133,7 @@ function buildCatalog(isZh: boolean, t: (k: string) => string): NavItem[] {
 				showcase: s,
 				kind: "showcase",
 				group: entry.group,
+				starred: Boolean(entry.starred),
 			});
 			continue;
 		}
@@ -153,6 +156,7 @@ function buildCatalog(isZh: boolean, t: (k: string) => string): NavItem[] {
 				body: [...c.brief],
 				kind: "company",
 				group: entry.group,
+				starred: Boolean(entry.starred),
 			});
 			continue;
 		}
@@ -179,6 +183,7 @@ function buildCatalog(isZh: boolean, t: (k: string) => string): NavItem[] {
 				helmetImages: [...helmet.images],
 				kind: "helmet",
 				group: entry.group,
+				starred: Boolean(entry.starred),
 			});
 			continue;
 		}
@@ -208,6 +213,7 @@ function buildCatalog(isZh: boolean, t: (k: string) => string): NavItem[] {
 				diyItems: [...diyWall.items],
 				kind: "diy",
 				group: entry.group,
+				starred: Boolean(entry.starred),
 			});
 		}
 	}
@@ -231,7 +237,7 @@ function NavButton({
 			type="button"
 			data-nav-id={item.id}
 			onClick={() => onSelect(item.id)}
-			className={`project-nav__item relative z-[1] block w-full text-left transition-colors ${
+			className={`project-nav__item relative z-[1] flex w-full items-baseline gap-1 text-left transition-colors ${
 				compact ? "project-nav__item--compact whitespace-nowrap px-2.5 py-1.5" : "px-2.5 py-[0.2rem]"
 			} ${
 				active
@@ -240,7 +246,7 @@ function NavButton({
 			}`}
 		>
 			<span
-				className={`${
+				className={`min-w-0 ${
 					compact ? "text-[0.7rem]" : "text-[0.74rem]"
 				} leading-snug tracking-tight ${
 					active ? "font-semibold" : "font-medium"
@@ -248,6 +254,16 @@ function NavButton({
 			>
 				{item.label}
 			</span>
+			{item.starred ? (
+				<span
+					aria-hidden
+					className={`shrink-0 font-normal leading-none ${
+						active ? "text-[#0F4C45]/55" : "text-[#0F4C45]/35"
+					} ${compact ? "text-[0.58rem]" : "text-[0.62rem]"}`}
+				>
+					★
+				</span>
+			) : null}
 		</button>
 	);
 }

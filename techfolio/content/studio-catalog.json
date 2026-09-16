@@ -133,5 +133,14 @@
 	"groups": {
 		"safe-campus-service": "university",
 		"drone-workstation": "university"
-	}
+	},
+	"starred": [
+		"zongheng-robot",
+		"shixun-car",
+		"rtk",
+		"agv",
+		"smart-clothes",
+		"fire-warning",
+		"smart-helmet"
+	]
 }

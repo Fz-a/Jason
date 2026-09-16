@@ -24,6 +24,8 @@ export type ProjectCatalogEntry = {
 	id: string;
 	group: ProjectCatalogGroup;
 	kind: ProjectCatalogKind;
+	/** Highlight in the site project rail (Studio-toggled). */
+	starred?: boolean;
 };
 
 export type ProjectOrderFile = {
@@ -31,6 +33,8 @@ export type ProjectOrderFile = {
 	hidden: string[];
 	/** Optional group overrides vs default membership (id → group). */
 	groups?: Record<string, ProjectCatalogGroup>;
+	/** Project ids marked with a star in the site nav. */
+	starred?: string[];
 };
 
 /** Studio sidebar labels (zh) ↔ site group ids */
@@ -138,11 +142,15 @@ export function listProjectCatalog(
 	override?: Partial<ProjectOrderFile> | null,
 ): ProjectCatalogEntry[] {
 	const file = projectOrderFile as ProjectOrderFile;
+	const starred = new Set(override?.starred ?? file.starred ?? []);
 	return applyProjectOrder(defaultProjectCatalog(), {
 		order: override?.order ?? file.order ?? [],
 		hidden: override?.hidden ?? file.hidden ?? [],
 		groups: override?.groups ?? file.groups ?? {},
-	});
+	}).map((e) => ({
+		...e,
+		starred: starred.has(e.id),
+	}));
 }
 
 /** Build order payload from a Studio catalog list (builtins only). */

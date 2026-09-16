@@ -6,8 +6,8 @@ import { isCapabilitiesRailActive } from "../lib/capabilities-rail";
 
 export const STORY_STAGES = [
 	{ id: "experience", key: "story.01", short: "01" },
-	{ id: "goal", key: "story.02", short: "02" },
-	{ id: "research", key: "story.03", short: "03" },
+	{ id: "research", key: "story.02", short: "02" },
+	{ id: "goal", key: "story.03", short: "03" },
 	{ id: "next", key: "story.04", short: "04" },
 ] as const;
 
@@ -21,6 +21,8 @@ export function StoryProgress({ activeId, onNavigate }: Props) {
 	const [scrolled, setScrolled] = useState(false);
 	/** Soften left rail while the tall Projects block owns the viewport */
 	const [inProjects, setInProjects] = useState(false);
+	/** Dark teal story slides need light rail type */
+	const onDark = activeId === "goal";
 
 	useEffect(() => {
 		const el = () => document.getElementById("experience");
@@ -90,10 +92,16 @@ export function StoryProgress({ activeId, onNavigate }: Props) {
 							<span
 								className={`mt-0.5 shrink-0 font-mono text-[0.65rem] tabular-nums transition ${
 									active
-										? "font-bold text-[#043439]"
-										: i < activeIndex
-											? "text-[#0F4C45]/50"
-											: "text-[#0F4C45]/28"
+										? onDark
+											? "font-bold text-[#F7F1E8]"
+											: "font-bold text-[#043439]"
+										: onDark
+											? i < activeIndex
+												? "text-white/45"
+												: "text-white/28"
+											: i < activeIndex
+												? "text-[#0F4C45]/50"
+												: "text-[#0F4C45]/28"
 								}`}
 							>
 								{stage.short}
@@ -101,8 +109,12 @@ export function StoryProgress({ activeId, onNavigate }: Props) {
 							<span
 								className={`text-[0.68rem] font-semibold leading-snug tracking-tight transition ${
 									active
-										? "text-[#043439]"
-										: "text-[#0F4C45]/40 group-hover:text-[#0F4C45]/70"
+										? onDark
+											? "text-[#F7F1E8]"
+											: "text-[#043439]"
+										: onDark
+											? "text-white/38 group-hover:text-white/70"
+											: "text-[#0F4C45]/40 group-hover:text-[#0F4C45]/70"
 								}`}
 							>
 								{t(stage.key)}
