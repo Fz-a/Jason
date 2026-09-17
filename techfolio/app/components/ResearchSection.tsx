@@ -1,5 +1,7 @@
 "use client";
 
+import Image from "next/image";
+
 import { useLocale } from "../lib/i18n";
 import { LayoutText } from "../lib/use-page-layout";
 
@@ -8,25 +10,29 @@ const DIRS = [
 		n: "01",
 		title: "research.d1.title",
 		tech: "research.d1.tech",
-		body: "research.d1.body",
+		img: "/research/d1.webp?v=2",
+		alt: "Satellite beams positioning signals down to a drone over a crosshair-marked field.",
 	},
 	{
 		n: "02",
 		title: "research.d2.title",
 		tech: "research.d2.tech",
-		body: "research.d2.body",
+		img: "/research/d2.webp?v=2",
+		alt: "Drone scans crop rows with dotted sensing waves beside a microchip.",
 	},
 	{
 		n: "03",
 		title: "research.d3.title",
 		tech: "research.d3.tech",
-		body: "research.d3.body",
+		img: "/research/d3.webp?v=2",
+		alt: "Field rover follows a planned dotted route to a destination flag.",
 	},
 	{
 		n: "04",
 		title: "research.d4.title",
 		tech: "research.d4.tech",
-		body: "research.d4.body",
+		img: "/research/d4.webp?v=2",
+		alt: "Drone linked by a dashed line to a ground rover and sensor posts.",
 	},
 ] as const;
 
@@ -47,39 +53,36 @@ export function ResearchSection() {
 					</header>
 
 					<div className="flex min-h-0 flex-1 flex-col justify-center pb-[4vh] pt-4 lg:pb-[6vh]">
-						<div className="grid grid-cols-1 gap-x-10 gap-y-5 sm:grid-cols-2 sm:gap-y-6">
-							{DIRS.map((d) => (
-								<div
-									key={d.n}
-									className="min-w-0 border-t border-[#0F4C45]/12 pt-3"
-								>
-									<p className="font-mono text-[0.62rem] font-semibold text-[#0F4C45]/40">
+					<div className="grid grid-cols-2 gap-x-6 gap-y-10 xl:grid-cols-4 xl:gap-x-8">
+						{DIRS.map((d) => (
+							<figure
+								key={d.n}
+								className="flex flex-col items-center text-center"
+							>
+								<Image
+									src={d.img}
+									alt={d.alt}
+									width={768}
+									height={768}
+									className="h-32 w-full object-contain select-none sm:h-40 xl:h-44"
+								/>
+								<figcaption className="mt-5 px-1">
+									<p className="font-mono text-[0.62rem] font-semibold tracking-[0.25em] text-[#0F4C45]/60">
 										{d.n}
 									</p>
-									<h3 className="mt-1 text-[1rem] font-extrabold tracking-tight text-[#162b26] sm:text-[1.1rem]">
+									<p className="mt-2 text-[1rem] font-extrabold leading-tight tracking-tight text-[#162b26]">
 										<LayoutText k={d.title} />
-									</h3>
-									<p className="mt-1 text-[0.66rem] font-semibold uppercase tracking-[0.12em] text-[#0F4C45]/60">
+									</p>
+									<p className="mt-1.5 text-[0.66rem] font-medium text-[#4A5C58]">
 										{t(d.tech)}
 									</p>
-									<p className="mt-1.5 text-[0.8rem] leading-5 text-[#4A5C58] sm:text-[0.84rem] sm:leading-6">
-										<LayoutText k={d.body} multiline />
-									</p>
-								</div>
-							))}
-						</div>
-
-						<div className="mt-8 border-t border-[#0F4C45]/12 pt-4 sm:mt-10">
-							<p className="text-[0.58rem] font-semibold uppercase tracking-[0.2em] text-[#0F4C45]/50">
-								<LayoutText k="research.q.kicker" />
-							</p>
-							<p className="mt-2 max-w-[40rem] text-[1rem] font-bold leading-7 tracking-tight text-[#162b26] sm:text-[1.15rem]">
-								<LayoutText k="research.q.body" multiline />
-							</p>
-						</div>
+								</figcaption>
+							</figure>
+						))}
 					</div>
 				</div>
 			</div>
-		</section>
+		</div>
+	</section>
 	);
 }

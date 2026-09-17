@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { LayoutText } from "../lib/use-page-layout";
 
 const STEPS = [
@@ -31,9 +32,18 @@ export function ResearchFitNext() {
 							<p className="mt-3 max-w-[22rem] text-[0.74rem] leading-[1.65] text-[#4A5C58]">
 								<LayoutText k="next.blurb" multiline />
 							</p>
+							<figure className="mt-6 hidden lg:block lg:translate-y-[3.625rem]">
+								<Image
+									src="/next-steps-lineart.webp?v=3"
+									alt="Line-art diagram of the path ahead: foundations in knowledge, software and hardware craft, and autonomous spraying for agriculture."
+									width={1400}
+									height={700}
+									className="h-auto w-full max-w-[36.5rem] select-none"
+								/>
+							</figure>
 						</header>
 
-						<ol className="w-full max-w-[22rem] self-end translate-y-8 sm:translate-y-12 lg:ml-auto lg:mr-2 lg:max-w-[24rem] lg:-translate-x-[9.25rem] lg:translate-y-[11.875rem] lg:self-start xl:mr-8 2xl:mr-14">
+						<ol className="w-full max-w-[22rem] self-end translate-y-8 sm:translate-y-12 lg:ml-auto lg:mr-2 lg:max-w-[24rem] lg:-translate-x-[3.5rem] lg:translate-y-[8.4375rem] lg:self-start xl:mr-8 2xl:mr-14">
 							{STEPS.map((key, i) => {
 								const last = i === STEPS.length - 1;
 								return (
