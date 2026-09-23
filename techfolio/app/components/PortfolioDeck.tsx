@@ -48,6 +48,7 @@ export function PortfolioDeck({
 	layout: pageLayout,
 	sections,
 	contactVariant = "compact",
+	avatarSrc,
 }: {
 	layout: PageLayoutFile;
 	sections?: readonly PageSectionId[];
@@ -56,6 +57,8 @@ export function PortfolioDeck({
 	 * `compact` → the original slim slide, hero CTA scrolls to it in place.
 	 */
 	contactVariant?: "feature" | "compact";
+	/** Override the hero avatar (defaults to content/avatar.json). */
+	avatarSrc?: string;
 }) {
 	const { t } = useLocale();
 	const router = useRouter();
@@ -310,11 +313,12 @@ export function PortfolioDeck({
 									<div className="hero-avatar relative aspect-square w-full max-w-[240px] sm:max-w-[340px] lg:max-w-[420px]">
 										<div className="hero-avatar__frame relative h-full w-full overflow-hidden rounded-full">
 											<Image
-												src={
-													avatarSettings.v
-														? `${avatarSettings.src}?v=${avatarSettings.v}`
-														: avatarSettings.src
-												}
+										src={
+											avatarSrc ??
+											(avatarSettings.v
+												? `${avatarSettings.src}?v=${avatarSettings.v}`
+												: avatarSettings.src)
+										}
 												alt="Jason Chen"
 												fill
 												sizes="(max-width: 640px) 240px, 420px"

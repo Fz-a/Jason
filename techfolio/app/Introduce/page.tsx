@@ -9,7 +9,7 @@ export default function Introduce() {
 
 	return (
 		<PageLayoutRoot layout={pageLayout}>
-			<PortfolioDeck layout={pageLayout} />
+			<PortfolioDeck layout={pageLayout} avatarSrc="/avatar-source.jpg" />
 		</PageLayoutRoot>
 	);
 }
