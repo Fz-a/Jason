@@ -31,6 +31,12 @@
 			"source": "showcase"
 		},
 		{
+			"id": "techmore",
+			"title": "techmore",
+			"group": "工作",
+			"source": "showcase"
+		},
+		{
 			"id": "zongheng",
 			"title": "zongheng",
 			"group": "工作",
@@ -116,6 +122,7 @@
 		"vxs-100",
 		"rtk",
 		"agv",
+		"techmore",
 		"zongheng",
 		"cvte",
 		"smart-clothes",

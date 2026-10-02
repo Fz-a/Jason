@@ -10,37 +10,37 @@
     },
     "blocks": [
       {
-        "id": "b_zhglvu83",
+        "id": "b_qcovz4zx",
         "type": "kicker",
         "text": "工作"
       },
       {
-        "id": "b_tz6i9849",
+        "id": "b_42i1zl3y",
         "type": "heading",
         "text": "Zongheng Robot"
       },
       {
-        "id": "b_quw86q77",
+        "id": "b_me6gqva8",
         "type": "subheading",
         "text": "Education robot · IoT teaching"
       },
       {
-        "id": "b_z7afp0ds",
+        "id": "b_kf12c544",
         "type": "kicker",
         "text": "01 · Product"
       },
       {
-        "id": "b_zj77ujsp",
+        "id": "b_ju1zb4h5",
         "type": "heading",
         "text": "Zongheng Robot"
       },
       {
-        "id": "b_srr9tdw1",
+        "id": "b_l3u33lyl",
         "type": "pull",
         "text": "Education robot for university IoT / Inventing System labs — docking, charge bring-up, fleet demos, and the embedded fundamentals students build on in class."
       },
       {
-        "id": "b_tk1xci0a",
+        "id": "b_pue91a78",
         "type": "image",
         "image": {
           "src": "/experience/work/zongheng/robot-product-main.webp",
@@ -49,22 +49,22 @@
         }
       },
       {
-        "id": "b_xs5en5ec",
+        "id": "b_zyn4f5oq",
         "type": "kicker",
         "text": "02 · Specs"
       },
       {
-        "id": "b_jl0rndoj",
+        "id": "b_11yyyvjp",
         "type": "heading",
         "text": "NAVI-BOT specifications"
       },
       {
-        "id": "b_u33ifuoc",
+        "id": "b_xopf5jsn",
         "type": "text",
         "text": "Full parameter sheet for the education fleet — dimensions, sensing, payload, and battery — the same platform used in university IoT and inventing-system labs."
       },
       {
-        "id": "b_skjeu6i2",
+        "id": "b_pgo1fza6",
         "type": "image",
         "image": {
           "src": "/experience/work/zongheng/robot-navi-specs.webp",
@@ -73,22 +73,22 @@
         }
       },
       {
-        "id": "b_6qovuqrg",
+        "id": "b_b0vfqbau",
         "type": "heading",
         "text": "Product positioning"
       },
       {
-        "id": "b_av8vaeyf",
+        "id": "b_z022irq0",
         "type": "text",
         "text": "NAVI-BOT is positioned as an intelligent mobile base for teaching: multi-sensor fusion, LLM voice interaction, and a payload class that fits classroom demos as well as lab projects."
       },
       {
-        "id": "b_ktvtjoan",
+        "id": "b_qcu79a9p",
         "type": "text",
         "text": "The banner sits beside the fleet story — not as a twin card, but as the go-to-market face of the same chassis students drive in class."
       },
       {
-        "id": "b_4efkrh0a",
+        "id": "b_22rs1mlu",
         "type": "image",
         "image": {
           "src": "/experience/work/zongheng/robot-navi-banner.webp",
@@ -97,22 +97,22 @@
         }
       },
       {
-        "id": "b_g4il7yby",
+        "id": "b_w54e45y5",
         "type": "kicker",
         "text": "03 · Teaching"
       },
       {
-        "id": "b_g0r14ikk",
+        "id": "b_k1tkjz5f",
         "type": "heading",
         "text": "Lectures around the robot"
       },
       {
-        "id": "b_jxmvepgu",
+        "id": "b_7ycvisvf",
         "type": "text",
         "text": "Classroom talks center on Zongheng Robot — IoT practice plus embedded fundamentals for university students."
       },
       {
-        "id": "b_i1e6uc6g",
+        "id": "b_v5anc915",
         "type": "image",
         "image": {
           "src": "/experience/work/zongheng/robot-lecture-iot.webp",
@@ -133,37 +133,37 @@
     },
     "blocks": [
       {
-        "id": "b_8prlbkmz",
+        "id": "b_45nrc9n9",
         "type": "kicker",
         "text": "工作"
       },
       {
-        "id": "b_txp0m9k0",
+        "id": "b_m2l205gl",
         "type": "heading",
-        "text": "Training vehicle"
+        "text": "Mecanum Training Platform"
       },
       {
-        "id": "b_yyar6gsf",
+        "id": "b_vwpuq8gc",
         "type": "subheading",
         "text": "Shixun · Mecanum training car"
       },
       {
-        "id": "b_h7m3dvtb",
+        "id": "b_2zj1jirj",
         "type": "kicker",
         "text": "01 · Product"
       },
       {
-        "id": "b_y80jsa2d",
+        "id": "b_z1z1tvwj",
         "type": "heading",
-        "text": "Training vehicle"
+        "text": "Mecanum Training Platform"
       },
       {
-        "id": "b_3whde7no",
+        "id": "b_4prkf5te",
         "type": "pull",
         "text": "Mecanum training platform for classroom fleets — paired with Zongheng robots for hands-on IoT and motion labs."
       },
       {
-        "id": "b_l47fzhga",
+        "id": "b_23b55wv7",
         "type": "image",
         "image": {
           "src": "/experience/work/zongheng/shixun-car.webp",
@@ -172,42 +172,42 @@
         }
       },
       {
-        "id": "b_qlm1oisy",
+        "id": "b_godgfexk",
         "type": "kicker",
         "text": "02 · Role"
       },
       {
-        "id": "b_taoewx3x",
+        "id": "b_23awuc24",
         "type": "heading",
         "text": "What it is for"
       },
       {
-        "id": "b_ik9ry9te",
+        "id": "b_8xbafun5",
         "type": "text",
         "text": "The Shixun car is the student-facing chassis in the teaching line — docking and charge support for classroom fleets, and a clear platform for embedded / IoT exercises."
       },
       {
-        "id": "b_hl7vltb1",
+        "id": "b_uobtfrfq",
         "type": "text",
         "text": "It sits beside the Zongheng robot as a separate product in the same education stack, not a single bundled unit."
       },
       {
-        "id": "b_e6dccsrd",
+        "id": "b_rwzwj790",
         "type": "heading",
         "text": "ZH_MCar controller"
       },
       {
-        "id": "b_3absv67f",
+        "id": "b_yz7pukah",
         "type": "text",
         "text": "Mainboard for the training car — ESP32 wireless, DC12V in, USB-C, and four motor channels (A–D) for mecanum drive."
       },
       {
-        "id": "b_xbw2c63g",
+        "id": "b_p35ord1e",
         "type": "text",
         "text": "Designed as the student-facing control board: bring-up, power, and motion on one PCB rather than a pile of modules."
       },
       {
-        "id": "b_codq92lm",
+        "id": "b_947hketl",
         "type": "image",
         "image": {
           "src": "/experience/work/zongheng/shixun-pcb.webp",
@@ -216,22 +216,22 @@
         }
       },
       {
-        "id": "b_jma44vpf",
+        "id": "b_mejadw9f",
         "type": "kicker",
         "text": "03 · Lab"
       },
       {
-        "id": "b_j98ghjej",
+        "id": "b_jk30zcb0",
         "type": "heading",
         "text": "In the teaching room"
       },
       {
-        "id": "b_bw0urciv",
+        "id": "b_nxrhdom5",
         "type": "text",
         "text": "Lab sessions put students around the chassis and laptops — path control, sensing, and bring-up on a real mecanum platform."
       },
       {
-        "id": "b_mjdcnz3t",
+        "id": "b_4lmw9osg",
         "type": "image",
         "image": {
           "src": "/experience/work/zongheng/lab-teaching.webp",
