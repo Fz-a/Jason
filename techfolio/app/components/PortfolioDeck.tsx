@@ -8,8 +8,9 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { HomeScrollPreloader } from "./HomeScrollPreloader";
 import { HeroNameFlip } from "./HeroNameFlip";
-import { FeaturedProjects } from "./FeaturedProjects";
+import { FeaturedProjectsRail } from "./FeaturedProjectsRail";
 import { AgendaSection } from "./AgendaSection";
+import { AboutSection } from "./AboutSection";
 import { GoalSection } from "./GoalSection";
 import { ResearchSection } from "./ResearchSection";
 import { ResearchFitNext } from "./ResearchFitNext";
@@ -22,7 +23,7 @@ import {
 	orderedVisible,
 } from "../lib/use-page-layout";
 import type { PageLayoutFile, PageSectionId } from "../lib/page-layout";
-import avatarSettings from "../../content/avatar.json";
+import { avatarDisplaySrc, type AvatarVariant } from "../lib/avatar";
 
 const montserrat = Montserrat({
 	subsets: ["latin"],
@@ -48,7 +49,8 @@ export function PortfolioDeck({
 	layout: pageLayout,
 	sections,
 	contactVariant = "compact",
-	avatarSrc,
+	avatarVariant = "home",
+	showEnterIntroduce = true,
 }: {
 	layout: PageLayoutFile;
 	sections?: readonly PageSectionId[];
@@ -57,8 +59,10 @@ export function PortfolioDeck({
 	 * `compact` → the original slim slide, hero CTA scrolls to it in place.
 	 */
 	contactVariant?: "feature" | "compact";
-	/** Override the hero avatar (defaults to content/avatar.json). */
-	avatarSrc?: string;
+	/** Which avatar to show in the hero ("home" | "introduce"). */
+	avatarVariant?: AvatarVariant;
+	/** Show the hero "Enter Introduce" link (off on /Introduce/ itself). */
+	showEnterIntroduce?: boolean;
 }) {
 	const { t } = useLocale();
 	const router = useRouter();
@@ -262,10 +266,7 @@ export function PortfolioDeck({
 										onClick={onStudioTap}
 										className="cursor-default text-left"
 									>
-										<p className="text-[0.68rem] font-semibold uppercase tracking-[0.28em] text-[#0F4C45]">
-											<LayoutText k="hero.headline" multiline />
-										</p>
-									<p className="mt-2 text-[0.78rem] font-semibold uppercase tracking-[0.18em] text-[#0F4C45]/60">
+									<p className="text-[0.78rem] font-semibold uppercase tracking-[0.18em] text-[#0F4C45]/60">
 										<LayoutText k="hero.role" />
 									</p>
 								</button>
@@ -276,7 +277,7 @@ export function PortfolioDeck({
 						<span>{t("hero.iam")} </span>
 					</span>
 					<span className="mt-[0.12em] block">
-						<HeroNameFlip /><span>{t("hero.greetingEnd")}</span>
+						<HeroNameFlip />
 					</span>
 				</h1>
 
@@ -298,40 +299,35 @@ export function PortfolioDeck({
 											.join(" · ")}
 									</p>
 
-									<div className="mt-8 flex flex-wrap items-center gap-3">
+								<div className="mt-8 flex flex-wrap items-center gap-3">
+									<Link
+										href={contactHref}
+										onClick={(event) => handleNavClick(event, contactHref)}
+										className="cursor-pointer rounded-full bg-[#043439] px-6 py-2.5 text-sm font-semibold text-white transition hover:opacity-90"
+									>
+										{t("hero.contact")}
+									</Link>
+									{showEnterIntroduce ? (
 										<Link
-											href={contactHref}
-											onClick={(event) => handleNavClick(event, contactHref)}
-											className="cursor-pointer rounded-full bg-[#043439] px-6 py-2.5 text-sm font-semibold text-white transition hover:opacity-90"
+											href="/Introduce/"
+											className="cursor-pointer rounded-full border border-[#0F4C45]/25 px-6 py-2.5 text-sm font-semibold text-[#0F4C45] transition hover:bg-[#0F4C45] hover:text-white"
 										>
-											{t("hero.contact")}
+											{t("hero.enterIntroduce")}
 										</Link>
-									</div>
+									) : null}
+								</div>
 								</div>
 
 								<div className="order-1 flex items-center justify-center lg:order-2">
 									<div className="hero-avatar relative aspect-square w-full max-w-[240px] sm:max-w-[340px] lg:max-w-[420px]">
 										<div className="hero-avatar__frame relative h-full w-full overflow-hidden rounded-full">
 											<Image
-										src={
-											avatarSrc ??
-											(avatarSettings.v
-												? `${avatarSettings.src}?v=${avatarSettings.v}`
-												: avatarSettings.src)
-										}
+												src={avatarDisplaySrc(avatarVariant)}
 												alt="Jason Chen"
 												fill
 												sizes="(max-width: 640px) 240px, 420px"
 												priority
 												className="hero-avatar__img object-cover"
-												style={
-													avatarSettings.source
-														? undefined
-														: {
-																transform: `translate(${avatarSettings.tx ?? 0}%, ${avatarSettings.ty ?? 0}%) scale(${avatarSettings.scale})`,
-																transformOrigin: "center center",
-															}
-												}
 											/>
 											<span aria-hidden className="hero-avatar__veil" />
 										</div>
@@ -360,8 +356,10 @@ export function PortfolioDeck({
 				);
 			case "agenda":
 				return <AgendaSection onNavigate={scrollToSection} />;
+			case "about":
+				return <AboutSection />;
 			case "experience":
-				return <FeaturedProjects />;
+				return <FeaturedProjectsRail />;
 			case "research":
 				return <ResearchSection />;
 			case "goal":

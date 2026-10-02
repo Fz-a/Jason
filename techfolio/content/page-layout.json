@@ -2,6 +2,7 @@
   "version": 1,
   "order": [
     "home",
+    "about",
     "agenda",
     "experience",
     "research",

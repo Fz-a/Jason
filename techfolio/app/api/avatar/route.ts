@@ -12,6 +12,7 @@ type AvatarBody = {
 	tx: number;
 	ty: number;
 	v?: number;
+	variant?: "home" | "introduce";
 };
 
 const DISPLAY_SIZE = 1600;
@@ -103,6 +104,7 @@ export async function POST(request: Request) {
 		}
 
 		const parsed = JSON.parse(settingsRaw) as AvatarBody;
+		const variant = parsed.variant === "introduce" ? "introduce" : "home";
 		const settingsIn = {
 			scale: Number(parsed.scale),
 			tx: Number(parsed.tx),
@@ -112,17 +114,23 @@ export async function POST(request: Request) {
 		const root = process.cwd();
 		const v = Date.now();
 
-		// Prefer fresh upload; else bake from existing source / avatar2
+		const displayName =
+			variant === "introduce" ? "avatar-introduce.webp" : "avatar.webp";
+		const sourceName =
+			variant === "introduce"
+				? "avatar-introduce-source.jpg"
+				: "avatar-source.jpg";
+
+		// Prefer fresh upload; else bake from existing source / display
 		let inputBuf: Buffer | null = null;
 		const image = form.get("image");
 		if (image instanceof File && image.size > 0) {
 			inputBuf = Buffer.from(await image.arrayBuffer());
 		} else {
-			const candidates = [
-				"avatar-source.jpg",
-				"avatar2.png",
-				"avatar.webp",
-			];
+			const candidates =
+				variant === "introduce"
+					? ["avatar-introduce-source.jpg", "avatar-introduce.webp"]
+					: ["avatar-source.jpg", "avatar2.png", "avatar.webp"];
 			const { readFile } = await import("node:fs/promises");
 			for (const name of candidates) {
 				try {
@@ -146,20 +154,23 @@ export async function POST(request: Request) {
 			makeSource(inputBuf),
 		]);
 
-		await writeFile(path.join(root, "public", "avatar.webp"), displayBuf);
-		await writeFile(path.join(root, "public", "avatar-source.jpg"), sourceBuf);
+		await writeFile(path.join(root, "public", displayName), displayBuf);
+		await writeFile(path.join(root, "public", sourceName), sourceBuf);
 
 		const settings: AvatarBody = {
-			src: "/avatar.webp",
-			source: "/avatar-source.jpg",
+			src: `/${displayName}`,
+			source: `/${sourceName}`,
 			scale: settingsIn.scale,
 			tx: settingsIn.tx,
 			ty: settingsIn.ty,
 			v,
+			variant,
 		};
 
+		const jsonName =
+			variant === "introduce" ? "avatar-introduce.json" : "avatar.json";
 		await writeFile(
-			path.join(root, "content", "avatar.json"),
+			path.join(root, "content", jsonName),
 			`${JSON.stringify(settings, null, "\t")}\n`,
 			"utf8",
 		);

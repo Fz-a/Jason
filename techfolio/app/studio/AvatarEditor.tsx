@@ -12,6 +12,8 @@ import {
 	type PointerEvent as ReactPointerEvent,
 } from "react";
 import seedAvatar from "../../content/avatar.json";
+import seedIntroduceAvatar from "../../content/avatar-introduce.json";
+import type { AvatarVariant } from "../lib/avatar";
 
 export type AvatarSettings = {
 	src: string;
@@ -35,6 +37,7 @@ export type AvatarEditorHandle = {
 };
 
 const STORAGE_KEY = "techfolio-avatar-draft-v2";
+const STORAGE_KEY_INTRODUCE = "techfolio-avatar-introduce-draft-v1";
 const MIN_SCALE = 1;
 const MAX_SCALE = 3.2;
 
@@ -48,8 +51,10 @@ function panLimit(scale: number) {
 
 function normalize(
 	raw: Partial<AvatarSettings> & { x?: number; y?: number },
+	variant: AvatarVariant,
 ): AvatarSettings {
-	const scale = clamp(Number(raw.scale ?? seedAvatar.scale), MIN_SCALE, MAX_SCALE);
+	const seed = variant === "introduce" ? seedIntroduceAvatar : seedAvatar;
+	const scale = clamp(Number(raw.scale ?? seed.scale), MIN_SCALE, MAX_SCALE);
 	const limit = panLimit(scale);
 	let tx = raw.tx;
 	let ty = raw.ty;
@@ -59,21 +64,25 @@ function normalize(
 		src: raw.src ?? "/avatar.webp",
 		source: raw.source,
 		scale,
-		tx: clamp(Number(tx ?? seedAvatar.tx), -limit, limit),
-		ty: clamp(Number(ty ?? seedAvatar.ty), -limit, limit),
+		tx: clamp(Number(tx ?? seed.tx), -limit, limit),
+		ty: clamp(Number(ty ?? seed.ty), -limit, limit),
 		v: raw.v,
 	};
 }
 
 type Props = {
 	embedded?: boolean;
+	variant?: AvatarVariant;
 	onPreviewChange?: (preview: AvatarPreview) => void;
 	onTip?: (msg: string | null) => void;
 };
 
 export const AvatarEditor = forwardRef<AvatarEditorHandle, Props>(
-	function AvatarEditor({ embedded = false, onPreviewChange, onTip }, ref) {
-		const seed = normalize(seedAvatar);
+	function AvatarEditor(
+		{ embedded = false, variant = "home", onPreviewChange, onTip },
+		ref,
+	) {
+		const seed = normalize(seedAvatar, variant);
 		const [settings, setSettings] = useState<AvatarSettings>(seed);
 		const [previewSrc, setPreviewSrc] = useState(seed.source ?? seed.src);
 		const [fileName, setFileName] = useState<string | null>(null);
@@ -99,15 +108,19 @@ export const AvatarEditor = forwardRef<AvatarEditorHandle, Props>(
 			[onTip],
 		);
 
+		const storageKey =
+			variant === "introduce" ? STORAGE_KEY_INTRODUCE : STORAGE_KEY;
+
 		useEffect(() => {
 			try {
-				const raw = window.localStorage.getItem(STORAGE_KEY);
+				const raw = window.localStorage.getItem(storageKey);
 				if (raw) {
-					const parsed = normalize(JSON.parse(raw));
+					const parsed = normalize(JSON.parse(raw), variant);
 					setSettings(parsed);
 					const editSrc = parsed.source ?? parsed.src;
 					if (!editSrc.startsWith("blob:")) setPreviewSrc(editSrc);
 				} else {
+					setSettings(seed);
 					setPreviewSrc(seed.source ?? seed.src);
 				}
 			} catch {
@@ -115,12 +128,12 @@ export const AvatarEditor = forwardRef<AvatarEditorHandle, Props>(
 			}
 			setReady(true);
 			// eslint-disable-next-line react-hooks/exhaustive-deps
-		}, []);
+		}, [variant]);
 
 		useEffect(() => {
 			if (!ready) return;
-			window.localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
-		}, [settings, ready]);
+			window.localStorage.setItem(storageKey, JSON.stringify(settings));
+		}, [settings, ready, storageKey]);
 
 		useEffect(() => {
 			onPreviewChange?.({
@@ -152,8 +165,11 @@ export const AvatarEditor = forwardRef<AvatarEditorHandle, Props>(
 				setFileName(file.name);
 				setPreviewSrc(url);
 				setSettings({
-					src: "/avatar.webp",
-					source: "/avatar-source.jpg",
+					src: variant === "introduce" ? "/avatar-introduce.webp" : "/avatar.webp",
+					source:
+						variant === "introduce"
+							? "/avatar-introduce-source.jpg"
+							: "/avatar-source.jpg",
 					scale: 1.45,
 					tx: 10,
 					ty: -4,
@@ -250,8 +266,15 @@ export const AvatarEditor = forwardRef<AvatarEditorHandle, Props>(
 			setSaving(true);
 			try {
 				const payload = {
-					src: "/avatar.webp",
-					source: "/avatar-source.jpg",
+					variant,
+					src:
+						variant === "introduce"
+							? "/avatar-introduce.webp"
+							: "/avatar.webp",
+					source:
+						variant === "introduce"
+							? "/avatar-introduce-source.jpg"
+							: "/avatar-source.jpg",
 					scale: Number(settings.scale.toFixed(2)),
 					tx: Number(settings.tx.toFixed(1)),
 					ty: Number(settings.ty.toFixed(1)),
@@ -278,14 +301,18 @@ export const AvatarEditor = forwardRef<AvatarEditorHandle, Props>(
 				}
 
 				if (data.settings) {
-					const next = normalize(data.settings);
+					const next = normalize(data.settings, variant);
 					setSettings(next);
 					const bust = data.settings.v ?? Date.now();
-					setPreviewSrc(`${next.source ?? "/avatar-source.jpg"}?v=${bust}`);
+					const fallbackSource =
+						variant === "introduce"
+							? "/avatar-introduce-source.jpg"
+							: "/avatar-source.jpg";
+					setPreviewSrc(`${next.source ?? fallbackSource}?v=${bust}`);
 				}
 				setUploadFile(null);
 				setFileName(null);
-				flash("已保存清晰头像，去首页刷新即可");
+				flash("已保存清晰头像，去刷新即可");
 			} catch {
 				flash("保存失败：开发服务器未开启或接口不可用");
 			} finally {
@@ -511,7 +538,7 @@ export const AvatarEditor = forwardRef<AvatarEditorHandle, Props>(
 						<button
 							type="button"
 							onClick={() => {
-								const next = normalize(seedAvatar);
+								const next = normalize(seedAvatar, variant);
 								setSettings(next);
 								setPreviewSrc(next.source ?? next.src);
 								setUploadFile(null);

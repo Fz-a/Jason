@@ -1666,23 +1666,12 @@ button,
 }
 
 .hero-name-roll {
-	--roll-ease: cubic-bezier(0.22, 1, 0.36, 1);
-	--roll-duration: 0.82s;
-	--roll-lift: -5px;
 	display: inline-block;
 	vertical-align: baseline;
 	line-height: 1;
 	cursor: default;
 	outline: none;
-	transition:
-		transform 0.65s var(--roll-ease);
 }
-
-.hero-name-roll:hover,
-.hero-name-roll:focus-visible {
-	transform: translate3d(0, var(--roll-lift), 0) scale(1.012);
-}
-
 
 .hero-name-roll__shell {
 	display: inline-grid;
@@ -1706,111 +1695,55 @@ button,
 	white-space: nowrap;
 }
 
-.hero-name-roll__sizer-en {
-	font: inherit;
-	letter-spacing: inherit;
-}
-
 .hero-name-roll__sizer-zh {
-	font: inherit;
-	font-size: 0.94em;
-	white-space: nowrap;
+	font-family:
+		"PingFang SC",
+		"Microsoft YaHei",
+		"Noto Sans SC",
+		system-ui,
+		sans-serif;
+	letter-spacing: 0.14em;
 }
 
 .hero-name-roll__viewport {
 	grid-area: 1 / 1;
+	height: 1.2em;
+	line-height: 1;
 	overflow: hidden;
-	height: 1em;
-	line-height: 1;
 	align-self: end;
+	display: grid;
 }
 
-.hero-name-roll__track {
-	display: flex;
-	flex-direction: column;
-	transform: translate3d(0, 0, 0);
-	transition: transform var(--roll-duration) var(--roll-ease);
-	will-change: transform;
-}
-
-.hero-name-roll:hover .hero-name-roll__track,
-.hero-name-roll:focus-visible .hero-name-roll__track {
-	transform: translate3d(0, -1em, 0);
-}
-
+/* Rolling-text lines overlap in the viewport; chars roll individually. */
 .hero-name-roll__line {
-	height: 1em;
-	flex-shrink: 0;
-	display: flex;
-	align-items: center;
-	justify-content: flex-start;
-	width: 100%;
-}
-
-.hero-name-roll__text {
-	display: inline-block;
+	grid-area: 1 / 1;
+	display: block;
 	white-space: nowrap;
 	line-height: 1;
+	perspective: 600px;
 }
 
-.hero-name-roll__line--en .hero-name-roll__text {
-	transition: none;
+/* Chinese name: inherit the h1 weight/color (Montserrat has no CJK glyphs, so
+   the CJK glyphs render in a matching geometric sans stack). */
+.hero-name-roll__line--zh {
+	font-family:
+		"PingFang SC",
+		"Microsoft YaHei",
+		"Noto Sans SC",
+		system-ui,
+		sans-serif;
+	letter-spacing: 0.14em;
 }
 
-.hero-name-roll:hover .hero-name-roll__line--en .hero-name-roll__text,
-.hero-name-roll:focus-visible .hero-name-roll__line--en .hero-name-roll__text {
-	opacity: 1;
-}
-
-.hero-name-roll__text--zh {
-	font: inherit;
-	font-size: 0.94em;
-	color: inherit;
-	white-space: nowrap;
-}
-
-.hero-name-roll:hover .hero-name-roll__text--zh,
-.hero-name-roll:focus-visible .hero-name-roll__text--zh {
-	color: inherit;
-}
-
-.hero-name-roll__glow {
-	display: none;
-}
-
-.hero-name-roll:focus-visible {
-	outline: 2px solid rgb(15 76 69 / 0.28);
-	outline-offset: 0.12em;
-	border-radius: 0.08em;
+.hero-name-roll__char {
+	display: inline-block;
+	will-change: transform;
+	backface-visibility: hidden;
 }
 
 @media (prefers-reduced-motion: reduce) {
-	.hero-name-roll,
-	.hero-name-roll__track {
-		transition: none;
-	}
-
-	.hero-name-roll:hover,
-	.hero-name-roll:focus-visible {
-		transform: none;
-		filter: none;
-	}
-
-	.hero-name-roll:hover .hero-name-roll__track,
-	.hero-name-roll:focus-visible .hero-name-roll__track {
-		transform: none;
-	}
-
 	.hero-name-roll__line--zh {
 		display: none;
-	}
-
-	.hero-name-roll__glow {
-		display: none;
-	}
-
-	.motion-safe\:animate-\[uniCardIn_0\.55s_ease_both\] {
-		animation: none !important;
 	}
 }
 
@@ -2040,4 +1973,41 @@ button,
 	border: 0;
 	background: transparent;
 	border-radius: 999px;
+}
+
+/* —— Projects: FLIP carousel (spotlight + track, no pinning) —— */
+.flip-carousel__card {
+	will-change: transform;
+}
+
+.flip-carousel__spotlight {
+	min-height: min(15rem, 38vh);
+}
+
+@media (max-width: 1023px) {
+	.flip-carousel__spotlight {
+		min-height: min(13rem, 34vh);
+	}
+}
+
+/* The flying ghost clone — keep it as a clean image tile (no text). */
+.flip-carousel__ghost {
+	overflow: hidden;
+	box-shadow: 0 24px 60px rgb(22 43 38 / 0.28);
+}
+
+.flip-carousel__ghost img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+.flip-carousel__ghost .flip-carousel__card-label {
+	display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.flip-carousel__ghost {
+		display: none;
+	}
 }

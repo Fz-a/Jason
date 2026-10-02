@@ -2,6 +2,7 @@ import type { Locale } from "./i18n";
 
 export const PAGE_SECTION_IDS = [
 	"home",
+	"about",
 	"agenda",
 	"experience",
 	"research",
@@ -38,6 +39,17 @@ export const PAGE_SECTIONS: PageSectionMeta[] = [
 			{ key: "hero.role", label: "角色", role: "label" },
 			{ key: "hero.hello", label: "问候", role: "label" },
 			{ key: "hero.contact", label: "按钮", role: "label" },
+		],
+	},
+	{
+		id: "about",
+		label: "About",
+		hint: "个人简介（首页第二页）",
+		fields: [
+			{ key: "about.kicker", label: "Kicker", role: "label" },
+			{ key: "about.heading", label: "标题", role: "display" },
+			{ key: "about.body1", label: "正文 1", multiline: true, role: "body" },
+			{ key: "about.body2", label: "正文 2", multiline: true, role: "body" },
 		],
 	},
 	{

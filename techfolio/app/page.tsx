@@ -11,7 +11,7 @@ export default function Home() {
 		<PageLayoutRoot layout={pageLayout}>
 			<PortfolioDeck
 				layout={pageLayout}
-				sections={["home", "experience", "contact"]}
+				sections={["home", "about", "experience", "contact"]}
 				contactVariant="feature"
 			/>
 		</PageLayoutRoot>

@@ -1,11 +1,9 @@
 "use client";
 
 import Image from "next/image";
-import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { Flip } from "gsap/Flip";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useLocale } from "../lib/i18n";
+import { isCapabilitiesRailActive } from "../lib/capabilities-rail";
 import { ZoomableFrame } from "./ImageLightbox";
 import { ShowcaseDocument } from "../projects/UniversityShowcase";
 import {
@@ -223,6 +221,53 @@ function buildCatalog(isZh: boolean, t: (k: string) => string): NavItem[] {
 	return items;
 }
 
+function NavButton({
+	item,
+	active,
+	onSelect,
+	compact,
+}: {
+	item: NavItem;
+	active: boolean;
+	onSelect: (id: string) => void;
+	compact?: boolean;
+}) {
+	return (
+		<button
+			type="button"
+			data-nav-id={item.id}
+			onClick={() => onSelect(item.id)}
+			className={`project-nav__item relative z-[1] flex w-full items-baseline gap-1 text-left transition-colors ${
+				compact ? "project-nav__item--compact whitespace-nowrap px-2.5 py-1.5" : "px-2.5 py-[0.2rem]"
+			} ${
+				active
+					? "text-[#043439]"
+					: "text-[#0F4C45]/50 hover:text-[#0F4C45]/85"
+			}`}
+		>
+			<span
+				className={`min-w-0 ${
+					compact ? "text-[0.7rem]" : "text-[0.74rem]"
+				} leading-snug tracking-tight ${
+					active ? "font-semibold" : "font-medium"
+				}`}
+			>
+				{item.label}
+			</span>
+			{item.starred ? (
+				<span
+					aria-hidden
+					className={`shrink-0 font-normal leading-none ${
+						active ? "text-[#0F4C45]/55" : "text-[#0F4C45]/35"
+					} ${compact ? "text-[0.58rem]" : "text-[0.62rem]"}`}
+				>
+					★
+				</span>
+			) : null}
+		</button>
+	);
+}
+
 function DiyGrid({
 	items,
 	isZh,
@@ -264,76 +309,41 @@ function DiyGrid({
 	);
 }
 
-function SpotlightCard({
-	item,
-	onOpen,
-	canOpen,
-	openLabel,
-}: {
-	item: NavItem;
-	onOpen: () => void;
-	canOpen: boolean;
-	openLabel: string;
-}) {
+function DiyCollagePreview({ items }: { items: MakeDiyItem[] }) {
+	const tiles = items.slice(0, 9);
 	return (
-		<div className="relative flex h-full min-h-[16rem] flex-col">
-			<div className="relative min-h-[11rem] flex-1">
-				<Image
-					src={item.imageSrc}
-					alt={item.imageAlt}
-					fill
-					sizes="(max-width: 1024px) 100vw, 560px"
-					className="object-cover"
-					priority
-					style={imageFocusStyle({
-						scale: item.imageScale,
-						tx: item.imageTx,
-						ty: item.imageTy,
-					})}
-				/>
-				<span className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#162b26]/85 via-[#162b26]/25 to-transparent" />
-				<div className="absolute inset-x-0 bottom-0 flex flex-col gap-1.5 p-5 sm:p-7">
-					<span className="text-[0.6rem] font-semibold uppercase tracking-[0.22em] text-[#F7F1E8]/70">
-						{item.section}
-					</span>
-					<h3 className="text-[1.5rem] font-extrabold leading-[1.05] tracking-tight text-white sm:text-[1.9rem]">
-						{item.label}
-					</h3>
+		<div className="grid h-full w-full grid-cols-3 grid-rows-3 gap-1 bg-[#E8E2D8] p-1 sm:gap-1.5 sm:p-1.5">
+			{tiles.map((diy) => (
+				<div key={diy.id} className="relative min-h-0 overflow-hidden bg-[#DDD6CC]">
+					<Image
+						src={diy.image.src}
+						alt=""
+						fill
+						sizes="120px"
+						className="object-cover object-center"
+					/>
 				</div>
-			</div>
-
-			<div className="shrink-0 px-5 pb-5 pt-3 sm:px-7 sm:pb-7">
-				{item.summary ? (
-					<p className="line-clamp-2 text-[0.86rem] leading-6 text-[#3E514D]">
-						{item.summary}
-					</p>
-				) : null}
-				{canOpen ? (
-					<button
-						type="button"
-						onClick={onOpen}
-						className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-[#0F4C45] px-5 py-2 text-[0.78rem] font-semibold text-white transition hover:bg-[#043439]"
-					>
-						{openLabel}
-						<span aria-hidden>→</span>
-					</button>
-				) : null}
-			</div>
+			))}
 		</div>
 	);
 }
 
-export function FeaturedProjects() {
+export function FeaturedProjectsRail() {
 	const { t, isZh } = useLocale();
 	const sectionRef = useRef<HTMLElement>(null);
-	const trackRef = useRef<HTMLDivElement>(null);
-	const spotlightRef = useRef<HTMLDivElement>(null);
 	const catalog = useMemo(() => buildCatalog(isZh, t), [isZh, t]);
 	const [selectedId, setSelectedId] = useState<string>(
 		() => catalog[0]?.id ?? "rtk",
 	);
 	const [panelOpen, setPanelOpen] = useState(false);
+	const [railVisible, setRailVisible] = useState(false);
 	const [diyFocus, setDiyFocus] = useState<MakeDiyItem | null>(null);
+	const [pill, setPill] = useState({
+		top: 0,
+		height: 0,
+		ready: false,
+	});
+	const railTrackRef = useRef<HTMLDivElement>(null);
 
 	const groups = useMemo(
 		() =>
@@ -343,10 +353,6 @@ export function FeaturedProjects() {
 			})).filter((g) => g.items.length > 0),
 		[catalog],
 	);
-
-	// Cards in a single list (groups flattened, grouped order preserved) for
-	// the FLIP carousel track.
-	const cards = useMemo(() => groups.flatMap((g) => g.items), [groups]);
 
 	const selected =
 		catalog.find((n) => n.id === selectedId) ?? catalog[0] ?? null;
@@ -358,6 +364,32 @@ export function FeaturedProjects() {
 				selected.kind === "diy" ||
 				(selected.kind === "company" && selected.body?.length)),
 	);
+
+	useEffect(() => {
+		const el = sectionRef.current;
+		if (!el) return;
+		let raf = 0;
+		const update = () => {
+			raf = 0;
+			const r = el.getBoundingClientRect();
+			const vh = window.innerHeight;
+			setRailVisible((prev) => {
+				const show = isCapabilitiesRailActive(r, vh, prev);
+				return prev === show ? prev : show;
+			});
+		};
+		const onScroll = () => {
+			if (!raf) raf = requestAnimationFrame(update);
+		};
+		update();
+		window.addEventListener("scroll", onScroll, { passive: true });
+		window.addEventListener("resize", onScroll);
+		return () => {
+			if (raf) cancelAnimationFrame(raf);
+			window.removeEventListener("scroll", onScroll);
+			window.removeEventListener("resize", onScroll);
+		};
+	}, []);
 
 	useEffect(() => {
 		const locked = panelOpen || Boolean(diyFocus);
@@ -376,91 +408,35 @@ export function FeaturedProjects() {
 		};
 	}, [panelOpen, diyFocus]);
 
-	// GSAP — reveal the track when the section scrolls into view.
-	useEffect(() => {
-		gsap.registerPlugin(ScrollTrigger);
-		const el = sectionRef.current;
-		if (!el) return;
-		const ctx = gsap.context(() => {
-			ScrollTrigger.create({
-				trigger: el,
-				start: "top 70%",
-				once: true,
-				onEnter: () => {
-					gsap.from(".flip-carousel__card", {
-						autoAlpha: 0,
-						y: 24,
-						scale: 0.94,
-						duration: 0.6,
-						stagger: 0.04,
-						ease: "power2.out",
-						immediateRender: false,
-						clearProps: "all",
-					});
-				},
+	useLayoutEffect(() => {
+		const syncPill = () => {
+			const track = railTrackRef.current;
+			if (!track) return;
+			const btn = track.querySelector(
+				`[data-nav-id="${selectedId}"]`,
+			) as HTMLElement | null;
+			if (!btn) {
+				setPill((p) => ({ ...p, ready: false }));
+				return;
+			}
+			const trackRect = track.getBoundingClientRect();
+			const btnRect = btn.getBoundingClientRect();
+			setPill({
+				top: btnRect.top - trackRect.top + track.scrollTop,
+				height: btnRect.height,
+				ready: true,
 			});
-		}, el);
-		return () => ctx.revert();
-	}, []);
+		};
 
-	// GSAP Flip — clicking a card FLIPs a ghost of it into the spotlight
-	// position (React-safe: the real spotlight re-renders behind the ghost,
-	// then the ghost fades out).
+		syncPill();
+		window.addEventListener("resize", syncPill);
+		return () => window.removeEventListener("resize", syncPill);
+	}, [selectedId, groups, railVisible]);
+
 	const select = (id: string) => {
-		const track = trackRef.current;
-		const spotlight = spotlightRef.current;
-		const incoming = track?.querySelector<HTMLElement>(
-			`[data-card-id="${id}"]`,
-		);
-
-		if (!incoming || !spotlight) {
-			setSelectedId(id);
-			return;
-		}
-
-		if (id === selectedId) return;
-
-		// Clone the clicked thumbnail to animate it into the spotlight.
-		const ghost = incoming.cloneNode(true) as HTMLElement;
-		ghost.setAttribute("aria-hidden", "true");
-		ghost.classList.add("flip-carousel__ghost");
-		document.body.appendChild(ghost);
-
-		const from = incoming.getBoundingClientRect();
-		gsap.set(ghost, {
-			position: "fixed",
-			left: from.left,
-			top: from.top,
-			width: from.width,
-			height: from.height,
-			margin: 0,
-			zIndex: 80,
-			pointerEvents: "none",
-		});
-
-		const to = spotlight.getBoundingClientRect();
-
-		// Swap the state so the spotlight re-renders with the new card.
 		setSelectedId(id);
 		setPanelOpen(false);
 		setDiyFocus(null);
-
-		gsap.to(ghost, {
-			left: to.left,
-			top: to.top,
-			width: to.width,
-			height: to.height,
-			borderRadius: "1rem",
-			duration: 0.6,
-			ease: "power2.inOut",
-			onComplete: () => {
-				ghost.remove();
-			},
-		});
-	};
-
-	const openSelected = () => {
-		if (canOpen) setPanelOpen(true);
 	};
 
 	const openLabel =
@@ -474,87 +450,150 @@ export function FeaturedProjects() {
 			id="experience"
 			className="story-slide relative bg-[#F7F1E8]"
 		>
-			<div className="story-slide__body px-5 py-6 sm:px-8 sm:py-8 md:px-11 lg:px-14">
-				<div className="mx-auto flex h-full w-full max-w-[1180px] flex-col xl:max-w-[1240px]">
-					<header className="shrink-0">
-						<p className="text-[0.62rem] font-semibold uppercase tracking-[0.28em] text-[#0F4C45]/60">
-							{t("core.kicker")}
-						</p>
-						<h2 className="mt-2 text-[1.7rem] font-extrabold leading-[1.02] tracking-tight text-[#162b26] sm:text-[2.2rem] lg:text-[2.6rem]">
-							{t("core.title")}
-						</h2>
-					</header>
-
-					<div className="relative mt-4 flex min-h-0 flex-1 flex-col gap-4 lg:flex-row lg:gap-6">
-						{/* Spotlight — the active card lives here */}
-						<div
-							ref={spotlightRef}
-							className="flip-carousel__spotlight relative shrink-0 overflow-hidden rounded-2xl bg-[#E8E2D8] shadow-[0_18px_50px_rgb(22_43_38_/_0.16)] lg:w-[46%]"
-						>
-							{selected ? (
-								<SpotlightCard
-									item={selected}
-									onOpen={openSelected}
-									canOpen={canOpen}
-									openLabel={openLabel}
-								/>
-							) : null}
-						</div>
-
-						{/* Track of cards */}
-						<div
-							ref={trackRef}
-							className="flip-carousel__track relative flex min-h-0 flex-1 flex-wrap content-start gap-2.5 sm:gap-3 lg:overflow-y-auto"
-						>
-							{cards.map((item) => (
-								<div
-									key={item.key}
-									data-card-id={item.id}
-									className="flip-carousel__card group relative aspect-[4/5] w-[calc(50%-0.3125rem)] cursor-pointer overflow-hidden rounded-xl bg-[#E8E2D8] text-left sm:w-[calc(33.333%-0.5rem)] lg:w-[calc(25%-0.5625rem)]"
-									onClick={() => select(item.id)}
-									onDoubleClick={openSelected}
-									role="button"
-									tabIndex={0}
-									onKeyDown={(e) => {
-										if (e.key === "Enter") select(item.id);
-									}}
-								>
-									<Image
-										src={item.imageSrc}
-										alt={item.imageAlt}
-										fill
-										sizes="220px"
-										className="object-cover transition duration-500 group-hover:scale-[1.05]"
-										style={imageFocusStyle({
-											scale: item.imageScale,
-											tx: item.imageTx,
-											ty: item.imageTy,
-										})}
-									/>
-									<span
-										aria-hidden
-										className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#162b26]/72 via-transparent to-transparent"
-									/>
-									<span className="flip-carousel__card-label absolute inset-x-0 bottom-0 px-2.5 py-2">
-										<span className="block truncate text-[0.7rem] font-semibold leading-tight text-white">
-											{item.label}
-										</span>
-										<span className="mt-0.5 block truncate text-[0.56rem] uppercase tracking-[0.12em] text-[#F7F1E8]/60">
-											{item.section}
-										</span>
-									</span>
-									{item.starred ? (
-										<span
-											aria-hidden
-											className="absolute right-2 top-1.5 text-[0.75rem] leading-none text-white drop-shadow"
-										>
-											★
-										</span>
-									) : null}
+			<aside
+				aria-hidden={!railVisible}
+				className={`pointer-events-none fixed inset-y-0 right-2 z-30 hidden w-[12.75rem] items-center xl:flex 2xl:right-5 2xl:w-[14rem] ${
+					railVisible ? "opacity-100" : "opacity-0"
+				}`}
+				style={{ transition: "opacity 260ms ease-out" }}
+			>
+				<nav
+					aria-label={t("core.nav")}
+					className={`project-nav w-full pr-1 ${
+						railVisible ? "pointer-events-auto" : "pointer-events-none"
+					}`}
+				>
+					<div ref={railTrackRef} className="project-nav__track relative">
+						<span
+							aria-hidden
+							className={`project-nav__pill ${
+								pill.ready ? "project-nav__pill--ready" : ""
+							}`}
+							style={{
+								transform: `translate3d(0, ${pill.top}px, 0)`,
+								height: pill.height,
+							}}
+						/>
+						<div className="project-nav__groups">
+							{groups.map((group) => (
+								<div key={group.id} className="project-nav__group-block">
+									<p className="project-nav__group-label px-2.5 text-[0.56rem] font-semibold uppercase tracking-[0.16em] text-[#0F4C45]/42">
+										{t(group.labelKey)}
+									</p>
+									<ul className="project-nav__list">
+										{group.items.map((item) => (
+											<li key={item.key}>
+												<NavButton
+													item={item}
+													active={item.id === selectedId}
+													onSelect={select}
+												/>
+											</li>
+										))}
+									</ul>
 								</div>
 							))}
 						</div>
 					</div>
+				</nav>
+			</aside>
+
+			<div className="story-slide__body xl:pr-[15rem] 2xl:pr-[16.5rem]">
+				<div className="mx-auto flex h-full w-full max-w-[1180px] flex-col justify-center xl:max-w-[1240px]">
+					<nav
+						aria-label={t("core.nav")}
+						className="shrink-0 space-y-2 px-6 pt-4 sm:px-8 md:px-10 lg:px-12 xl:hidden"
+					>
+						{groups.map((group) => (
+							<div key={group.id}>
+								<p className="mb-1 px-0.5 text-[0.56rem] font-semibold uppercase tracking-[0.16em] text-[#0F4C45]/40">
+									{t(group.labelKey)}
+								</p>
+								<ul className="-mx-1 flex w-full gap-0.5 overflow-x-auto pb-1">
+									{group.items.map((item) => (
+										<li key={item.key} className="shrink-0">
+											<NavButton
+												item={item}
+												active={item.id === selectedId}
+												onSelect={select}
+												compact
+											/>
+										</li>
+									))}
+								</ul>
+							</div>
+						))}
+					</nav>
+
+					{selected ? (
+						<article className="project-stage">
+							<header className="project-stage__head">
+								<p className="project-stage__eyebrow">
+									{selected.section}
+									{selected.kind === "helmet" || selected.kind === "diy"
+										? ` · ${t("core.collection")}`
+										: null}
+								</p>
+								<h2 className="project-stage__title">{selected.label}</h2>
+							</header>
+
+							<button
+								type="button"
+								onClick={() => (canOpen ? setPanelOpen(true) : undefined)}
+								className="project-stage__media group"
+							>
+								{selected.kind === "diy" && selected.diyItems ? (
+									<div
+										key={selected.id}
+										className="project-stage__media-inner absolute inset-0 transition duration-700 group-hover:scale-[1.02]"
+									>
+										<DiyCollagePreview items={selected.diyItems} />
+									</div>
+								) : (
+									<div
+										key={selected.id}
+										className="absolute inset-0 transition duration-700 group-hover:scale-[1.02]"
+									>
+										<Image
+											src={selected.imageSrc}
+											alt={selected.imageAlt}
+											fill
+											sizes="(max-width: 900px) 100vw, 544px"
+											priority
+											className="object-cover object-center"
+											style={imageFocusStyle({
+												scale: selected.imageScale,
+												tx: selected.imageTx,
+												ty: selected.imageTy,
+											})}
+										/>
+									</div>
+								)}
+							</button>
+
+							{selected.summary || selected.subtitle ? (
+								<p className="project-stage__body">
+									{selected.summary &&
+									selected.summary !== selected.subtitle
+										? selected.summary
+										: selected.subtitle}
+								</p>
+							) : null}
+
+							{canOpen ? (
+								<button
+									type="button"
+									onClick={() => setPanelOpen(true)}
+									className="project-stage__open"
+								>
+									{openLabel}
+									<span className="project-stage__open-arrow" aria-hidden>
+										→
+									</span>
+								</button>
+							) : null}
+						</article>
+					) : null}
 				</div>
 			</div>
 

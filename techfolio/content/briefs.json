@@ -10,37 +10,37 @@
     },
     "blocks": [
       {
-        "id": "b_gn76mq2h",
+        "id": "b_zhglvu83",
         "type": "kicker",
         "text": "工作"
       },
       {
-        "id": "b_42scvwhe",
+        "id": "b_tz6i9849",
         "type": "heading",
         "text": "Zongheng Robot"
       },
       {
-        "id": "b_jr1ndnd9",
+        "id": "b_quw86q77",
         "type": "subheading",
         "text": "Education robot · IoT teaching"
       },
       {
-        "id": "b_ss4dm8kt",
+        "id": "b_z7afp0ds",
         "type": "kicker",
         "text": "01 · Product"
       },
       {
-        "id": "b_3oac52o9",
+        "id": "b_zj77ujsp",
         "type": "heading",
         "text": "Zongheng Robot"
       },
       {
-        "id": "b_vcccsjgy",
+        "id": "b_srr9tdw1",
         "type": "pull",
         "text": "Education robot for university IoT / Inventing System labs — docking, charge bring-up, fleet demos, and the embedded fundamentals students build on in class."
       },
       {
-        "id": "b_nsnwddli",
+        "id": "b_tk1xci0a",
         "type": "image",
         "image": {
           "src": "/experience/work/zongheng/robot-product-main.webp",
@@ -49,22 +49,22 @@
         }
       },
       {
-        "id": "b_z0u4udhk",
+        "id": "b_xs5en5ec",
         "type": "kicker",
         "text": "02 · Specs"
       },
       {
-        "id": "b_mcd4jgwi",
+        "id": "b_jl0rndoj",
         "type": "heading",
         "text": "NAVI-BOT specifications"
       },
       {
-        "id": "b_fh79y7zg",
+        "id": "b_u33ifuoc",
         "type": "text",
         "text": "Full parameter sheet for the education fleet — dimensions, sensing, payload, and battery — the same platform used in university IoT and inventing-system labs."
       },
       {
-        "id": "b_rzqfi3fq",
+        "id": "b_skjeu6i2",
         "type": "image",
         "image": {
           "src": "/experience/work/zongheng/robot-navi-specs.webp",
@@ -73,22 +73,22 @@
         }
       },
       {
-        "id": "b_ymsr827h",
+        "id": "b_6qovuqrg",
         "type": "heading",
         "text": "Product positioning"
       },
       {
-        "id": "b_0w7e4zd9",
+        "id": "b_av8vaeyf",
         "type": "text",
         "text": "NAVI-BOT is positioned as an intelligent mobile base for teaching: multi-sensor fusion, LLM voice interaction, and a payload class that fits classroom demos as well as lab projects."
       },
       {
-        "id": "b_cuhluip6",
+        "id": "b_ktvtjoan",
         "type": "text",
         "text": "The banner sits beside the fleet story — not as a twin card, but as the go-to-market face of the same chassis students drive in class."
       },
       {
-        "id": "b_0hbtraj3",
+        "id": "b_4efkrh0a",
         "type": "image",
         "image": {
           "src": "/experience/work/zongheng/robot-navi-banner.webp",
@@ -97,22 +97,22 @@
         }
       },
       {
-        "id": "b_qo98sij5",
+        "id": "b_g4il7yby",
         "type": "kicker",
         "text": "03 · Teaching"
       },
       {
-        "id": "b_jwup5jvl",
+        "id": "b_g0r14ikk",
         "type": "heading",
         "text": "Lectures around the robot"
       },
       {
-        "id": "b_0wuhfkr2",
+        "id": "b_jxmvepgu",
         "type": "text",
         "text": "Classroom talks center on Zongheng Robot — IoT practice plus embedded fundamentals for university students."
       },
       {
-        "id": "b_zofv9nd4",
+        "id": "b_i1e6uc6g",
         "type": "image",
         "image": {
           "src": "/experience/work/zongheng/robot-lecture-iot.webp",
@@ -133,37 +133,37 @@
     },
     "blocks": [
       {
-        "id": "b_ocs0r9xf",
+        "id": "b_8prlbkmz",
         "type": "kicker",
         "text": "工作"
       },
       {
-        "id": "b_nivsvqt4",
+        "id": "b_txp0m9k0",
         "type": "heading",
-        "text": "Training trolley"
+        "text": "Training vehicle"
       },
       {
-        "id": "b_okprmo20",
+        "id": "b_yyar6gsf",
         "type": "subheading",
         "text": "Shixun · Mecanum training car"
       },
       {
-        "id": "b_21q1ksx6",
+        "id": "b_h7m3dvtb",
         "type": "kicker",
         "text": "01 · Product"
       },
       {
-        "id": "b_w1xt7bzs",
+        "id": "b_y80jsa2d",
         "type": "heading",
-        "text": "Training trolley "
+        "text": "Training vehicle"
       },
       {
-        "id": "b_o2j532yo",
+        "id": "b_3whde7no",
         "type": "pull",
         "text": "Mecanum training platform for classroom fleets — paired with Zongheng robots for hands-on IoT and motion labs."
       },
       {
-        "id": "b_bvm0eo1b",
+        "id": "b_l47fzhga",
         "type": "image",
         "image": {
           "src": "/experience/work/zongheng/shixun-car.webp",
@@ -172,42 +172,42 @@
         }
       },
       {
-        "id": "b_x3rzvucv",
+        "id": "b_qlm1oisy",
         "type": "kicker",
         "text": "02 · Role"
       },
       {
-        "id": "b_os0ixj3o",
+        "id": "b_taoewx3x",
         "type": "heading",
         "text": "What it is for"
       },
       {
-        "id": "b_4e2l6dyx",
+        "id": "b_ik9ry9te",
         "type": "text",
         "text": "The Shixun car is the student-facing chassis in the teaching line — docking and charge support for classroom fleets, and a clear platform for embedded / IoT exercises."
       },
       {
-        "id": "b_xwx2q7v4",
+        "id": "b_hl7vltb1",
         "type": "text",
         "text": "It sits beside the Zongheng robot as a separate product in the same education stack, not a single bundled unit."
       },
       {
-        "id": "b_anzz256d",
+        "id": "b_e6dccsrd",
         "type": "heading",
         "text": "ZH_MCar controller"
       },
       {
-        "id": "b_7zdz2rrv",
+        "id": "b_3absv67f",
         "type": "text",
         "text": "Mainboard for the training car — ESP32 wireless, DC12V in, USB-C, and four motor channels (A–D) for mecanum drive."
       },
       {
-        "id": "b_gbaeq4v3",
+        "id": "b_xbw2c63g",
         "type": "text",
         "text": "Designed as the student-facing control board: bring-up, power, and motion on one PCB rather than a pile of modules."
       },
       {
-        "id": "b_9hx6ws12",
+        "id": "b_codq92lm",
         "type": "image",
         "image": {
           "src": "/experience/work/zongheng/shixun-pcb.webp",
@@ -216,27 +216,174 @@
         }
       },
       {
-        "id": "b_gt1th03t",
+        "id": "b_jma44vpf",
         "type": "kicker",
         "text": "03 · Lab"
       },
       {
-        "id": "b_re5tvtpa",
+        "id": "b_j98ghjej",
         "type": "heading",
         "text": "In the teaching room"
       },
       {
-        "id": "b_jduvtqde",
+        "id": "b_bw0urciv",
         "type": "text",
         "text": "Lab sessions put students around the chassis and laptops — path control, sensing, and bring-up on a real mecanum platform."
       },
       {
-        "id": "b_r26ja4ea",
+        "id": "b_mjdcnz3t",
         "type": "image",
         "image": {
           "src": "/experience/work/zongheng/lab-teaching.webp",
           "alt": "Students learning around Shixun car and laptops",
           "caption": "Lab class — hands-on with 实讯小车"
+        }
+      }
+    ]
+  },
+  "vxs-100": {
+    "id": "vxs-100",
+    "title": "VXS-100",
+    "subtitle": "Handheld voice module · Robot & 实讯 control",
+    "section": "工作",
+    "cardImage": {
+      "src": "/experience/work/zongheng/vxs-100.webp",
+      "alt": "Three VXS-100 handheld voice modules standing side by side"
+    },
+    "blocks": [
+      {
+        "id": "b_1t4irfuo",
+        "type": "kicker",
+        "text": "工作"
+      },
+      {
+        "id": "b_b5di78qg",
+        "type": "heading",
+        "text": "VXS-100"
+      },
+      {
+        "id": "b_1v9yim00",
+        "type": "subheading",
+        "text": "Handheld voice module · Robot & 实讯 control"
+      },
+      {
+        "id": "b_8o53r5a8",
+        "type": "kicker",
+        "text": "01 · Product"
+      },
+      {
+        "id": "b_aeuo7ye8",
+        "type": "heading",
+        "text": "VXS-100 handheld module"
+      },
+      {
+        "id": "b_hhf6gto2",
+        "type": "pull",
+        "text": "Handheld voice module for Shixun cars and Zongheng robots — the bridge between instructor demos and student labs."
+      },
+      {
+        "id": "b_r1xvcrny",
+        "type": "image",
+        "image": {
+          "src": "/experience/work/zongheng/vxs-100.webp",
+          "alt": "Three VXS-100 handheld voice modules standing side by side",
+          "caption": "VXS-100 — Standard Voice Module"
+        }
+      },
+      {
+        "id": "b_5f601wgm",
+        "type": "heading",
+        "text": "Faceplate & marking"
+      },
+      {
+        "id": "b_ydvoeg7s",
+        "type": "text",
+        "text": "Front panel layout for the handheld voice module — brand lockup, VXS-100 title, speaker grille, and company line on an 85 mm tall plate."
+      },
+      {
+        "id": "b_wvfnwvw8",
+        "type": "text",
+        "text": "Clear silkscreen keeps the remote readable in a teaching demo without looking like a generic enclosure."
+      },
+      {
+        "id": "b_qj42hig9",
+        "type": "image",
+        "image": {
+          "src": "/experience/work/zongheng/vxs-100-faceplate.webp",
+          "alt": "VXS-100 faceplate drawing with dimensions",
+          "caption": "Faceplate — 85 mm height, grille & LED hole"
+        }
+      },
+      {
+        "id": "b_35pt1kd7",
+        "type": "kicker",
+        "text": "02 · Enclosure"
+      },
+      {
+        "id": "b_4xv8k4k7",
+        "type": "heading",
+        "text": "Exploded aluminum body"
+      },
+      {
+        "id": "b_yome1lii",
+        "type": "text",
+        "text": "Extruded aluminum shell with end caps pulled apart — finned sides, diagonal grille, and ports for antenna / USB bring-up."
+      },
+      {
+        "id": "b_0xt25u79",
+        "type": "image",
+        "image": {
+          "src": "/experience/work/zongheng/vxs-100-explode.webp",
+          "alt": "Exploded 3D view of the VXS-100 aluminum enclosure",
+          "caption": "Enclosure — explode view"
+        }
+      },
+      {
+        "id": "b_jxds8z7w",
+        "type": "heading",
+        "text": "Open chassis"
+      },
+      {
+        "id": "b_ouanvhaa",
+        "type": "text",
+        "text": "Front open view of the assembled unit — USB-C, status LEDs, and board edge visible inside the silver shell."
+      },
+      {
+        "id": "b_i8ywari9",
+        "type": "text",
+        "text": "Antenna mount on the end cap keeps the handheld radio link ready for robot and 实讯 demos."
+      },
+      {
+        "id": "b_j9whnp14",
+        "type": "image",
+        "image": {
+          "src": "/experience/work/zongheng/vxs-100-open.webp",
+          "alt": "VXS-100 open enclosure showing internal PCB and ports",
+          "caption": "Open chassis — USB-C and LED indicators"
+        }
+      },
+      {
+        "id": "b_0lji7pfs",
+        "type": "kicker",
+        "text": "03 · Board"
+      },
+      {
+        "id": "b_o8knm9fx",
+        "type": "heading",
+        "text": "Main PCB"
+      },
+      {
+        "id": "b_rzwzx83i",
+        "type": "text",
+        "text": "Controller board with one-click boot, battery and USB power rails, mic path, and reset / IO0 buttons — the electronics behind the handheld voice module."
+      },
+      {
+        "id": "b_wcdv47yr",
+        "type": "image",
+        "image": {
+          "src": "/experience/work/zongheng/vxs-100-pcb.webp",
+          "alt": "VXS-100 main PCB 3D render",
+          "caption": "PCB — power, boot, and I/O"
         }
       }
     ]

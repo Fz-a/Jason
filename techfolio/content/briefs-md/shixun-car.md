@@ -6,7 +6,7 @@ source_locale: zh-Hans
 # Locale: zh-Hans
 
 ## Title
-实讯小车
+Training vehicle
 
 ## Subtitle
 Shixun · Mecanum training car
@@ -19,67 +19,67 @@ Shixun · Mecanum training car
 
 ## Blocks
 
-<!-- block:b_ocs0r9xf type:kicker -->
+<!-- block:b_8prlbkmz type:kicker -->
 工作
 
-<!-- block:b_nivsvqt4 type:heading -->
-Training trolley
+<!-- block:b_txp0m9k0 type:heading -->
+Training vehicle
 
-<!-- block:b_okprmo20 type:subheading -->
+<!-- block:b_yyar6gsf type:subheading -->
 Shixun · Mecanum training car
 
-<!-- block:b_21q1ksx6 type:kicker -->
+<!-- block:b_h7m3dvtb type:kicker -->
 01 · Product
 
-<!-- block:b_w1xt7bzs type:heading -->
-Training trolley
+<!-- block:b_y80jsa2d type:heading -->
+Training vehicle
 
-<!-- block:b_o2j532yo type:pull -->
+<!-- block:b_3whde7no type:pull -->
 Mecanum training platform for classroom fleets — paired with Zongheng robots for hands-on IoT and motion labs.
 
-<!-- block:b_bvm0eo1b type:image -->
+<!-- block:b_l47fzhga type:image -->
 ![Shixun Mecanum training car chassis|实讯小车 — Mecanum training platform](/experience/work/zongheng/shixun-car.webp)
 
-<!-- block:b_x3rzvucv type:kicker -->
+<!-- block:b_qlm1oisy type:kicker -->
 02 · Role
 
-<!-- block:b_os0ixj3o type:heading -->
+<!-- block:b_taoewx3x type:heading -->
 What it is for
 
-<!-- block:b_4e2l6dyx type:text -->
+<!-- block:b_ik9ry9te type:text -->
 The Shixun car is the student-facing chassis in the teaching line — docking and charge support for classroom fleets, and a clear platform for embedded / IoT exercises.
 
-<!-- block:b_xwx2q7v4 type:text -->
+<!-- block:b_hl7vltb1 type:text -->
 It sits beside the Zongheng robot as a separate product in the same education stack, not a single bundled unit.
 
-<!-- block:b_anzz256d type:heading -->
+<!-- block:b_e6dccsrd type:heading -->
 ZH_MCar controller
 
-<!-- block:b_7zdz2rrv type:text -->
+<!-- block:b_3absv67f type:text -->
 Mainboard for the training car — ESP32 wireless, DC12V in, USB-C, and four motor channels (A–D) for mecanum drive.
 
-<!-- block:b_gbaeq4v3 type:text -->
+<!-- block:b_xbw2c63g type:text -->
 Designed as the student-facing control board: bring-up, power, and motion on one PCB rather than a pile of modules.
 
-<!-- block:b_9hx6ws12 type:image -->
+<!-- block:b_codq92lm type:image -->
 ![ZH_MCar PCB 3D render for the Shixun training car|ZH_MCar — main controller PCB](/experience/work/zongheng/shixun-pcb.webp)
 
-<!-- block:b_gt1th03t type:kicker -->
+<!-- block:b_jma44vpf type:kicker -->
 03 · Lab
 
-<!-- block:b_re5tvtpa type:heading -->
+<!-- block:b_j98ghjej type:heading -->
 In the teaching room
 
-<!-- block:b_jduvtqde type:text -->
+<!-- block:b_bw0urciv type:text -->
 Lab sessions put students around the chassis and laptops — path control, sensing, and bring-up on a real mecanum platform.
 
-<!-- block:b_r26ja4ea type:image -->
+<!-- block:b_mjdcnz3t type:image -->
 ![Students learning around Shixun car and laptops|Lab class — hands-on with 实讯小车](/experience/work/zongheng/lab-teaching.webp)
 
 # Locale: en
 
 ## Title
-TODO: 实讯小车
+TODO: Training vehicle
 
 ## Subtitle
 TODO: Shixun · Mecanum training car

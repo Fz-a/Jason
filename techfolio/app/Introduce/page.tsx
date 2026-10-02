@@ -9,7 +9,20 @@ export default function Introduce() {
 
 	return (
 		<PageLayoutRoot layout={pageLayout}>
-			<PortfolioDeck layout={pageLayout} avatarSrc="/avatar-source.jpg" />
+			<PortfolioDeck
+				layout={pageLayout}
+				avatarVariant="introduce"
+				showEnterIntroduce={false}
+				sections={[
+					"home",
+					"agenda",
+					"experience",
+					"research",
+					"goal",
+					"next",
+					"contact",
+				]}
+			/>
 		</PageLayoutRoot>
 	);
 }

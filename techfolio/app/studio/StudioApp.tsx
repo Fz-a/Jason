@@ -1214,6 +1214,9 @@ export function StudioApp() {
 	const [starredIds, setStarredIds] = useState<string[]>([]);
 	const [catalogReady, setCatalogReady] = useState(false);
 	const [mode, setMode] = useState<"briefs" | "avatar" | "page">("briefs");
+	const [avatarVariant, setAvatarVariant] = useState<"home" | "introduce">(
+		"home",
+	);
 	const [store, setStore] = useState<BriefStore>(
 		() => structuredClone(seedBriefs) as BriefStore,
 	);
@@ -2010,6 +2013,27 @@ export function StudioApp() {
 						</>
 					) : mode === "avatar" ? (
 						<>
+							<div className="flex items-center gap-0.5 rounded-full bg-white/70 p-0.5 ring-1 ring-[#0F4C45]/8">
+								{(
+									[
+										["home", "首页"],
+										["introduce", "Introduce"],
+									] as const
+								).map(([id, label]) => (
+									<button
+										key={id}
+										type="button"
+										onClick={() => setAvatarVariant(id)}
+										className={`rounded-full px-2.5 py-0.5 text-[0.68rem] font-semibold transition ${
+											avatarVariant === id
+												? "bg-white text-[#043439] shadow-sm"
+												: "text-[#0F4C45]/70 hover:text-[#0F4C45]"
+										}`}
+									>
+										{label}
+									</button>
+								))}
+							</div>
 							<button
 								type="button"
 								onClick={() => avatarRef.current?.pickFile()}
@@ -2077,6 +2101,7 @@ export function StudioApp() {
 								<AvatarEditor
 									ref={avatarRef}
 									embedded
+									variant={avatarVariant}
 									onPreviewChange={onAvatarPreview}
 									onTip={setTip}
 								/>
@@ -2355,7 +2380,7 @@ export function StudioApp() {
 						{mode === "avatar" ? (
 							<div className="flex flex-col items-center gap-3">
 								<p className="text-[0.6rem] font-semibold uppercase tracking-[0.2em] text-[#0F4C45]/40">
-									首页
+									{avatarVariant === "introduce" ? "Introduce" : "首页"}
 								</p>
 								<div className="hero-avatar relative aspect-square w-[min(40vw,240px)]">
 									<div className="hero-avatar__frame relative h-full w-full overflow-hidden rounded-full shadow-[0_20px_48px_rgba(22,43,38,0.12)] ring-4 ring-white/70">
