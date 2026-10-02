@@ -19,10 +19,16 @@ import {
 } from "../projects/make-essay";
 import { overrideCardImage } from "../lib/brief-card";
 import { imageFocusStyle } from "../lib/image-focus";
+import briefsStore from "../../content/briefs.json";
+import { BriefDocument } from "./BriefDocument";
+import type { BriefStore } from "../lib/brief-types";
 import {
 	listProjectCatalog,
 	type ProjectCatalogGroup,
 } from "../projects/project-catalog";
+
+/** Studio-saved briefs (详情 mode) — overrides the code showcase in the Open-brief panel. */
+const BRIEF_OVERRIDES = briefsStore as BriefStore;
 
 type GroupId = ProjectCatalogGroup;
 
@@ -625,7 +631,9 @@ export function FeaturedProjectsRail() {
 							</button>
 						</div>
 						<div className="min-h-0 flex-1 overflow-y-auto">
-							{selected.showcase ? (
+							{BRIEF_OVERRIDES[selected.id] ? (
+								<BriefDocument doc={BRIEF_OVERRIDES[selected.id]} />
+							) : selected.showcase ? (
 								<ShowcaseDocument
 									item={selected.showcase}
 									sectionLabel={selected.section}

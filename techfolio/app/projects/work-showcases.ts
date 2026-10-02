@@ -423,6 +423,133 @@ export const workShowcases: WorkShowcase[] = [
 			},
 		],
 	},
+	{
+		id: "techmore",
+		title: "TechMore",
+		subtitle: "摩尔创展 · TouchDesigner interaction & exhibition tech",
+		cardImage: {
+			src: "/experience/work/techmore/exhibition-hall.jpg",
+			alt: "TechMore exhibition hall with large interactive displays",
+			width: 1930,
+			height: 1280,
+		},
+		spreads: [
+			{
+				type: "product-hero",
+				kicker: "01 · Interaction",
+				title: "TechMore Interactive",
+				subtitle:
+					"Internship at Shenzhen TechMore (摩尔创展) — software–hardware interaction for exhibitions: sensors and firmware signals wired into TouchDesigner for realtime experiential output.",
+				image: {
+					src: "/experience/work/techmore/robot-arm.jpg",
+					alt: "Robotic arm interactive installation with laser light lines",
+					width: 1080,
+					height: 1920,
+					caption: "点亮光 — robotic arm + laser interactive installation.",
+				},
+			},
+			{
+				type: "duo",
+				eyebrow: "02 · Realtime",
+				heading: "TouchDesigner pipelines",
+				body: [
+					"Node-based patches turn camera and sensor input into live visuals — filter chains, edge detection, and color mapping wired up in TouchDesigner.",
+					"The output runs as a realtime effect on visitors, not a rendered video.",
+				],
+				tone: "soft",
+				mediaFit: "contain",
+				images: [
+					{
+						src: "/experience/work/techmore/td-nodes.png",
+						alt: "TouchDesigner node graph for the filter interaction",
+						width: 1018,
+						height: 524,
+						caption: "Node graph — sensor-driven filter pipeline.",
+					},
+					{
+						src: "/experience/work/techmore/realtime-fx.png",
+						alt: "Realtime posterized effect running on a visitor",
+						width: 482,
+						height: 199,
+						caption: "Live output — realtime effect on camera feed.",
+					},
+				],
+			},
+			{
+				type: "image-full",
+				eyebrow: "03 · Immersive",
+				heading: "Immersive space",
+				body: [
+					"Curved projection room with city-scale visuals — the kind of space the interaction pipelines ship into.",
+				],
+				image: {
+					src: "/experience/work/techmore/immersive-room.jpg",
+					alt: "Immersive curved screen room with blue city visuals",
+					width: 2142,
+					height: 1280,
+					caption: "Immersive room — curved screen walkthrough.",
+				},
+				imageTone: "dark",
+			},
+			{
+				type: "split",
+				heading: "Hardware behind the show",
+				body: [
+					"Inside each installation is a control box I helped debug — relay banks, power supplies, and controller boards that drive lights and the arm.",
+					"Firmware signals leave these boxes and become the TouchDesigner input that visitors see react.",
+				],
+				image: {
+					src: "/experience/work/techmore/electronics-debug.jpg",
+					alt: "Open control box with relays and power supplies being debugged",
+					width: 1279,
+					height: 1706,
+					caption: "Debug — relay / PSU control box on site.",
+				},
+				imageSide: "right",
+			},
+			{
+				type: "duo",
+				eyebrow: "04 · Process",
+				heading: "Reviews & builds",
+				body: [
+					"From team reviews around the 3D scene to long editing sessions — the installation content is iterated scene by scene.",
+				],
+				tone: "soft",
+				images: [
+					{
+						src: "/experience/work/techmore/team-review.jpg",
+						alt: "Team reviewing a 3D scene on a studio screen",
+						width: 1109,
+						height: 745,
+						caption: "Review — walking through the scene with the team.",
+					},
+					{
+						src: "/experience/work/techmore/unity-session.jpg",
+						alt: "Editing session with 3D content on screen",
+						width: 1121,
+						height: 774,
+						caption: "Build — content iteration in the studio.",
+					},
+				],
+			},
+			{
+				type: "image-full",
+				eyebrow: "05 · Delivered",
+				heading: "On the exhibition floor",
+				body: [
+					"Shipped as city exhibition displays — the interaction work landed where visitors actually meet it.",
+				],
+				image: {
+					src: "/experience/work/techmore/exhibition-hall.jpg",
+					alt: "Exhibition hall with large interactive display walls",
+					width: 1930,
+					height: 1280,
+					caption: "Exhibition — interactive display walls in the hall.",
+				},
+				imageTone: "light",
+			},
+		],
+	},
 ];
 
 export const workInternships = [
