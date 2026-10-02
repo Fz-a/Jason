@@ -1,0 +1,15 @@
+﻿NETSTAT:
+TCP    0.0.0.0:4321           0.0.0.0:0              LISTENING       21728
+TCP    [::]:4321              [::]:0                 LISTENING       21728
+TCP    [::1]:2014             [::1]:4321             ESTABLISHED     8012
+TCP    [::1]:4321             [::1]:2014             ESTABLISHED     21728
+TCP    [::1]:4321             [::1]:2118             TIME_WAIT       0
+TCP    [::1]:4321             [::1]:4444             TIME_WAIT       0
+TCP    [::1]:4321             [::1]:6129             TIME_WAIT       0
+TCP    [::1]:4321             [::1]:8313             TIME_WAIT       0
+TCP    [::1]:4321             [::1]:8947             TIME_WAIT       0
+TCP    [::1]:4321             [::1]:9162             ESTABLISHED     21728
+TCP    [::1]:4321             [::1]:13156            ESTABLISHED     21728
+TCP    [::1]:9162             [::1]:4321             ESTABLISHED     8012
+TCP    [::1]:13156            [::1]:4321             ESTABLISHED     32956
+ERR=The remote server returned an error: (308) Permanent Redirect.

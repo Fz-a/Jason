@@ -2,241 +2,217 @@
   "zongheng-robot": {
     "id": "zongheng-robot",
     "title": "Zongheng Robot",
-    "subtitle": "Education robot · IoT teaching",
-    "section": "工作",
+    "subtitle": "Education robot · IoT teaching platform",
+    "section": "Work",
     "cardImage": {
-      "src": "/experience/work/zongheng/robot-product-main.webp",
+      "src": "/experience/work/zongheng/robot-product-main-43.webp",
       "alt": "Zongheng education robot with docking station"
     },
     "blocks": [
       {
-        "id": "b_qcovz4zx",
+        "id": "b_zr_kick",
         "type": "kicker",
-        "text": "工作"
+        "text": "Work"
       },
       {
-        "id": "b_42i1zl3y",
+        "id": "b_zr_head",
         "type": "heading",
         "text": "Zongheng Robot"
       },
       {
-        "id": "b_me6gqva8",
+        "id": "b_zr_sub",
         "type": "subheading",
-        "text": "Education robot · IoT teaching"
+        "text": "Education robot · IoT teaching platform"
       },
       {
-        "id": "b_kf12c544",
-        "type": "kicker",
-        "text": "01 · Product"
-      },
-      {
-        "id": "b_ju1zb4h5",
-        "type": "heading",
-        "text": "Zongheng Robot"
-      },
-      {
-        "id": "b_l3u33lyl",
+        "id": "b_zr_pull",
         "type": "pull",
-        "text": "Education robot for university IoT / Inventing System labs — docking, charge bring-up, fleet demos, and the embedded fundamentals students build on in class."
+        "text": "An intelligent mobile base for university IoT and inventing-system labs — docking, charge bring-up, and fleet demos, plus the embedded fundamentals students build on in class."
       },
       {
-        "id": "b_pue91a78",
+        "id": "b_zr_img1",
         "type": "image",
         "image": {
-          "src": "/experience/work/zongheng/robot-product-main.webp",
+          "src": "/experience/work/zongheng/robot-product-main-43.webp",
           "alt": "Zongheng education robot with docking station",
-          "caption": "Robot — with dock / charge station."
+          "caption": "Zongheng robot with docking / charge station"
         }
       },
       {
-        "id": "b_zyn4f5oq",
+        "id": "b_zr_kick2",
         "type": "kicker",
-        "text": "02 · Specs"
+        "text": "01 · Specs"
       },
       {
-        "id": "b_11yyyvjp",
+        "id": "b_zr_head2",
         "type": "heading",
         "text": "NAVI-BOT specifications"
       },
       {
-        "id": "b_xopf5jsn",
+        "id": "b_zr_text1",
         "type": "text",
-        "text": "Full parameter sheet for the education fleet — dimensions, sensing, payload, and battery — the same platform used in university IoT and inventing-system labs."
+        "text": "Full parameter sheet for the education fleet — dimensions, sensing, payload, and battery — the same platform used in university IoT labs."
       },
       {
-        "id": "b_pgo1fza6",
+        "id": "b_zr_img2",
         "type": "image",
         "image": {
           "src": "/experience/work/zongheng/robot-navi-specs.webp",
           "alt": "NAVI-BOT education robot specifications sheet",
-          "caption": "NAVI-BOT — education robot specs"
+          "caption": "NAVI-BOT education robot — full spec sheet",
+          "fit": "contain"
         }
       },
       {
-        "id": "b_b0vfqbau",
+        "id": "b_zr_head3",
         "type": "heading",
         "text": "Product positioning"
       },
       {
-        "id": "b_z022irq0",
+        "id": "b_zr_text2",
         "type": "text",
         "text": "NAVI-BOT is positioned as an intelligent mobile base for teaching: multi-sensor fusion, LLM voice interaction, and a payload class that fits classroom demos as well as lab projects."
       },
       {
-        "id": "b_qcu79a9p",
-        "type": "text",
-        "text": "The banner sits beside the fleet story — not as a twin card, but as the go-to-market face of the same chassis students drive in class."
+        "id": "b_zr_list1",
+        "type": "list",
+        "items": [
+          "500 × 420 × 310 mm · 35 kg body · 50 kg payload",
+          "24 V / 12 Ah battery · up to 3 h runtime",
+          "ROS · MQTT · 2.4 G remote control"
+        ]
       },
       {
-        "id": "b_22rs1mlu",
-        "type": "image",
-        "image": {
-          "src": "/experience/work/zongheng/robot-navi-banner.webp",
-          "alt": "NAVI-BOT education robot product banner",
-          "caption": "Banner — intelligent mobile base"
-        }
-      },
-      {
-        "id": "b_w54e45y5",
+        "id": "b_zr_kick3",
         "type": "kicker",
-        "text": "03 · Teaching"
+        "text": "02 · Teaching"
       },
       {
-        "id": "b_k1tkjz5f",
+        "id": "b_zr_head4",
         "type": "heading",
         "text": "Lectures around the robot"
       },
       {
-        "id": "b_7ycvisvf",
+        "id": "b_zr_text3",
         "type": "text",
-        "text": "Classroom talks center on Zongheng Robot — IoT practice plus embedded fundamentals for university students."
+        "text": "Classroom talks center on the Zongheng Robot — IoT practice plus embedded fundamentals for university students."
       },
       {
-        "id": "b_v5anc915",
+        "id": "b_zr_img3",
         "type": "image",
         "image": {
           "src": "/experience/work/zongheng/robot-lecture-iot.webp",
           "alt": "Lecture on Zongheng Robot IoT system analysis",
-          "caption": "Lecture — 纵横机器人 · IoT system analysis"
+          "caption": "Guest lecture — Zongheng Robot · IoT system analysis"
         }
       }
     ]
   },
   "shixun-car": {
     "id": "shixun-car",
-    "title": "实讯小车",
+    "title": "Mecanum Training Platform",
     "subtitle": "Shixun · Mecanum training car",
-    "section": "工作",
+    "section": "Work",
     "cardImage": {
-      "src": "/experience/work/zongheng/shixun-car.webp",
+      "src": "/experience/work/zongheng/shixun-car-43.webp",
       "alt": "Shixun Mecanum training car chassis"
     },
     "blocks": [
       {
-        "id": "b_45nrc9n9",
+        "id": "b_sc_kick",
         "type": "kicker",
-        "text": "工作"
+        "text": "Work"
       },
       {
-        "id": "b_m2l205gl",
+        "id": "b_sc_head",
         "type": "heading",
         "text": "Mecanum Training Platform"
       },
       {
-        "id": "b_vwpuq8gc",
+        "id": "b_sc_sub",
         "type": "subheading",
         "text": "Shixun · Mecanum training car"
       },
       {
-        "id": "b_2zj1jirj",
-        "type": "kicker",
-        "text": "01 · Product"
-      },
-      {
-        "id": "b_z1z1tvwj",
-        "type": "heading",
-        "text": "Mecanum Training Platform"
-      },
-      {
-        "id": "b_4prkf5te",
+        "id": "b_sc_pull",
         "type": "pull",
-        "text": "Mecanum training platform for classroom fleets — paired with Zongheng robots for hands-on IoT and motion labs."
+        "text": "A mecanum platform for classroom fleets — motion, sensing, and bring-up, paired with the Zongheng robots in hands-on IoT labs."
       },
       {
-        "id": "b_23b55wv7",
+        "id": "b_sc_img1",
         "type": "image",
         "image": {
-          "src": "/experience/work/zongheng/shixun-car.webp",
+          "src": "/experience/work/zongheng/shixun-car-43.webp",
           "alt": "Shixun Mecanum training car chassis",
-          "caption": "实讯小车 — Mecanum training platform"
+          "caption": "Shixun car — mecanum training platform"
         }
       },
       {
-        "id": "b_godgfexk",
+        "id": "b_sc_kick2",
         "type": "kicker",
-        "text": "02 · Role"
+        "text": "01 · Role"
       },
       {
-        "id": "b_23awuc24",
+        "id": "b_sc_head2",
         "type": "heading",
         "text": "What it is for"
       },
       {
-        "id": "b_8xbafun5",
+        "id": "b_sc_text1",
         "type": "text",
-        "text": "The Shixun car is the student-facing chassis in the teaching line — docking and charge support for classroom fleets, and a clear platform for embedded / IoT exercises."
+        "text": "The Shixun car is the student-facing chassis in the teaching line — docking and charge support for classroom fleets, and a clear platform for embedded / IoT exercises. It sits beside the Zongheng robot as a separate product in the same education stack."
       },
       {
-        "id": "b_uobtfrfq",
-        "type": "text",
-        "text": "It sits beside the Zongheng robot as a separate product in the same education stack, not a single bundled unit."
-      },
-      {
-        "id": "b_rwzwj790",
+        "id": "b_sc_head3",
         "type": "heading",
         "text": "ZH_MCar controller"
       },
       {
-        "id": "b_yz7pukah",
+        "id": "b_sc_text2",
         "type": "text",
-        "text": "Mainboard for the training car — ESP32 wireless, DC12V in, USB-C, and four motor channels (A–D) for mecanum drive."
+        "text": "Mainboard for the training car — bring-up, power, and motion on one PCB rather than a pile of modules."
       },
       {
-        "id": "b_p35ord1e",
-        "type": "text",
-        "text": "Designed as the student-facing control board: bring-up, power, and motion on one PCB rather than a pile of modules."
+        "id": "b_sc_list1",
+        "type": "list",
+        "items": [
+          "ESP32 wireless · DC12V input · USB-C",
+          "Four motor channels (A–D) for mecanum drive",
+          "One board for bring-up, power, and motion"
+        ]
       },
       {
-        "id": "b_947hketl",
+        "id": "b_sc_img2",
         "type": "image",
         "image": {
           "src": "/experience/work/zongheng/shixun-pcb.webp",
           "alt": "ZH_MCar PCB 3D render for the Shixun training car",
-          "caption": "ZH_MCar — main controller PCB"
+          "caption": "ZH_MCar — main controller PCB (3D render)",
+          "fit": "contain"
         }
       },
       {
-        "id": "b_mejadw9f",
+        "id": "b_sc_kick3",
         "type": "kicker",
-        "text": "03 · Lab"
+        "text": "02 · Lab"
       },
       {
-        "id": "b_jk30zcb0",
+        "id": "b_sc_head4",
         "type": "heading",
         "text": "In the teaching room"
       },
       {
-        "id": "b_nxrhdom5",
+        "id": "b_sc_text3",
         "type": "text",
         "text": "Lab sessions put students around the chassis and laptops — path control, sensing, and bring-up on a real mecanum platform."
       },
       {
-        "id": "b_4lmw9osg",
+        "id": "b_sc_img3",
         "type": "image",
         "image": {
           "src": "/experience/work/zongheng/lab-teaching.webp",
           "alt": "Students learning around Shixun car and laptops",
-          "caption": "Lab class — hands-on with 实讯小车"
+          "caption": "Lab class — hands-on with the Shixun car"
         }
       }
     ]
@@ -244,146 +220,876 @@
   "vxs-100": {
     "id": "vxs-100",
     "title": "VXS-100",
-    "subtitle": "Handheld voice module · Robot & 实讯 control",
-    "section": "工作",
+    "subtitle": "Handheld voice module · Robot & Shixun control",
+    "section": "Work",
     "cardImage": {
       "src": "/experience/work/zongheng/vxs-100.webp",
       "alt": "Three VXS-100 handheld voice modules standing side by side"
     },
     "blocks": [
       {
-        "id": "b_1t4irfuo",
+        "id": "b_vx_kick",
         "type": "kicker",
-        "text": "工作"
+        "text": "Work"
       },
       {
-        "id": "b_b5di78qg",
+        "id": "b_vx_head",
         "type": "heading",
         "text": "VXS-100"
       },
       {
-        "id": "b_1v9yim00",
+        "id": "b_vx_sub",
         "type": "subheading",
-        "text": "Handheld voice module · Robot & 实讯 control"
+        "text": "Handheld voice module · Robot & Shixun control"
       },
       {
-        "id": "b_8o53r5a8",
-        "type": "kicker",
-        "text": "01 · Product"
-      },
-      {
-        "id": "b_aeuo7ye8",
-        "type": "heading",
-        "text": "VXS-100 handheld module"
-      },
-      {
-        "id": "b_hhf6gto2",
+        "id": "b_vx_pull",
         "type": "pull",
         "text": "Handheld voice module for Shixun cars and Zongheng robots — the bridge between instructor demos and student labs."
       },
       {
-        "id": "b_r1xvcrny",
+        "id": "b_vx_img1",
         "type": "image",
         "image": {
           "src": "/experience/work/zongheng/vxs-100.webp",
           "alt": "Three VXS-100 handheld voice modules standing side by side",
-          "caption": "VXS-100 — Standard Voice Module"
+          "caption": "VXS-100 — standard voice module"
         }
       },
       {
-        "id": "b_5f601wgm",
+        "id": "b_vx_kick2",
+        "type": "kicker",
+        "text": "01 · Enclosure"
+      },
+      {
+        "id": "b_vx_head2",
+        "type": "heading",
+        "text": "Aluminum enclosure"
+      },
+      {
+        "id": "b_vx_text1",
+        "type": "text",
+        "text": "Extruded aluminum shell with finned sides, a diagonal speaker grille, and antenna / USB ports on the end caps — shown exploded, then assembled."
+      },
+      {
+        "id": "b_vx_duo1",
+        "type": "duo",
+        "images": [
+          {
+            "src": "/experience/work/zongheng/vxs-100-explode-43.webp",
+            "alt": "Exploded 3D view of the VXS-100 aluminum enclosure",
+            "caption": "Enclosure — explode view"
+          },
+          {
+            "src": "/experience/work/zongheng/vxs-100-open.webp",
+            "alt": "VXS-100 assembled shell with internal board edge",
+            "caption": "Assembled shell — board edge and LEDs",
+            "ty": -5
+          }
+        ]
+      },
+      {
+        "id": "b_vx_kick3",
+        "type": "kicker",
+        "text": "02 · Faceplate"
+      },
+      {
+        "id": "b_vx_head3",
         "type": "heading",
         "text": "Faceplate & marking"
       },
       {
-        "id": "b_ydvoeg7s",
+        "id": "b_vx_text2",
         "type": "text",
-        "text": "Front panel layout for the handheld voice module — brand lockup, VXS-100 title, speaker grille, and company line on an 85 mm tall plate."
+        "text": "Front panel for the handheld — brand lockup, VXS-100 title, speaker grille, and company line on an 85 mm plate. Clear silkscreen keeps the remote readable in a teaching demo without looking like a generic enclosure."
       },
       {
-        "id": "b_wvfnwvw8",
-        "type": "text",
-        "text": "Clear silkscreen keeps the remote readable in a teaching demo without looking like a generic enclosure."
-      },
-      {
-        "id": "b_qj42hig9",
+        "id": "b_vx_img2",
         "type": "image",
         "image": {
           "src": "/experience/work/zongheng/vxs-100-faceplate.webp",
           "alt": "VXS-100 faceplate drawing with dimensions",
-          "caption": "Faceplate — 85 mm height, grille & LED hole"
+          "caption": "Faceplate drawing — 85 mm height, grille & LED hole",
+          "fit": "contain"
         }
       },
       {
-        "id": "b_35pt1kd7",
-        "type": "kicker",
-        "text": "02 · Enclosure"
-      },
-      {
-        "id": "b_4xv8k4k7",
-        "type": "heading",
-        "text": "Exploded aluminum body"
-      },
-      {
-        "id": "b_yome1lii",
-        "type": "text",
-        "text": "Extruded aluminum shell with end caps pulled apart — finned sides, diagonal grille, and ports for antenna / USB bring-up."
-      },
-      {
-        "id": "b_0xt25u79",
-        "type": "image",
-        "image": {
-          "src": "/experience/work/zongheng/vxs-100-explode.webp",
-          "alt": "Exploded 3D view of the VXS-100 aluminum enclosure",
-          "caption": "Enclosure — explode view"
-        }
-      },
-      {
-        "id": "b_jxds8z7w",
-        "type": "heading",
-        "text": "Open chassis"
-      },
-      {
-        "id": "b_ouanvhaa",
-        "type": "text",
-        "text": "Front open view of the assembled unit — USB-C, status LEDs, and board edge visible inside the silver shell."
-      },
-      {
-        "id": "b_i8ywari9",
-        "type": "text",
-        "text": "Antenna mount on the end cap keeps the handheld radio link ready for robot and 实讯 demos."
-      },
-      {
-        "id": "b_j9whnp14",
-        "type": "image",
-        "image": {
-          "src": "/experience/work/zongheng/vxs-100-open.webp",
-          "alt": "VXS-100 open enclosure showing internal PCB and ports",
-          "caption": "Open chassis — USB-C and LED indicators"
-        }
-      },
-      {
-        "id": "b_0lji7pfs",
+        "id": "b_vx_kick4",
         "type": "kicker",
         "text": "03 · Board"
       },
       {
-        "id": "b_o8knm9fx",
+        "id": "b_vx_head4",
         "type": "heading",
         "text": "Main PCB"
       },
       {
-        "id": "b_rzwzx83i",
+        "id": "b_vx_text3",
         "type": "text",
-        "text": "Controller board with one-click boot, battery and USB power rails, mic path, and reset / IO0 buttons — the electronics behind the handheld voice module."
+        "text": "The controller board behind the module — one-click boot, battery and USB power rails, mic path, and reset / IO0 buttons."
       },
       {
-        "id": "b_wcdv47yr",
+        "id": "b_vx_img3",
         "type": "image",
         "image": {
           "src": "/experience/work/zongheng/vxs-100-pcb.webp",
           "alt": "VXS-100 main PCB 3D render",
-          "caption": "PCB — power, boot, and I/O"
+          "caption": "VXS-100 main PCB — power, boot, and I/O",
+          "fit": "contain"
+        }
+      }
+    ]
+  },
+  "robotman": {
+    "id": "robotman",
+    "title": "Robotman Team",
+    "subtitle": "萝卜丁 · Competitions · Lab builds · Pitches",
+    "section": "大学",
+    "cardImage": {
+      "src": "/experience/university/robotman/team-model.webp",
+      "alt": "Robotman team with project model"
+    },
+    "blocks": [
+      {
+        "id": "b_hp3nzufy",
+        "type": "kicker",
+        "text": "大学"
+      },
+      {
+        "id": "b_sbrroesa",
+        "type": "heading",
+        "text": "Robotman Team"
+      },
+      {
+        "id": "b_60g1uk95",
+        "type": "subheading",
+        "text": "萝卜丁 · Competitions · Lab builds · Pitches"
+      },
+      {
+        "id": "b_n345wpqi",
+        "type": "kicker",
+        "text": "01 · Team"
+      },
+      {
+        "id": "b_j581fcxs",
+        "type": "heading",
+        "text": "Robotman · 萝卜丁"
+      },
+      {
+        "id": "b_1rbt0vwj",
+        "type": "pull",
+        "text": "A campus engineering crew behind smart wearables, early fire warning, and competition demos."
+      },
+      {
+        "id": "b_awqrq7pf",
+        "type": "image",
+        "image": {
+          "src": "/experience/university/robotman/team-model.webp",
+          "alt": "Full Robotman team with urban model and handshake",
+          "caption": "Team portrait — builders around the model."
+        }
+      },
+      {
+        "id": "b_yv0re987",
+        "type": "kicker",
+        "text": "02 · Who we are"
+      },
+      {
+        "id": "b_ibcfji4r",
+        "type": "heading",
+        "text": "Builders first"
+      },
+      {
+        "id": "b_26h8x7rp",
+        "type": "text",
+        "text": "Robotman brings together electronics, embedded software, vision, structure, and storytelling — the same people who moved early fire warning from a robot car to a pure-camera edge box."
+      },
+      {
+        "id": "b_pvpo1wn7",
+        "type": "text",
+        "text": "Lab nights, pitch rehearsals, and award stages stay one loop: ship the prototype, then tell it clearly."
+      },
+      {
+        "id": "b_8uj665sk",
+        "type": "kicker",
+        "text": "03 · Identity"
+      },
+      {
+        "id": "b_brfi4isi",
+        "type": "heading",
+        "text": "The banner"
+      },
+      {
+        "id": "b_e4u118qn",
+        "type": "text",
+        "text": "ROBOT MAN · 萝卜丁 — the name we carry into contests and demos."
+      },
+      {
+        "id": "b_xcb57nw6",
+        "type": "image",
+        "image": {
+          "src": "/experience/university/robotman/robotman-banner.webp",
+          "alt": "Robotman team holding the ROBOT MAN banner",
+          "caption": "Team banner — Robotman / 萝卜丁."
+        }
+      },
+      {
+        "id": "b_bfr00g9c",
+        "type": "kicker",
+        "text": "04 · Moments"
+      },
+      {
+        "id": "b_l6zp4bj9",
+        "type": "heading",
+        "text": "Lab, stage, and harder rooms"
+      },
+      {
+        "id": "b_i0imy6xi",
+        "type": "text",
+        "text": "Bench debug, auditorium pitches, campus contests, and Shaoguan finals — four frames from the same crew."
+      },
+      {
+        "id": "b_r23lesml",
+        "type": "duo",
+        "images": [
+          {
+            "src": "/experience/university/robotman/lab-collab.webp",
+            "alt": "Two teammates debugging together in the robotics lab",
+            "caption": "Lab — pair debug at the bench"
+          },
+          {
+            "src": "/experience/university/robotman/pitch-stage.webp",
+            "alt": "Three teammates presenting core tech on stage",
+            "caption": "Stage — product intro & detection metrics"
+          }
+        ]
+      },
+      {
+        "id": "b_ajaqakty",
+        "type": "duo",
+        "images": [
+          {
+            "src": "/experience/university/robotman/pitch-campus.webp",
+            "alt": "Team presenting at campus innovation competition",
+            "caption": "Campus — innovation contest lineup"
+          },
+          {
+            "src": "/experience/university/robotman/pitch-shaoguan.webp",
+            "alt": "Team member presenting at Shaoguan Big Data competition",
+            "caption": "Shaoguan — big data innovation stage"
+          }
+        ]
+      },
+      {
+        "id": "b_a0hhh7xi",
+        "type": "kicker",
+        "text": "05 · Awards"
+      },
+      {
+        "id": "b_6c26mgm3",
+        "type": "heading",
+        "text": "Results on the desk"
+      },
+      {
+        "id": "b_n667ktf9",
+        "type": "text",
+        "text": "China International College Students’ Innovation Competition (2023) Guangdong Division bronze, plus the 14th E-commerce Innovation Challenge second prize — with the project notes still on the bench."
+      },
+      {
+        "id": "b_wwafu0m9",
+        "type": "image",
+        "image": {
+          "src": "/experience/university/robotman/awards-desk.webp",
+          "alt": "Competition award boards, trophy, and project sticky notes on the lab desk",
+          "caption": "Awards — boards, trophy, and project stickies."
+        }
+      }
+    ]
+  },
+  "fire-warning": {
+    "id": "fire-warning",
+    "title": "Early Fire Warning System",
+    "subtitle": "Deep learning · Jetson · Aliyun IoT · Phone alert",
+    "section": "大学",
+    "cardImage": {
+      "src": "/experience/university/fire-warning/fire-car-robot.webp",
+      "alt": "Early fire warning robot car with camera"
+    },
+    "blocks": [
+      {
+        "id": "b_162dwgq9",
+        "type": "kicker",
+        "text": "大学"
+      },
+      {
+        "id": "b_i259zkjb",
+        "type": "heading",
+        "text": "Early Fire Warning System"
+      },
+      {
+        "id": "b_elv6cnor",
+        "type": "subheading",
+        "text": "Deep learning · Jetson · Aliyun IoT · Phone alert"
+      },
+      {
+        "id": "b_nhl7yszy",
+        "type": "kicker",
+        "text": "01 · Product"
+      },
+      {
+        "id": "b_ls5c7e3d",
+        "type": "heading",
+        "text": "Early Fire Warning System"
+      },
+      {
+        "id": "b_qkzn7cvi",
+        "type": "pull",
+        "text": "Deep-learning smoke and flame detection with cloud upload and automatic phone alerts."
+      },
+      {
+        "id": "b_5zfvjz3p",
+        "type": "image",
+        "image": {
+          "src": "/experience/university/fire-warning/fire-car-robot.webp",
+          "alt": "Mobile robot platform with camera and Jetson compute",
+          "caption": "Phase 1 — mobile platform: car + camera + edge compute."
+        }
+      },
+      {
+        "id": "b_mjftxmos",
+        "type": "kicker",
+        "text": "02 · Concept"
+      },
+      {
+        "id": "b_9qx0nfif",
+        "type": "heading",
+        "text": "What it is"
+      },
+      {
+        "id": "b_xlvsdzlu",
+        "type": "text",
+        "text": "A deep-learning early fire warning system for factories, warehouses, and campuses: cameras watch for smoke and flame around the clock, then push alerts to the cloud and call emergency contacts."
+      },
+      {
+        "id": "b_94mtd5m6",
+        "type": "text",
+        "text": "YOLOv5 (lightened for embedded devices) runs on Jetson-class hardware. When fire is detected, an IoT module reports the camera ID and can dial a preset phone number while the mini program flags the abnormal channel in red."
+      },
+      {
+        "id": "b_higafgmv",
+        "type": "kicker",
+        "text": "03 · Evolution"
+      },
+      {
+        "id": "b_7j5wlfhm",
+        "type": "heading",
+        "text": "From car + camera to pure camera"
+      },
+      {
+        "id": "b_6o1h9ccx",
+        "type": "text",
+        "text": "We started on a mobile robot—drive unit, stereo/LiDAR sensing, and onboard compute—so the team could validate detection while moving."
+      },
+      {
+        "id": "b_7vvnirox",
+        "type": "text",
+        "text": "Later we simplified to a fixed Hikvision camera on a tripod with Jetson edge compute and a cellular/IoT board—easier to deploy at scale without the chassis."
+      },
+      {
+        "id": "b_zh6cfhn3",
+        "type": "duo",
+        "images": [
+          {
+            "src": "/experience/university/fire-warning/fire-car-robot.webp",
+            "alt": "Fire-car robot with Mecanum wheels and sensors",
+            "caption": "Start — vehicle + camera platform"
+          },
+          {
+            "src": "/experience/university/fire-warning/camera-jetson.webp",
+            "alt": "Hikvision camera with Jetson and IoT antenna board",
+            "caption": "Later — pure camera + edge + modem"
+          }
+        ]
+      },
+      {
+        "id": "b_u35oqtza",
+        "type": "heading",
+        "text": "Vision model"
+      },
+      {
+        "id": "b_2qp1cdfc",
+        "type": "text",
+        "text": "Flame and smoke samples were collected, cleaned, and labeled (thousands of frames) for YOLOv5 training, then lightened so the model fits embedded runtime with only a small accuracy trade-off."
+      },
+      {
+        "id": "b_jw34es69",
+        "type": "text",
+        "text": "Detection boxes mark fire and smoke in real scenes—parking lots, industrial chimneys, building exteriors—before the alert path fires."
+      },
+      {
+        "id": "b_xdl8a9z7",
+        "type": "image",
+        "image": {
+          "src": "/experience/university/fire-warning/detection-dataset.webp",
+          "alt": "YOLO fire and smoke detection samples with bounding boxes",
+          "caption": "Detection samples — smoke / flame bounding boxes"
+        }
+      },
+      {
+        "id": "b_t1flutnq",
+        "type": "kicker",
+        "text": "04 · Field test"
+      },
+      {
+        "id": "b_biznkk1a",
+        "type": "heading",
+        "text": "Live detection on the edge"
+      },
+      {
+        "id": "b_68odrvfn",
+        "type": "text",
+        "text": "On-device runs of the detection script print fire / no-fire lines in real time. Bench tests with a lighter confirmed the pipeline from camera frame to alert trigger."
+      },
+      {
+        "id": "b_7c7l1s8d",
+        "type": "image",
+        "image": {
+          "src": "/experience/university/fire-warning/lighter-test.webp",
+          "alt": "Terminal fire detection output with live camera test",
+          "caption": "Bench test — lighter flame vs. detection log"
+        }
+      },
+      {
+        "id": "b_dcbejole",
+        "type": "kicker",
+        "text": "05 · Cloud"
+      },
+      {
+        "id": "b_gesqjqd4",
+        "type": "heading",
+        "text": "Aliyun IoT & MQTT"
+      },
+      {
+        "id": "b_ut140844",
+        "type": "text",
+        "text": "AT-command flows authenticate to Aliyun, then publish fire status over MQTT. Custom topics handle update / error / get for each device."
+      },
+      {
+        "id": "b_p97c1pya",
+        "type": "duo",
+        "images": [
+          {
+            "src": "/experience/university/fire-warning/mqtt-logs.webp",
+            "alt": "AT command logs connecting fire_car to Aliyun MQTT",
+            "caption": "Device logs — fire_car MQTT publish"
+          },
+          {
+            "src": "/experience/university/fire-warning/aliyun-topics.webp",
+            "alt": "Aliyun IoT custom topic list for the product",
+            "caption": "Cloud console — custom topic classes"
+          }
+        ]
+      },
+      {
+        "id": "b_7a27xals",
+        "type": "kicker",
+        "text": "06 · Alerts"
+      },
+      {
+        "id": "b_ppsv5xzw",
+        "type": "heading",
+        "text": "Phone call & mini program"
+      },
+      {
+        "id": "b_2jzuhg7c",
+        "type": "text",
+        "text": "When fire is flagged, the modem can dial an emergency number while the mini program marks the abnormal camera in red for staff on site."
+      },
+      {
+        "id": "b_wcsx63ww",
+        "type": "duo",
+        "images": [
+          {
+            "src": "/experience/university/fire-warning/phone-alert.webp",
+            "alt": "Phone receiving automated fire alert call",
+            "caption": "Phone alert — AT dial on detect"
+          },
+          {
+            "src": "/experience/university/fire-warning/robotapp-cameras.webp",
+            "alt": "ROBOTAPP camera status grid with one abnormal channel",
+            "caption": "Mini program — camera channels & anomaly"
+          }
+        ]
+      }
+    ]
+  },
+  "smart-clothes": {
+    "id": "smart-clothes",
+    "title": "Smart Clothes for Elderly",
+    "subtitle": "Wearable monitoring · Mini program · Family alerts",
+    "section": "大学",
+    "cardImage": {
+      "src": "/experience/university/smart-clothes/smart-vest.webp",
+      "alt": "Smart monitoring vest"
+    },
+    "blocks": [
+      {
+        "id": "b_rl7fn3t3",
+        "type": "kicker",
+        "text": "大学"
+      },
+      {
+        "id": "b_pktuzrya",
+        "type": "heading",
+        "text": "Smart Clothes for Elderly"
+      },
+      {
+        "id": "b_ews8qb35",
+        "type": "subheading",
+        "text": "Wearable monitoring · Mini program · Family alerts"
+      },
+      {
+        "id": "b_j1gprsco",
+        "type": "kicker",
+        "text": "01 · Product"
+      },
+      {
+        "id": "b_mk74lby6",
+        "type": "heading",
+        "text": "Smart Clothes for Elderly"
+      },
+      {
+        "id": "b_at5uslrb",
+        "type": "pull",
+        "text": "Wearable care that senses, alerts, and stays with the family."
+      },
+      {
+        "id": "b_blcl9zgo",
+        "type": "image",
+        "image": {
+          "src": "/experience/university/smart-clothes/smart-vest.webp",
+          "alt": "Smart monitoring vest",
+          "caption": "Everyday form — sensing module in the chest pocket."
+        }
+      },
+      {
+        "id": "b_fa0mymoo",
+        "type": "kicker",
+        "text": "02 · Concept"
+      },
+      {
+        "id": "b_896in0dn",
+        "type": "heading",
+        "text": "What it is"
+      },
+      {
+        "id": "b_v3o0h58i",
+        "type": "text",
+        "text": "A garment that watches an elder’s body signals in real time, works with a camera when something looks wrong, contacts family, and raises an alarm for a fast response."
+      },
+      {
+        "id": "b_w3atkhpk",
+        "type": "text",
+        "text": "Posture, location, heart rate, and temperature stream into a mini program so relatives can follow status without standing next to the device."
+      },
+      {
+        "id": "b_6aufq2ug",
+        "type": "image",
+        "image": {
+          "src": "/experience/university/smart-clothes/system-architecture.png",
+          "alt": "System architecture of the smart elderly care monitoring system",
+          "caption": "System overview — sensing, cloud, and family interaction"
+        }
+      },
+      {
+        "id": "b_ghq5sjrk",
+        "type": "kicker",
+        "text": "03 · Hardware"
+      },
+      {
+        "id": "b_ylnpmfg6",
+        "type": "heading",
+        "text": "Boards first"
+      },
+      {
+        "id": "b_50f1sa25",
+        "type": "text",
+        "text": "Compact wearable modules carry sensing, power, and wireless links—light enough for daily wear, dense enough for vitals and alerts."
+      },
+      {
+        "id": "b_e6gviccp",
+        "type": "text",
+        "text": "PCB layout ties HR and TEMP channels, power control, and IO into one bring-up path."
+      },
+      {
+        "id": "b_osh9pyhw",
+        "type": "duo",
+        "images": [
+          {
+            "src": "/experience/university/smart-clothes/wearable-module.webp",
+            "alt": "Wearable PCB module front and back",
+            "caption": "Wearable module — front / back product views"
+          },
+          {
+            "src": "/experience/university/smart-clothes/pcb-layout.webp",
+            "alt": "PCB layout for the smart monitoring board",
+            "caption": "PCB layout — routing for HR, TEMP, and power"
+          }
+        ]
+      },
+      {
+        "id": "b_gh6eddtc",
+        "type": "kicker",
+        "text": "04 · Edge & Cloud"
+      },
+      {
+        "id": "b_2575iuam",
+        "type": "heading",
+        "text": "From the edge to the cloud"
+      },
+      {
+        "id": "b_24jbwe36",
+        "type": "text",
+        "text": "Edge compute handles heavier sensing and vision cues. Cloud messaging keeps telemetry live for monitoring and family-facing views."
+      },
+      {
+        "id": "b_cam9ujdo",
+        "type": "duo",
+        "images": [
+          {
+            "src": "/experience/university/smart-clothes/k210-board.webp",
+            "alt": "K210 edge compute board",
+            "caption": "Edge — on-device compute"
+          },
+          {
+            "src": "/experience/university/smart-clothes/emqx-dashboard.webp",
+            "alt": "EMQX cloud messaging dashboard",
+            "caption": "Cloud — live messaging & connections"
+          }
+        ]
+      },
+      {
+        "id": "b_wyd6wedn",
+        "type": "kicker",
+        "text": "05 · Mini Program"
+      },
+      {
+        "id": "b_vffmxpjt",
+        "type": "heading",
+        "text": "Family view"
+      },
+      {
+        "id": "b_5yu0nkxz",
+        "type": "text",
+        "text": "Two compact screens for relatives: live status at a glance, and trend charts when they want the story over time."
+      },
+      {
+        "id": "b_h0tc3uan",
+        "type": "duo",
+        "images": [
+          {
+            "src": "/experience/university/smart-clothes/miniapp-status.webp",
+            "alt": "Mini program status overview",
+            "caption": "Status"
+          },
+          {
+            "src": "/experience/university/smart-clothes/miniapp-vitals.webp",
+            "alt": "Mini program vitals charts",
+            "caption": "Trends"
+          }
+        ]
+      }
+    ]
+  },
+  "techmore": {
+    "id": "techmore",
+    "title": "TechMore",
+    "subtitle": "摩尔创展 · TouchDesigner interaction & exhibition tech",
+    "section": "工作",
+    "cardImage": {
+      "src": "/uploads/e4e4046cdd502bc5a77c351b64e61512-mur2zfks.webp",
+      "alt": "TechMore exhibition hall with large interactive displays",
+      "scale": 1.15
+    },
+    "blocks": [
+      {
+        "id": "b_6sgqabcs",
+        "type": "kicker",
+        "text": "工作"
+      },
+      {
+        "id": "b_ekfl8789",
+        "type": "heading",
+        "text": "TechMore"
+      },
+      {
+        "id": "b_fyvxdahr",
+        "type": "subheading",
+        "text": "摩尔创展 · TouchDesigner interaction & exhibition tech"
+      },
+      {
+        "id": "b_sua7m1c5",
+        "type": "kicker",
+        "text": "01 · Interaction"
+      },
+      {
+        "id": "b_k6e0672t",
+        "type": "heading",
+        "text": "TechMore Interactive"
+      },
+      {
+        "id": "b_9mbivl7p",
+        "type": "pull",
+        "text": "Internship at Shenzhen TechMore (摩尔创展) — software–hardware interaction for exhibitions: sensors and firmware signals wired into TouchDesigner for realtime experiential output."
+      },
+      {
+        "id": "b_neiilyeh",
+        "type": "image",
+        "image": {
+          "src": "/experience/work/techmore/robot-arm.jpg",
+          "alt": "Robotic arm interactive installation with laser light lines",
+          "caption": "点亮光 — robotic arm + laser interactive installation."
+        }
+      },
+      {
+        "id": "b_me1lgath",
+        "type": "kicker",
+        "text": "02 · Realtime"
+      },
+      {
+        "id": "b_b108pjpl",
+        "type": "heading",
+        "text": "TouchDesigner pipelines"
+      },
+      {
+        "id": "b_vz7c4rib",
+        "type": "text",
+        "text": "Node-based patches turn camera and sensor input into live visuals — filter chains, edge detection, and color mapping wired up in TouchDesigner."
+      },
+      {
+        "id": "b_m23vsq7n",
+        "type": "text",
+        "text": "The output runs as a realtime effect on visitors, not a rendered video."
+      },
+      {
+        "id": "b_5dztvtlj",
+        "type": "duo",
+        "images": [
+          {
+            "src": "/experience/work/techmore/td-nodes.png",
+            "alt": "TouchDesigner node graph for the filter interaction",
+            "caption": "Node graph — sensor-driven filter pipeline."
+          },
+          {
+            "src": "/experience/work/techmore/realtime-fx.png",
+            "alt": "Realtime posterized effect running on a visitor",
+            "caption": "Live output — realtime effect on camera feed."
+          }
+        ]
+      },
+      {
+        "id": "b_od8ple5l",
+        "type": "kicker",
+        "text": "03 · Immersive"
+      },
+      {
+        "id": "b_3s3lm3nn",
+        "type": "heading",
+        "text": "Immersive space"
+      },
+      {
+        "id": "b_y8p5zkjb",
+        "type": "text",
+        "text": "Curved projection room with city-scale visuals — the kind of space the interaction pipelines ship into."
+      },
+      {
+        "id": "b_n05pki3a",
+        "type": "image",
+        "image": {
+          "src": "/experience/work/techmore/immersive-room.jpg",
+          "alt": "Immersive curved screen room with blue city visuals",
+          "caption": "Immersive room — curved screen walkthrough."
+        }
+      },
+      {
+        "id": "b_4okrmnz9",
+        "type": "heading",
+        "text": "Hardware behind the show"
+      },
+      {
+        "id": "b_mgbqq6m6",
+        "type": "text",
+        "text": "Inside each installation is a control box I helped debug — relay banks, power supplies, and controller boards that drive lights and the arm."
+      },
+      {
+        "id": "b_nvufkzau",
+        "type": "text",
+        "text": "Firmware signals leave these boxes and become the TouchDesigner input that visitors see react."
+      },
+      {
+        "id": "b_wjg8oy46",
+        "type": "image",
+        "image": {
+          "src": "/experience/work/techmore/electronics-debug.jpg",
+          "alt": "Open control box with relays and power supplies being debugged",
+          "caption": "Debug — relay / PSU control box on site."
+        }
+      },
+      {
+        "id": "b_bhzonkn0",
+        "type": "kicker",
+        "text": "04 · Process"
+      },
+      {
+        "id": "b_ngmhrlwe",
+        "type": "heading",
+        "text": "Reviews & builds"
+      },
+      {
+        "id": "b_uaauq11b",
+        "type": "text",
+        "text": "From team reviews around the 3D scene to long editing sessions — the installation content is iterated scene by scene."
+      },
+      {
+        "id": "b_wznqk2d5",
+        "type": "duo",
+        "images": [
+          {
+            "src": "/experience/work/techmore/team-review.jpg",
+            "alt": "Team reviewing a 3D scene on a studio screen",
+            "caption": "Review — walking through the scene with the team.",
+            "scale": 1.27
+          },
+          {
+            "src": "/experience/work/techmore/unity-session.jpg",
+            "alt": "Editing session with 3D content on screen",
+            "caption": "Build — content iteration in the studio.",
+            "scale": 1.23
+          }
+        ]
+      },
+      {
+        "id": "b_03d3m6sb",
+        "type": "kicker",
+        "text": "05 · Delivered"
+      },
+      {
+        "id": "b_h5oz8mfh",
+        "type": "heading",
+        "text": "On the exhibition floor"
+      },
+      {
+        "id": "b_z7fbkgyq",
+        "type": "text",
+        "text": "Shipped as city exhibition displays — the interaction work landed where visitors actually meet it."
+      },
+      {
+        "id": "b_th5crvyc",
+        "type": "image",
+        "image": {
+          "src": "/experience/work/techmore/exhibition-hall.jpg",
+          "alt": "Exhibition hall with large interactive display walls",
+          "caption": "Exhibition — interactive display walls in the hall."
         }
       }
     ]

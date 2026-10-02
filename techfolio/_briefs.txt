@@ -1,0 +1,4 @@
+﻿TOTAL=1 1 1
+zongheng-robot => title=[Zongheng Robot] subtitle=[Education robot Â· IoT teaching]
+shixun-car => title=[å®žè®¯å°è½¦] subtitle=[Shixun Â· Mecanum training car]
+vxs-100 => title=[VXS-100] subtitle=[Handheld voice module Â· Robot & å®žè®¯ control]

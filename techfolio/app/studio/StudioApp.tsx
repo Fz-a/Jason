@@ -4,7 +4,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState, type PointerEvent as ReactPointerEvent } from "react";
 import { BriefDocument } from "../components/BriefDocument";
-import { ShowcaseDocument } from "../projects/UniversityShowcase";
 import { briefFromShowcase } from "../lib/brief-from-legacy";
 import {
 	createEmptyBlock,
@@ -14,17 +13,6 @@ import {
 	type BriefImage,
 	type BriefStore,
 } from "../lib/brief-types";
-import {
-	AI_PROMPT_SNIPPET,
-	BRIEF_MD_RULES_TEXT,
-	briefDocToSlice,
-	bundleToActiveDoc,
-	docToBundle,
-	parseBriefMd,
-	serializeBriefMd,
-	type BriefLocale,
-	type BriefMdBundle,
-} from "../lib/brief-md";
 import {
 	IMAGE_FOCUS_MAX,
 	IMAGE_FOCUS_MIN,
@@ -240,28 +228,6 @@ function withCardImage(doc: BriefDoc): BriefDoc {
 	if (doc.cardImage?.src) return doc;
 	const fallback = lookupDefaultCardImage(doc.id);
 	return fallback ? { ...doc, cardImage: fallback } : doc;
-}
-
-function resolveLiveShowcase(
-	entry: CatalogEntry | undefined,
-): { item: (typeof workShowcases)[number]; section: string } | null {
-	if (!entry || entry.source !== "showcase") return null;
-	const section =
-		entry.group === "工作"
-			? "Work"
-			: entry.group === "大学"
-				? "University"
-				: entry.group === "造物"
-					? "MAKE"
-					: entry.group === "社会"
-						? "Society"
-						: entry.group;
-	const item = [
-		...workShowcases,
-		...universityProjectShowcases,
-		...societyShowcases,
-	].find((s) => s.id === entry.id);
-	return item ? { item, section } : null;
 }
 
 function toPersist(
@@ -1242,17 +1208,8 @@ export function StudioApp() {
 	const [extraMedia, setExtraMedia] = useState<string[]>([]);
 	const [uploading, setUploading] = useState(false);
 	const filePickRef = useRef<HTMLInputElement>(null);
-	const [mdPane, setMdPane] = useState(false);
-	const [mdText, setMdText] = useState("");
-	const [editLocale, setEditLocale] = useState<BriefLocale>("zh-Hans");
-	const [mdSource, setMdSource] = useState<BriefLocale>("zh-Hans");
-	const [mdBusy, setMdBusy] = useState(false);
 	const [saving, setSaving] = useState(false);
-	const mdBundleRef = useRef<BriefMdBundle | null>(null);
-	const editLocaleRef = useRef<BriefLocale>("zh-Hans");
-	const docRef = useRef(doc);
-	docRef.current = doc;
-	editLocaleRef.current = editLocale;
+	const [undoLabel, setUndoLabel] = useState<string | null>(null);
 	const undoRemoveRef = useRef<{
 		entry: CatalogEntry;
 		index: number;
@@ -1276,15 +1233,6 @@ export function StudioApp() {
 		}
 		return list;
 	}, [media, mediaQ]);
-
-	const activeEntry = useMemo(
-		() => catalog.find((c) => c.id === activeId),
-		[catalog, activeId],
-	);
-	const liveShowcase = useMemo(
-		() => resolveLiveShowcase(activeEntry),
-		[activeEntry],
-	);
 
 	useEffect(() => {
 		let cancelled = false;
@@ -1328,6 +1276,32 @@ export function StudioApp() {
 		};
 	}, []);
 
+	// Nav labels should match the site: prefer Studio-saved brief titles
+	// (runs once after the catalog is ready; live edits still win afterwards).
+	useEffect(() => {
+		if (!catalogReady) return;
+		let cancelled = false;
+		(async () => {
+			try {
+				const res = await fetch("/api/briefs/", { cache: "no-store" });
+				if (!res.ok) return;
+				const data = (await res.json()) as BriefStore;
+				if (cancelled || !data || typeof data !== "object") return;
+				setCatalog((prev) =>
+					prev.map((c) => {
+						const saved = data[c.id]?.title;
+						return saved && saved !== c.title ? { ...c, title: saved } : c;
+					}),
+				);
+			} catch {
+				/* keep source titles */
+			}
+		})();
+		return () => {
+			cancelled = true;
+		};
+	}, [catalogReady]);
+
 	// Persist catalog (local + disk)
 	useEffect(() => {
 		if (!catalogReady) return;
@@ -1361,6 +1335,37 @@ export function StudioApp() {
 	useEffect(() => {
 		setStore((prev) => ({ ...prev, [doc.id]: doc }));
 	}, [doc]);
+
+	// Live briefs: the static JSON seed is a compile-time snapshot and can be
+	// stale (e.g. after 写入 from an earlier session). Load the saved store from
+	// disk on mount so edits start from the real data instead of clobbering it.
+	useEffect(() => {
+		let cancelled = false;
+		(async () => {
+			try {
+				const res = await fetch("/api/briefs/", { cache: "no-store" });
+				if (!res.ok) return;
+				const data = (await res.json()) as BriefStore;
+				if (
+					cancelled ||
+					!data ||
+					typeof data !== "object" ||
+					Array.isArray(data)
+				)
+					return;
+				setStore(data);
+				setDoc((prev) => {
+					const fresh = data[prev.id];
+					return fresh ? structuredClone(fresh) : prev;
+				});
+			} catch {
+				/* keep seed */
+			}
+		})();
+		return () => {
+			cancelled = true;
+		};
+	}, []);
 
 	useEffect(() => {
 		if (!pickToken) return;
@@ -1431,6 +1436,7 @@ export function StudioApp() {
 				index,
 				wasHidden: entry.source !== "custom",
 			};
+			setUndoLabel(`已移除「${entry.title}」`);
 			const next = catalog.filter((c) => c.id !== id);
 			setCatalog(next);
 			setStarredIds((s) => s.filter((x) => x !== id));
@@ -1450,13 +1456,6 @@ export function StudioApp() {
 					setDoc(loadDoc(fallback, store));
 				}
 			}
-			setTip("已移除 · 点击可撤销");
-			window.setTimeout(() => {
-				if (undoRemoveRef.current?.entry.id === id) {
-					setTip(null);
-					undoRemoveRef.current = null;
-				}
-			}, 4000);
 		},
 		[activeId, catalog, store],
 	);
@@ -1465,6 +1464,7 @@ export function StudioApp() {
 		const u = undoRemoveRef.current;
 		if (!u) return;
 		undoRemoveRef.current = null;
+		setUndoLabel(null);
 		setCatalog((prev) => {
 			if (prev.some((c) => c.id === u.entry.id)) return prev;
 			const next = [...prev];
@@ -1602,76 +1602,6 @@ export function StudioApp() {
 		}
 	};
 
-	const flushDocIntoBundle = useCallback(
-		(locale: BriefLocale, current: BriefDoc, source: BriefLocale) => {
-			const prev = mdBundleRef.current;
-			const base =
-				prev && prev.id === current.id
-					? prev
-					: docToBundle(current, source, null);
-			const next: BriefMdBundle = {
-				...base,
-				id: current.id,
-				source_locale: source,
-				locales: {
-					...base.locales,
-					[locale]: briefDocToSlice(current),
-				},
-			};
-			mdBundleRef.current = next;
-			return next;
-		},
-		[],
-	);
-
-	const loadLocaleDoc = useCallback(
-		(bundle: BriefMdBundle, locale: BriefLocale) => {
-			const next = withCardImage(bundleToActiveDoc(bundle, locale));
-			setDoc(next);
-			setStore((prev) => ({ ...prev, [next.id]: next }));
-		},
-		[],
-	);
-
-	const ensureBundleForDoc = useCallback(
-		async (current: BriefDoc, preferred?: BriefLocale) => {
-			let existing: BriefMdBundle | null = null;
-			try {
-				const res = await fetch(
-					`/api/brief-md/?id=${encodeURIComponent(current.id)}`,
-				);
-				if (res.ok) {
-					const data = (await res.json()) as { markdown?: string };
-					if (data.markdown) existing = parseBriefMd(data.markdown);
-				}
-			} catch {
-				/* ignore */
-			}
-			const source = preferred ?? existing?.source_locale ?? mdSource;
-			const bundle = docToBundle(current, source, existing);
-			mdBundleRef.current = bundle;
-			setMdSource(bundle.source_locale);
-			setMdText(serializeBriefMd(bundle));
-			return bundle;
-		},
-		[mdSource],
-	);
-
-	const switchLocale = useCallback(
-		(nextLocale: BriefLocale) => {
-			if (nextLocale === editLocaleRef.current) return;
-			const bundle = flushDocIntoBundle(
-				editLocaleRef.current,
-				docRef.current,
-				mdSource,
-			);
-			setEditLocale(nextLocale);
-			loadLocaleDoc(bundle, nextLocale);
-			setMdText(serializeBriefMd(bundle));
-		},
-		[flushDocIntoBundle, loadLocaleDoc, mdSource],
-	);
-
 	const download = () => {
 		downloadJson({ ...store, [doc.id]: doc });
 		setTip("已下载 JSON · 也可点「写入」保存到磁盘");
@@ -1690,13 +1620,6 @@ export function StudioApp() {
 			const data = (await res.json()) as { path?: string; error?: string };
 			if (!res.ok) throw new Error(data.error || "写入失败");
 			setStore(payload);
-			const bundle = flushDocIntoBundle(editLocale, doc, mdSource);
-			const markdown = serializeBriefMd(bundle);
-			await fetch("/api/brief-md/", {
-				method: "POST",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({ id: doc.id, markdown }),
-			});
 			setTip(`已写入 ${data.path}`);
 		} catch (err) {
 			setTip(err instanceof Error ? err.message : "写入失败");
@@ -1706,167 +1629,15 @@ export function StudioApp() {
 		}
 	};
 
-	const enterMdPane = async () => {
-		setMdBusy(true);
-		try {
-			const bundle = flushDocIntoBundle(editLocale, doc, mdSource);
-			mdBundleRef.current = bundle;
-			setMdText(serializeBriefMd(bundle));
-			setMdPane(true);
-		} finally {
-			setMdBusy(false);
-		}
-	};
-
-	const leaveMdPane = () => {
-		try {
-			const parsed = parseBriefMd(mdText);
-			mdBundleRef.current = parsed;
-			setMdSource(parsed.source_locale);
-			loadLocaleDoc(parsed, editLocale);
-		} catch {
-			/* keep doc */
-		}
-		setMdPane(false);
-	};
-
-	const exportMdDownload = () => {
-		const bundle = flushDocIntoBundle(editLocale, doc, mdSource);
-		const text = mdPane ? mdText : serializeBriefMd(bundle);
-		const blob = new Blob([text], { type: "text/markdown;charset=utf-8" });
-		const url = URL.createObjectURL(blob);
-		const a = document.createElement("a");
-		a.href = url;
-		a.download = `${doc.id}.md`;
-		a.click();
-		URL.revokeObjectURL(url);
-		setTip("已导出 MD");
-		window.setTimeout(() => setTip(null), 2000);
-	};
-
-	const refreshMdFromPage = () => {
-		const bundle = flushDocIntoBundle(editLocale, doc, mdSource);
-		setMdText(serializeBriefMd(bundle));
-		setTip("已从当前预览刷新 MD");
-		window.setTimeout(() => setTip(null), 2000);
-	};
-
-	const copyRulesOnly = async () => {
-		try {
-			await navigator.clipboard.writeText(BRIEF_MD_RULES_TEXT);
-			setTip("已复制规则 · 可发给其它 AI");
-		} catch {
-			setTip("复制失败");
-		}
-		window.setTimeout(() => setTip(null), 2200);
-	};
-
-	const copyRulesAndMd = async () => {
-		const text = `${AI_PROMPT_SNIPPET}\n\n----\n\n${BRIEF_MD_RULES_TEXT}\n\n----\n\n${mdText}`;
-		try {
-			await navigator.clipboard.writeText(text);
-			setTip("已复制：提示 + 规则 + MD");
-		} catch {
-			setTip("复制失败");
-		}
-		window.setTimeout(() => setTip(null), 2200);
-	};
-
-	const saveMdFile = async () => {
-		setMdBusy(true);
-		try {
-			const parsed = parseBriefMd(mdText);
-			mdBundleRef.current = parsed;
-			const normalized = serializeBriefMd(parsed);
-			setMdText(normalized);
-			const res = await fetch("/api/brief-md/", {
-				method: "POST",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({
-					id: parsed.id || doc.id,
-					markdown: normalized,
-				}),
-			});
-			const data = (await res.json()) as { path?: string; error?: string };
-			if (!res.ok) throw new Error(data.error || "写入失败");
-			setTip(`已写入 ${data.path}`);
-		} catch (err) {
-			setTip(err instanceof Error ? err.message : "写入失败");
-		} finally {
-			setMdBusy(false);
-			window.setTimeout(() => setTip(null), 2500);
-		}
-	};
-
-	const importMdReplace = async () => {
-		setMdBusy(true);
-		try {
-			const parsed = parseBriefMd(mdText);
-			const normalized = serializeBriefMd(parsed);
-			mdBundleRef.current = parsed;
-			setMdText(normalized);
-			setMdSource(parsed.source_locale);
-			const loc = parsed.locales[editLocale]
-				? editLocale
-				: parsed.source_locale;
-			setEditLocale(loc);
-			loadLocaleDoc(parsed, loc);
-			await fetch("/api/brief-md/", {
-				method: "POST",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({
-					id: parsed.id || doc.id,
-					markdown: normalized,
-				}),
-			});
-			setTip("已导入替换 · 右侧实时预览已更新");
-			setMdPane(false);
-		} catch (err) {
-			setTip(err instanceof Error ? err.message : "解析失败");
-		} finally {
-			setMdBusy(false);
-			window.setTimeout(() => setTip(null), 2500);
-		}
-	};
-
-	// MD 编辑时实时预览
-	useEffect(() => {
-		if (!mdPane) return;
-		const t = window.setTimeout(() => {
-			try {
-				const parsed = parseBriefMd(mdText);
-				mdBundleRef.current = parsed;
-				loadLocaleDoc(parsed, editLocaleRef.current);
-			} catch {
-				/* 输入不完整时忽略 */
-			}
-		}, 480);
-		return () => window.clearTimeout(t);
-	}, [mdText, mdPane, loadLocaleDoc]);
-
-	// 切换卡片：正文跟站点展台同步；MD 只更新缓冲，不反写旧内容
+	// 切换卡片：正文跟站点展台同步
 	const switchCard = (id: string) => {
 		if (id === activeId) return;
 		const entry = catalog.find((c) => c.id === id);
 		if (!entry) return;
-		flushDocIntoBundle(editLocale, doc, mdSource);
 		setActiveId(id);
-		const nextDoc = loadDoc(entry, store);
-		setDoc(nextDoc);
-		setMdPane(false);
-		void ensureBundleForDoc(nextDoc).then((bundle) => {
-			mdBundleRef.current = bundle;
-			setMdSource(bundle.source_locale);
-			setMdText(serializeBriefMd(bundle));
-			// Stay on source locale so stale translated stubs cannot replace the live doc
-			if (editLocaleRef.current !== bundle.source_locale) {
-				setEditLocale(bundle.source_locale);
-			}
-		});
+		setDoc(loadDoc(entry, store));
 	};
 
-	const hasKicker = doc.blocks.some((b) => b.type === "kicker");
-	const hasHeading = doc.blocks.some((b) => b.type === "heading");
 	const avatarRef = useRef<AvatarEditorHandle>(null);
 	const [avatarPreview, setAvatarPreview] = useState<AvatarPreview | null>(
 		null,
@@ -1921,33 +1692,9 @@ export function StudioApp() {
 
 				<div className="hidden min-w-0 flex-1 items-center gap-2 sm:flex">
 					{mode === "briefs" ? (
-						<>
-							<div className="flex items-center gap-0.5 rounded-full bg-white/70 p-0.5 ring-1 ring-[#0F4C45]/8">
-								{(
-									[
-										["zh-Hans", "简"],
-										["en", "EN"],
-										["zh-Hant", "繁"],
-									] as const
-								).map(([id, label]) => (
-									<button
-										key={id}
-										type="button"
-										onClick={() => switchLocale(id)}
-										className={`rounded-full px-2.5 py-0.5 text-[0.68rem] font-semibold transition ${
-											editLocale === id
-												? "bg-[#043439] text-white"
-												: "text-[#0F4C45]/70 hover:text-[#0F4C45]"
-										}`}
-									>
-										{label}
-									</button>
-								))}
-							</div>
-							<span className="min-w-0 truncate text-[0.75rem] text-[#6A7A76]">
-								{doc.title}
-							</span>
-						</>
+						<span className="min-w-0 truncate text-[0.75rem] text-[#6A7A76]">
+							{doc.title}
+						</span>
 					) : mode === "page" ? (
 						<span className="truncate text-[0.75rem] text-[#6A7A76]">
 							边预览边改 · 点文字出红框
@@ -1960,47 +1707,25 @@ export function StudioApp() {
 				<div className="ml-auto flex items-center gap-1">
 					{mode === "briefs" ? (
 						<>
-							{!mdPane ? (
-								<div className="mr-0.5 hidden items-center gap-0.5 md:flex">
-									{(
-										[
-											["heading", "标题"],
-											["text", "正文"],
-											["image", "图"],
-											["duo", "双图"],
-										] as const
-									).map(([type, label]) => (
-										<button
-											key={type}
-											type="button"
-											onClick={() => addBlock(type)}
-											className="rounded-full px-2 py-0.5 text-[0.65rem] font-medium text-[#0F4C45]/65 transition hover:bg-white/80 hover:text-[#0F4C45]"
-										>
-											+{label}
-										</button>
-									))}
-								</div>
-							) : null}
-							<button
-								type="button"
-								onClick={() =>
-									mdPane ? leaveMdPane() : void enterMdPane()
-								}
-								className={`rounded-full px-2.5 py-1 text-[0.7rem] font-semibold ${
-									mdPane
-										? "bg-[#0F4C45]/12 text-[#043439]"
-										: "text-[#0F4C45] hover:bg-white/70"
-								}`}
-							>
-								{mdPane ? "编辑" : "MD"}
-							</button>
-							<button
-								type="button"
-								onClick={exportMdDownload}
-								className="rounded-full px-2.5 py-1 text-[0.7rem] font-semibold text-[#0F4C45] hover:bg-white/70"
-							>
-								导出MD
-							</button>
+							<div className="mr-0.5 hidden items-center gap-0.5 md:flex">
+								{(
+									[
+										["heading", "标题"],
+										["text", "正文"],
+										["image", "图"],
+										["duo", "双图"],
+									] as const
+								).map(([type, label]) => (
+									<button
+										key={type}
+										type="button"
+										onClick={() => addBlock(type)}
+										className="rounded-full px-2 py-0.5 text-[0.65rem] font-medium text-[#0F4C45]/65 transition hover:bg-white/80 hover:text-[#0F4C45]"
+									>
+										+{label}
+									</button>
+								))}
+							</div>
 							<button
 								type="button"
 								onClick={download}
@@ -2112,107 +1837,6 @@ export function StudioApp() {
 									onTip={setTip}
 								/>
 							</div>
-						) : mdPane ? (
-							<div className="flex h-full min-h-0">
-								{/* Rules column */}
-								<aside className="hidden w-[13.5rem] shrink-0 flex-col border-r border-[#0F4C45]/8 bg-[#F7F1E8]/70 md:flex">
-									<div className="flex items-center justify-between gap-1 border-b border-[#0F4C45]/8 px-3 py-2">
-										<p className="text-[0.72rem] font-semibold text-[#0F4C45]">
-											规则
-										</p>
-										<button
-											type="button"
-											onClick={() => void copyRulesOnly()}
-											className="rounded-full bg-white px-2 py-0.5 text-[0.65rem] font-semibold text-[#043439] ring-1 ring-[#0F4C45]/12"
-										>
-											复制规则
-										</button>
-									</div>
-									<div className="min-h-0 flex-1 overflow-y-auto px-3 py-2 text-[0.65rem] leading-4 text-[#5A6B67] whitespace-pre-wrap">
-										{BRIEF_MD_RULES_TEXT}
-									</div>
-								</aside>
-
-								<div className="flex min-w-0 flex-1 flex-col">
-									<div className="flex shrink-0 flex-wrap items-center gap-1.5 border-b border-[#0F4C45]/8 px-3 py-2">
-										<label className="mr-1 flex items-center gap-1 text-[0.68rem] text-[#6A7A76]">
-											主语言
-											<select
-												value={mdSource}
-												onChange={(e) => {
-													const v = e.target.value as BriefLocale;
-													setMdSource(v);
-													if (mdBundleRef.current) {
-														mdBundleRef.current = {
-															...mdBundleRef.current,
-															source_locale: v,
-														};
-													}
-												}}
-												className="rounded-md bg-white px-1.5 py-0.5 text-[0.68rem] outline-none ring-1 ring-[#0F4C45]/10"
-											>
-												<option value="zh-Hans">简体</option>
-												<option value="en">EN</option>
-												<option value="zh-Hant">繁体</option>
-											</select>
-										</label>
-										<button
-											type="button"
-											disabled={mdBusy}
-											onClick={refreshMdFromPage}
-											className="rounded-full bg-white px-2 py-0.5 text-[0.65rem] font-semibold text-[#0F4C45] ring-1 ring-[#0F4C45]/10"
-										>
-											从预览刷新
-										</button>
-										<button
-											type="button"
-											className="rounded-full bg-white px-2 py-0.5 text-[0.65rem] font-semibold text-[#0F4C45] ring-1 ring-[#0F4C45]/10 md:hidden"
-											onClick={() => void copyRulesOnly()}
-										>
-											复制规则
-										</button>
-										<button
-											type="button"
-											disabled={mdBusy}
-											onClick={() => void copyRulesAndMd()}
-											className="rounded-full bg-white px-2 py-0.5 text-[0.65rem] font-semibold text-[#0F4C45] ring-1 ring-[#0F4C45]/10"
-										>
-											复制规则+MD
-										</button>
-										<button
-											type="button"
-											disabled={mdBusy}
-											onClick={exportMdDownload}
-											className="rounded-full bg-white px-2 py-0.5 text-[0.65rem] font-semibold text-[#0F4C45] ring-1 ring-[#0F4C45]/10"
-										>
-											导出MD
-										</button>
-										<button
-											type="button"
-											disabled={mdBusy}
-											onClick={() => void saveMdFile()}
-											className="rounded-full bg-white px-2 py-0.5 text-[0.65rem] font-semibold text-[#0F4C45] ring-1 ring-[#0F4C45]/10"
-										>
-											写入文件
-										</button>
-										<button
-											type="button"
-											disabled={mdBusy}
-											onClick={() => void importMdReplace()}
-											className="rounded-full bg-[#043439] px-2.5 py-0.5 text-[0.65rem] font-semibold text-white"
-										>
-											导入替换
-										</button>
-									</div>
-									<textarea
-										value={mdText}
-										onChange={(e) => setMdText(e.target.value)}
-										spellCheck={false}
-										className="min-h-0 flex-1 resize-none bg-[#FFFCFA] p-3 font-mono text-[0.72rem] leading-5 text-[#162b26] outline-none"
-										placeholder="粘贴 AI 返回的 MD，或在此编辑… 右侧实时预览"
-									/>
-								</div>
-							</div>
 						) : (
 							<div className="h-full overflow-y-auto">
 								<div className="mx-auto max-w-[34rem] px-5 py-6 sm:px-8 sm:py-8">
@@ -2227,30 +1851,6 @@ export function StudioApp() {
 											</option>
 										))}
 									</select>
-
-									{/* mobile locale */}
-									<div className="mb-4 flex items-center gap-0.5 rounded-full bg-[#F7F1E8] p-0.5 sm:hidden">
-										{(
-											[
-												["zh-Hans", "简"],
-												["en", "EN"],
-												["zh-Hant", "繁"],
-											] as const
-										).map(([id, label]) => (
-											<button
-												key={id}
-												type="button"
-												onClick={() => switchLocale(id)}
-												className={`flex-1 rounded-full py-1.5 text-[0.72rem] font-semibold ${
-													editLocale === id
-														? "bg-[#043439] text-white"
-														: "text-[#0F4C45]/75"
-												}`}
-											>
-												{label}
-											</button>
-										))}
-									</div>
 
 									<div className="space-y-1">
 										{/* Homepage / Projects stage cover */}
@@ -2306,34 +1906,27 @@ export function StudioApp() {
 											)}
 										</div>
 
-										{!hasKicker && doc.section ? (
+										<div className="mb-6 rounded-2xl bg-[#F7F1E8] p-3.5 ring-1 ring-[#0F4C45]/8">
+											<p className="text-[0.62rem] font-semibold uppercase tracking-[0.2em] text-[#0F4C45]/45">
+												标题 · 首页卡片显示
+											</p>
 											<LiveText
-												value={doc.section}
-												onChange={(section) =>
-													setDoc((p) => ({ ...p, section }))
+												value={doc.title}
+												onChange={(title) =>
+													setDoc((p) => ({ ...p, title }))
 												}
-												className="text-[0.68rem] font-semibold uppercase tracking-[0.24em] text-[#8A9692]"
+												className="mt-2 text-[1.5rem] font-extrabold tracking-tight text-[#162b26]"
+												placeholder="标题"
 											/>
-										) : null}
-										{!hasHeading ? (
-											<>
-												<LiveText
-													value={doc.title}
-													onChange={(title) =>
-														setDoc((p) => ({ ...p, title }))
-													}
-													className="mt-3 text-[1.5rem] font-extrabold tracking-tight text-[#162b26]"
-												/>
-												<LiveText
-													value={doc.subtitle ?? ""}
-													onChange={(subtitle) =>
-														setDoc((p) => ({ ...p, subtitle }))
-													}
-													className="mt-1.5 text-[0.92rem] text-[#6A7A76]"
-													placeholder="副标题"
-												/>
-											</>
-										) : null}
+											<LiveText
+												value={doc.subtitle ?? ""}
+												onChange={(subtitle) =>
+													setDoc((p) => ({ ...p, subtitle }))
+												}
+												className="mt-1.5 text-[0.92rem] text-[#6A7A76]"
+												placeholder="副标题"
+											/>
+										</div>
 
 										{doc.blocks.map((block) => (
 											<BlockRow
@@ -2407,16 +2000,11 @@ export function StudioApp() {
 								</div>
 							</div>
 						) : (
-							<div className="studio-preview-drawer flex max-h-[min(100%,48rem)] w-full max-w-[28rem] flex-col overflow-hidden 2xl:max-w-[34rem]">
+							<div className="studio-preview-drawer flex max-h-[min(100%,48rem)] w-full max-w-[46rem] flex-col overflow-hidden">
 								<div className="flex shrink-0 items-center justify-between px-5 py-3">
-									<p className="text-[0.65rem] font-semibold uppercase tracking-[0.22em] text-[#0F4C45]/45">
-										站点预览 ·{" "}
-										{editLocale === "zh-Hans"
-											? "简"
-											: editLocale === "zh-Hant"
-												? "繁"
-												: "EN"}
-									</p>
+								<p className="text-[0.65rem] font-semibold uppercase tracking-[0.22em] text-[#0F4C45]/45">
+									站点预览
+								</p>
 									<span className="text-[0.72rem] font-medium text-[#0F4C45]/30">
 										与 Projects 一致
 									</span>
@@ -2424,34 +2012,23 @@ export function StudioApp() {
 								<div className="mx-4 mb-2 h-px bg-[#0F4C45]/[0.08]" />
 								<div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-1 pb-2">
 									<div className="studio-preview-body">
-										{liveShowcase ? (
-											<ShowcaseDocument
-												item={liveShowcase.item}
-												sectionLabel={liveShowcase.section}
-												className="shadow-none"
-												zoomable={false}
-											/>
-										) : (
-											<>
-												{doc.cardImage?.src ? (
-													<figure className="mx-4 mb-3 overflow-hidden rounded-xl bg-[#F5F5F3] ring-1 ring-black/[0.04]">
-														<div className="relative aspect-[16/10] w-full overflow-hidden">
-															{/* eslint-disable-next-line @next/next/no-img-element */}
-															<img
-																src={doc.cardImage.src}
-																alt={doc.cardImage.alt || doc.title}
-																className="absolute inset-0 h-full w-full object-cover"
-																style={imageFocusStyle(doc.cardImage)}
-															/>
-														</div>
-														<figcaption className="px-3 py-2 text-center text-[0.62rem] font-medium tracking-[0.08em] text-[#8A9692]">
-															首页卡片
-														</figcaption>
-													</figure>
-												) : null}
-												<BriefDocument doc={doc} />
-											</>
-										)}
+										{doc.cardImage?.src ? (
+											<figure className="mx-4 mb-3 overflow-hidden rounded-xl bg-[#F5F5F3] ring-1 ring-black/[0.04]">
+												<div className="relative aspect-[16/10] w-full overflow-hidden">
+													{/* eslint-disable-next-line @next/next/no-img-element */}
+													<img
+														src={doc.cardImage.src}
+														alt={doc.cardImage.alt || doc.title}
+														className="absolute inset-0 h-full w-full object-cover"
+														style={imageFocusStyle(doc.cardImage)}
+													/>
+												</div>
+												<figcaption className="px-3 py-2 text-center text-[0.62rem] font-medium tracking-[0.08em] text-[#8A9692]">
+													首页卡片
+												</figcaption>
+											</figure>
+										) : null}
+										<BriefDocument doc={doc} />
 									</div>
 								</div>
 							</div>
@@ -2536,13 +2113,34 @@ export function StudioApp() {
 				</div>
 			) : null}
 
+			{undoLabel ? (
+				<div className="fixed bottom-5 left-1/2 z-50 flex -translate-x-1/2 items-center gap-2 rounded-full bg-[#043439] px-2 py-1.5 text-[0.76rem] font-semibold text-white shadow-lg">
+					<span className="pl-2">{undoLabel}</span>
+					<button
+						type="button"
+						onClick={() => undoRemove()}
+						className="rounded-full bg-white/20 px-3 py-1 font-semibold text-white transition hover:bg-white/35"
+					>
+						撤销
+					</button>
+					<button
+						type="button"
+						onClick={() => {
+							undoRemoveRef.current = null;
+							setUndoLabel(null);
+						}}
+						className="rounded-full px-1.5 text-white/70 transition hover:text-white"
+						aria-label="关闭"
+					>
+						×
+					</button>
+				</div>
+			) : null}
+
 			{tip ? (
 				<button
 					type="button"
-					onClick={() => {
-						if (undoRemoveRef.current) undoRemove();
-						else setTip(null);
-					}}
+					onClick={() => setTip(null)}
 					className="fixed bottom-5 left-1/2 z-50 -translate-x-1/2 rounded-full bg-[#043439] px-4 py-2 text-[0.76rem] font-semibold text-white shadow-lg"
 				>
 					{tip}

@@ -1,9 +1,9 @@
 {
 	"src": "/avatar.webp",
 	"source": "/avatar-source.jpg",
-	"scale": 1.72,
-	"tx": 16.9,
-	"ty": 1.1,
-	"v": 1790170144895,
+	"scale": 1,
+	"tx": -0.2,
+	"ty": -0.1,
+	"v": 1790950783588,
 	"variant": "home"
 }

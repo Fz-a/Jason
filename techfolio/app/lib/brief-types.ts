@@ -2,6 +2,8 @@ export type BriefImage = {
 	src: string;
 	alt: string;
 	caption?: string;
+	/** Render the whole image letterboxed inside the 4:3 frame instead of cover-cropping. */
+	fit?: "contain";
 	/** Cover-frame zoom (1 = default). */
 	scale?: number;
 	/** Pan as % of frame (positive = right / down). */
