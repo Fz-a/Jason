@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useLocale } from "../lib/i18n";
 import { isCapabilitiesRailActive } from "../lib/capabilities-rail";
 import { ZoomableFrame } from "./ImageLightbox";
@@ -17,7 +17,6 @@ import {
 	type MakeDiyItem,
 	type MakeImage,
 } from "../projects/make-essay";
-import { overrideCardImage } from "../lib/brief-card";
 import { imageFocusStyle } from "../lib/image-focus";
 import briefsStore from "../../content/briefs.json";
 import { BriefDocument } from "./BriefDocument";
@@ -27,7 +26,7 @@ import {
 	type ProjectCatalogGroup,
 } from "../projects/project-catalog";
 
-/** Studio-saved briefs (详情 mode) — overrides the code showcase in the Open-brief panel. */
+/** Static seed of Studio-saved briefs; refreshed live from /api/briefs at runtime. */
 const BRIEF_OVERRIDES = briefsStore as BriefStore;
 
 type GroupId = ProjectCatalogGroup;
@@ -96,7 +95,15 @@ function firstSpreadBlurb(
 	return parts.length ? parts.join(" ") : undefined;
 }
 
-function buildCatalog(isZh: boolean, t: (k: string) => string): NavItem[] {
+function buildCatalog(
+	isZh: boolean,
+	t: (k: string) => string,
+	overrides: BriefStore,
+): NavItem[] {
+	const coverOf = (id: string) => {
+		const img = overrides[id]?.cardImage;
+		return img?.src ? img : undefined;
+	};
 	const workById = new Map(workShowcases.map((s) => [s.id, s]));
 	const uniById = new Map(universityProjectShowcases.map((s) => [s.id, s]));
 	const societyById = new Map(societyShowcases.map((s) => [s.id, s]));
@@ -109,7 +116,7 @@ function buildCatalog(isZh: boolean, t: (k: string) => string): NavItem[] {
 	const items: NavItem[] = [];
 
 	for (const entry of listProjectCatalog()) {
-		const cover = overrideCardImage(entry.id);
+		const cover = coverOf(entry.id);
 
 		if (entry.kind === "showcase") {
 			const s =
@@ -117,10 +124,11 @@ function buildCatalog(isZh: boolean, t: (k: string) => string): NavItem[] {
 				uniById.get(entry.id) ??
 				societyById.get(entry.id);
 			if (!s) continue;
+			const ov = overrides[entry.id];
 			items.push({
 				key: s.id,
 				id: s.id,
-				label: s.title,
+				label: ov?.title || s.title,
 				section:
 					entry.group === "work"
 						? "Work"
@@ -134,7 +142,7 @@ function buildCatalog(isZh: boolean, t: (k: string) => string): NavItem[] {
 				imageScale: cover?.scale,
 				imageTx: cover?.tx,
 				imageTy: cover?.ty,
-				subtitle: s.subtitle,
+				subtitle: ov?.subtitle || s.subtitle,
 				summary: firstSpreadBlurb(s),
 				showcase: s,
 				kind: "showcase",
@@ -147,17 +155,18 @@ function buildCatalog(isZh: boolean, t: (k: string) => string): NavItem[] {
 		if (entry.kind === "company") {
 			const c = companyById.get(entry.id);
 			if (!c) continue;
+			const ov = overrides[entry.id];
 			items.push({
 				key: c.id,
 				id: c.id,
-				label: isZh ? c.companyZh : c.company,
+				label: ov?.title || (isZh ? c.companyZh : c.company),
 				section: c.role,
 				imageSrc: cover?.src ?? c.image.src,
 				imageAlt: cover?.alt || c.image.alt,
 				imageScale: cover?.scale,
 				imageTx: cover?.tx,
 				imageTy: cover?.ty,
-				subtitle: isZh ? c.company : c.companyZh,
+				subtitle: ov?.subtitle || (isZh ? c.company : c.companyZh),
 				summary: c.brief?.[0] ? `${c.summary} ${c.brief[0]}` : c.summary,
 				body: [...c.brief],
 				kind: "company",
@@ -168,7 +177,7 @@ function buildCatalog(isZh: boolean, t: (k: string) => string): NavItem[] {
 		}
 
 		if (entry.kind === "helmet" && helmet && helmet.type === "helmet") {
-			const hCover = cover ?? overrideCardImage("smart-helmet");
+			const hCover = cover ?? coverOf("smart-helmet");
 			items.push({
 				key: "smart-helmet",
 				id: "smart-helmet",
@@ -197,8 +206,8 @@ function buildCatalog(isZh: boolean, t: (k: string) => string): NavItem[] {
 		if (entry.kind === "diy" && diyWall && diyWall.type === "diy-wall") {
 			const dCover =
 				cover ??
-				overrideCardImage("make-diy") ??
-				overrideCardImage("diy-wall");
+				coverOf("make-diy") ??
+				coverOf("diy-wall");
 			items.push({
 				key: "diy-wall",
 				id: "diy-wall",
@@ -337,11 +346,33 @@ function DiyCollagePreview({ items }: { items: MakeDiyItem[] }) {
 export function FeaturedProjectsRail() {
 	const { t, isZh } = useLocale();
 	const sectionRef = useRef<HTMLElement>(null);
-	const catalog = useMemo(() => buildCatalog(isZh, t), [isZh, t]);
+	const [briefs, setBriefs] = useState<BriefStore>(() => BRIEF_OVERRIDES);
+	const refreshBriefs = useCallback(() => {
+		fetch("/api/briefs/", { cache: "no-store" })
+			.then((r) => (r.ok ? r.json() : null))
+			.then((data) => {
+				if (data && typeof data === "object" && !Array.isArray(data)) {
+					setBriefs(data as BriefStore);
+				}
+			})
+			.catch(() => {});
+	}, []);
+	useEffect(() => {
+		refreshBriefs();
+	}, [refreshBriefs]);
+	const catalog = useMemo(
+		() => buildCatalog(isZh, t, briefs),
+		[isZh, t, briefs],
+	);
 	const [selectedId, setSelectedId] = useState<string>(
 		() => catalog[0]?.id ?? "rtk",
 	);
 	const [panelOpen, setPanelOpen] = useState(false);
+	// Re-pull Studio-saved briefs right before showing the panel, so a save made in
+	// another tab (Studio) shows up without needing a hard reload.
+	useEffect(() => {
+		if (panelOpen) refreshBriefs();
+	}, [panelOpen, refreshBriefs]);
 	const [railVisible, setRailVisible] = useState(false);
 	const [diyFocus, setDiyFocus] = useState<MakeDiyItem | null>(null);
 	const [pill, setPill] = useState({
@@ -631,8 +662,8 @@ export function FeaturedProjectsRail() {
 							</button>
 						</div>
 						<div className="min-h-0 flex-1 overflow-y-auto">
-							{BRIEF_OVERRIDES[selected.id] ? (
-								<BriefDocument doc={BRIEF_OVERRIDES[selected.id]} />
+							{briefs[selected.id] ? (
+								<BriefDocument doc={briefs[selected.id]} />
 							) : selected.showcase ? (
 								<ShowcaseDocument
 									item={selected.showcase}

@@ -785,16 +785,22 @@ function loadDoc(entry: CatalogEntry, store: BriefStore): BriefDoc {
 		);
 	}
 
-	const fromSource = buildDocFromSource(entry);
-	if (fromSource) {
-		const cardImage =
-			saved?.cardImage?.src != null
-				? structuredClone(saved.cardImage)
-				: fromSource.cardImage;
-		return withCardImage({ ...fromSource, cardImage });
+	// Prefer the Studio-saved doc so text edits persist across reloads. The source
+	// showcase is only a fallback, or used to fill in a missing cover / empty body.
+	if (saved) {
+		const doc = structuredClone(saved);
+		const fromSource = buildDocFromSource(entry);
+		if ((!doc.blocks || doc.blocks.length === 0) && fromSource) {
+			doc.blocks = fromSource.blocks;
+		}
+		if (!doc.cardImage?.src && fromSource?.cardImage?.src) {
+			doc.cardImage = structuredClone(fromSource.cardImage);
+		}
+		return withCardImage(doc);
 	}
 
-	if (saved) return withCardImage(structuredClone(saved));
+	const fromSource = buildDocFromSource(entry);
+	if (fromSource) return withCardImage(fromSource);
 
 	return withCardImage({
 		id: entry.id,
