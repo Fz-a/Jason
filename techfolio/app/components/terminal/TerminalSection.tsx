@@ -3,9 +3,12 @@
 import {
 	useCallback,
 	useEffect,
+	useMemo,
 	useRef,
 	useState,
 } from "react";
+import { useLocale } from "../../lib/i18n";
+import { getTermStrings } from "./term-strings";
 
 /**
  * Home "experience" slide — one clean terminal that anyone can drive,
@@ -23,24 +26,6 @@ type Line = { id: number; segments: Segment[]; cls?: string };
 
 const PROMPT = "jason@portfolio:~$";
 
-/** domain · bar (10 cells) · details */
-const SKILLS: [string, number, string][] = [
-	["embedded", 9, "C/C++ · STM32 · PCB bring-up · sensor integration"],
-	["control ", 9, "PID tuning · motion control · line-follow & AGV"],
-	["position", 8, "Beidou RTK · GNSS · LPWAN field deployment"],
-	["vision  ", 8, "OpenCV · edge AI on Jetson · detection pipelines"],
-	["software", 8, "Python · TypeScript · Next.js · mini programs"],
-];
-
-/** Concrete facts for `summary` / `stats` — the at-a-glance highlights. */
-const STATS: [string, string][] = [
-	["Experience", "4+ years, electronics / embedded"],
-	["Shipped", "9 products, 2 companies"],
-	["Focus", "hardware that lands on metal floors"],
-	["Stack", "C/C++ · STM32 · PCB · RTK/GNSS · Jetson · Web"],
-	["Rule", "if it doesn't work on the bench, it never leaves"],
-];
-
 /** Keyword → label map for emphasis highlighting in prose output. */
 const HIGHLIGHTS = [
 	"STM32", "PID", "RTK", "GNSS", "Jetson", "OpenCV", "AGV", "PCB",
@@ -53,39 +38,16 @@ const SOCIALS = [
 	{ label: "csdn  ", href: "https://blog.csdn.net/Fz_a" },
 ];
 
-/** [name, description, what clicking it actually runs] */
-const MANUAL: [string, string, string][] = [
-	["next / skip", "advance the guided tour one chapter", "next"],
-	["restart", "run the guided tour from the top", "restart"],
-	["summary / stats", "everything at a glance — the highlights", "summary"],
-	["skills", "capability bars, the honest kind", "skills"],
-	["about / whoami", "who is Jason", "about"],
-	["contact / social", "email + socials", "contact"],
-	["neofetch", "system info, portfolio edition", "neofetch"],
-	["git log", "commit history of a career", "git log"],
-	["hack", "hollywood-style intrusion (fake, obviously)", "hack"],
-	["art", "the ASCII gallery — buddha, neumann & friends", "art"],
-	["matrix", "follow the white rabbit", "matrix"],
-	["theme", "toggle green / amber phosphor", "theme"],
-	["cat <file>", "about.txt · skills.txt · contact.txt", "cat about.txt"],
-	["ping <host>", "check if the internet still works", "ping"],
-	["fortune", "wisdom dispenser", "fortune"],
-	["history", "your command history", "history"],
-	["man <cmd>", "manual pages", "man tour"],
-	["help", "list commands", "help"],
-	["clear", "wipe the screen", "clear"],
-];
-
 const COMMAND_NAMES = [
 	...new Set([
 		"next", "skip", "start", "restart", "tour", "skills", "hack",
 		"hollywood", "art", "buddha", "neumann", "dragon", "rocket", "help",
-		"about", "whoami", "summary", "stats", "resume", "contact", "social",
-		"email", "clear", "pwd", "date", "echo", "history", "man",
-		"neofetch", "banner", "matrix", "theme", "top", "htop", "ping",
-		"git", "uname", "uptime", "fortune", "python", "python3", "cat",
-		"sudo", "rm", "exit", "quit", "vim", "vi", "nano", "emacs",
-		"hello", "hi", "xyzzy", "42",
+		"about", "whoami", "intro", "me", "who", "summary", "stats", "resume",
+		"contact", "social", "email", "clear", "pwd", "date", "echo",
+		"history", "man", "neofetch", "banner", "matrix", "theme", "top",
+		"htop", "ping", "git", "uname", "uptime", "fortune", "python",
+		"python3", "cat", "sudo", "rm", "exit", "quit", "vim", "vi",
+		"nano", "emacs", "hello", "hi", "xyzzy", "42",
 	]),
 ];
 
@@ -98,71 +60,12 @@ const SUGGESTIONS = ["help", "art", "matrix"];
  * [ Enter ↵ ] prompt) to advance. `text` is typed by the shell first as
  * narration, then the command runs and its output reveals the chapter.
  */
-type Step = { label: string; text: string; cmd: string; takeaway: string };
-const JOURNEY: Step[] = [
-	{
-		label: "01 · who",
-		text: "first, who is this person? let's ask the system.",
-		cmd: "whoami",
-		takeaway: "Jason Chen — electronics engineer, 4+ yrs, Guangzhou.",
-	},
-	{
-		label: "02 · capability",
-		text: "next: what can they actually do?",
-		cmd: "skills",
-		takeaway: "embedded · control · positioning · vision · software",
-	},
-	{
-		label: "03 · the machine",
-		text: "and the machine behind it —",
-		cmd: "neofetch",
-		takeaway: "9 shipped products · 2 companies · 4+ yrs uptime",
-	},
-	{
-		label: "04 · career",
-		text: "four years, one commit at a time.",
-		cmd: "git log",
-		takeaway: "AGV → RTK → shixun → VXS-100 → edu robots",
-	},
-	{
-		label: "05 · contact",
-		text: "if you like what you've seen —",
-		cmd: "contact",
-		takeaway: "email + GitHub · Gitee · CSDN",
-	},
-	{
-		label: "06 · finale",
-		text: "and because every good demo needs a little theater…",
-		cmd: "hack",
-		takeaway: "(that was fake — the real skill is above)",
-	},
-];
-
 const BANNER = [
 	"     _                        ",
 	"    | | __ _ ___  ___  _ __   ",
 	" _  | |/ _` / __|/ _ \\| '_ \\  ",
 	"| |_| | (_| \\__ \\ (_) | | | | ",
 	" \\___/ \\__,_|___/\\___/|_| |_| ",
-];
-
-/** Kernel-style boot cascade — pours down before the banner appears. */
-const BOOT_LOG = [
-	"[    0.000000] JasonOS 2.6.10 booting on portfolio-cpu0",
-	"[    0.000421] CPU: curiosity @ 5.15GHz (8 cores, 1 brain)",
-	"[    0.001024] Memory: 128TB idea-space available",
-	"[    0.002048] solder0: USB iron detected, heating to 350°C",
-	"[    0.003145] rtk-gnss0: 31 satellites locked, fix: RTK-FIXED",
-	"[    0.004096] pid0: Kp=1.8 Ki=0.4 Kd=0.06 — loop stable",
-	"[    0.005512] agv-can0: link up, 500 kbit/s, metal floor ready",
-	"[    0.006331] jetson0: CUDA cores awake, edge-AI pipeline armed",
-	"[    0.007222] coffee0: drip dependency resolved (critical)",
-	"[    0.008192] mounting /dev/projects on /home/jason ... done",
-	"[  OK  ] Started Portfolio Shell.",
-	"[  OK  ] Reached target Shipped Projects (9).",
-	"[  OK  ] Reached target Companies (2).",
-	"[  OK  ] Started Easter Egg Daemon (4 eggs hidden).",
-	"",
 ];
 
 const NEOFETCH_LOGO = [
@@ -172,77 +75,6 @@ const NEOFETCH_LOGO = [
 	"  │     O S       │  ",
 	"  │ · · · · · · · │  ",
 	"  └───────────────┘  ",
-];
-
-const NEOFETCH_INFO: [string, string][] = [
-	["OS", "JasonOS 2.6.10 portfolio x86_64"],
-	["Host", "Guangzhou, China"],
-	["Role", "Electronics Engineer"],
-	["Kernel", "curiosity-5.15-rc2"],
-	["Uptime", "4+ yrs building hardware"],
-	["Packages", "9 shipped projects"],
-	["Shell", "jsh 1.0 (this thing)"],
-	["Editor", "whatever gets it done"],
-];
-
-const FORTUNES = [
-	"“Talk is cheap. Show me the code.” — Linus Torvalds",
-	"“Simplicity is prerequisite for reliability.” — Dijkstra",
-	"“First, solve the problem. Then, write the code.” — John Johnson",
-	"“Hardware: the part you can kick.” — anonymous",
-	"“It works on my bench.” — every electronics engineer ever",
-];
-
-const GIT_LOG = [
-	"* 9f3e2a1 (HEAD -> main) feat: heavy-industry AGV remote, metal-floor proven",
-	"* 4c7b8d2 feat: Beidou RTK batch bring-up — farm machines stay on line",
-	"* a1e5f90 fix: PID oscillation on shixun car at high Kp",
-	"* 77d0c3e feat: VXS-100 industrial remote — panel to PCB",
-	"* 52b9aa4 feat: education robot fleet for university IoT labs",
-	"* 2e08f17 chore: coffee.iv drip — dependency of all of the above",
-];
-
-const HACK_LINES = [
-	"[ 0.000021] jsh: intrusion module loaded",
-	"[ 0.000112] scanning 65535 ports on portfolio.local ...",
-	"[ 0.000987]    22/tcp   OPEN   ssh    OpenSSH 9.6p1",
-	"[ 0.001243]    80/tcp   OPEN   http   jason-nginx 1.25",
-	"[ 0.001890]    443/tcp  OPEN   https  let's-encrypt-everything",
-	">> injecting payload ................. done",
-	">> escalating privileges ............. done",
-	">> hijacking rtk-gnss0 uplink ........ done",
-	">> decrypting project_secrets.enc",
-	"   0f a3 9c 44 e1 7b 22 90  c8 15 6d f0 3a 61 84 2e",
-	"   7d b1 05 99 e4 2c 18 76  40 ad 53 f8 0b 96 d2 3f",
-	"   91 c4 2e 67 aa 18 f5 03  bd 49 70 e6 2a dc 31 85",
-	"   26 f8 0d b3 59 e1 47 ac  12 78 c0 95 da 43 6e b9",
-	"   b4 60 3d 17 ee 82 09 5c  f1 2b a6 48 70 d9 03 94",
-	"   58 c2 1a e7 30 96 4b dd  07 65 b8 21 f4 39 ac 50",
-	">> brute-forcing passphrase: \"solder\" ... MATCH",
-	"   [####------] 40%   1.1 GB/s",
-	"   [########--] 80%   2.9 GB/s",
-	"   [##########] 100%  3.2 GB/s",
-	"   extracting  pid_tuning_notes.txt",
-	"   extracting  rtk_field_logs.tar.gz",
-	"   extracting  satellite_ephemeris.bin",
-	"   extracting  agv_schematics_FINAL_v2.pdf",
-	"   extracting  resume_FINAL_v9_FINAL.docx",
-	"   extracting  coffee_recipes.secret",
-	"",
-	"  █████╗  ██████╗ ██████╗███████╗███████╗███████╗",
-	" ██╔══██╗██╔════╝██╔════╝██╔════╝██╔════╝██╔════╝",
-	" ███████║██║     ██║     █████╗  ███████╗███████╗",
-	" ██╔══██║██║     ██║     ██╔══╝  ╚════██║╚════██║",
-	" ██║  ██║╚██████╗╚██████╗███████╗███████║███████║",
-	" ╚═╝  ╚═╝ ╚═════╝ ╚═════╝╚══════╝╚══════╝╚══════╝",
-	"  ██████╗ ██████╗  █████╗ ███╗   ██╗████████╗███████╗██████╗",
-	" ██╔════╝ ██╔══██╗██╔══██╗████╗  ██║╚══██╔══╝██╔════╝██╔══██╗",
-	" ██║  ███╗██████╔╝███████║██╔██╗ ██║   ██║   █████╗  ██║  ██║",
-	" ██║   ██║██╔══██╗██╔══██║██║╚██╗██║   ██║   ██╔══╝  ██║  ██║",
-	" ╚██████╔╝██║  ██║██║  ██║██║ ╚████║   ██║   ███████╗██████╔╝",
-	"  ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝   ╚═╝   ╚══════╝╚═════╝",
-	"",
-	"  ... just kidding. this is a portfolio, not a mainframe.",
 ];
 
 const BUDDHA_ART = [
@@ -362,13 +194,6 @@ const ROCKET_ART = [
 	"               V",
 ];
 
-const GALLERY: [string, string][] = [
-	["buddha", "zen, in monospace"],
-	["neumann", "the machine you're using right now"],
-	["dragon", "here be shipped products"],
-	["rocket", "T-0, every time"],
-];
-
 type Theme = {
 	bg: string;
 	border: string;
@@ -378,22 +203,30 @@ type Theme = {
 	barText: string;
 };
 
+/**
+ * Frosted-glass terminal, drawn from the site's own design tokens so it
+ * feels like a light pane on the cream slide rather than a dark slab:
+ *   cream #F7F1E8 · forest #162b26 · teal #0F4C45 · deep #043439
+ *   gold #E8C468 (accent) · sage #6FA98C
+ * Both themes are light and translucent; the toggle only shifts the
+ * accent hue (teal/sage vs. gold), never the lightness.
+ */
 const THEMES: Record<"green" | "amber", Theme> = {
 	green: {
-		bg: "#0F2A24",
-		border: "rgba(111,169,140,0.22)",
-		text: "#C9DCD1",
-		acc: "#6FA98C",
-		hl: "#E8C468",
-		barText: "rgba(111,169,140,0.75)",
+		bg: "rgba(255,253,249,0.62)",
+		border: "rgba(22,43,38,0.12)",
+		text: "#1E322C",
+		acc: "#0F4C45",
+		hl: "#0F4C45",
+		barText: "rgba(22,43,38,0.55)",
 	},
 	amber: {
-		bg: "#1A1206",
-		border: "rgba(255,176,0,0.28)",
-		text: "#FFDFA8",
-		acc: "#FFB000",
-		hl: "#FFD76A",
-		barText: "rgba(255,176,0,0.75)",
+		bg: "rgba(255,252,246,0.62)",
+		border: "rgba(168,120,42,0.18)",
+		text: "#2B2415",
+		acc: "#9A6B1F",
+		hl: "#9A6B1F",
+		barText: "rgba(74,58,26,0.55)",
 	},
 };
 
@@ -463,6 +296,8 @@ function levenshtein(a: string, b: string): number {
 const EGG_TOTAL = 4;
 
 export function TerminalSection() {
+	const { locale } = useLocale();
+	const T = useMemo(() => getTermStrings(locale), [locale]);
 	const [lines, setLines] = useState<Line[]>([]);
 	const [value, setValue] = useState("");
 	const [booted, setBooted] = useState(false);
@@ -493,11 +328,19 @@ export function TerminalSection() {
 
 	const printStaggered = useCallback(
 		(newLines: Line[], stepMs = 45, startMs = 0) => {
-			newLines.forEach((line, i) => {
-				timerRef.current.push(
-					window.setTimeout(() => print([line]), startMs + stepMs * i),
-				);
-			});
+			// Batch small groups per tick so renders are fewer and the
+			// cascade reads as a smooth flow rather than a per-line stutter.
+			const batch = stepMs <= 40 ? 2 : 1;
+			let i = 0;
+			const tick = () => {
+				const chunk = newLines.slice(i, i + batch);
+				if (chunk.length) print(chunk);
+				i += batch;
+				if (i < newLines.length) {
+					timerRef.current.push(window.setTimeout(tick, stepMs));
+				}
+			};
+			timerRef.current.push(window.setTimeout(tick, startMs));
 		},
 		[print],
 	);
@@ -507,16 +350,19 @@ export function TerminalSection() {
 			if (eggsRef.current.has(id)) return;
 			eggsRef.current.add(id);
 			print([
-				out(`  ✦ easter egg ${eggsRef.current.size}/${EGG_TOTAL} — ${label}`, HL),
+				out(
+					`  ✦ ${T.eggPrefix(eggsRef.current.size, EGG_TOTAL, label)}`,
+					HL,
+				),
 				out(""),
 			]);
 		},
-		[print],
+		[print, T],
 	);
 
 	const bootLines = useCallback(
 		(): Line[] => [
-			...BOOT_LOG.map((l) =>
+			...T.bootLog.map((l) =>
 				out(
 					l,
 					l.startsWith("[  OK  ]")
@@ -526,10 +372,10 @@ export function TerminalSection() {
 			),
 			...BANNER.map((l) => out(l, "text-[var(--tt-acc)]")),
 			out(""),
-			out("JasonOS 2.6.10 — portfolio shell"),
+			out(T.bootTitle),
 			out(""),
 		],
-		[],
+		[T],
 	);
 
 	// Boot once when the slide first scrolls into view.
@@ -549,10 +395,14 @@ export function TerminalSection() {
 		return () => io.disconnect();
 	}, [printStaggered, bootLines]);
 
-	// Scrollback pinned to bottom.
+	// Scrollback pinned to bottom — smooth, so cascades glide instead of jump.
 	useEffect(() => {
 		const el = scrollRef.current;
-		if (el) el.scrollTop = el.scrollHeight;
+		if (!el) return;
+		const raf = requestAnimationFrame(() => {
+			el.scrollTo({ top: el.scrollHeight, behavior: "smooth" });
+		});
+		return () => cancelAnimationFrame(raf);
 	}, [lines, stepIdx]);
 
 	const focusInput = useCallback(() => {
@@ -607,9 +457,9 @@ export function TerminalSection() {
 		ctx.fillRect(0, 0, canvas.width, canvas.height);
 
 		const iv = setInterval(() => {
-			ctx.fillStyle = "rgba(0, 10, 4, 0.12)";
+			ctx.fillStyle = "rgba(0, 0, 0, 0.12)";
 			ctx.fillRect(0, 0, canvas.width, canvas.height);
-			ctx.fillStyle = "#2dff6d";
+			ctx.fillStyle = "#6FA98C";
 			ctx.font = `${fontSize}px monospace`;
 			for (let i = 0; i < cols; i++) {
 				const ch = chars[Math.floor(Math.random() * chars.length)];
@@ -644,7 +494,7 @@ export function TerminalSection() {
 			idx = k === seq[idx] ? idx + 1 : k === seq[0] ? 1 : 0;
 			if (idx < seq.length) return;
 			idx = 0;
-			print([out("  KONAMI ACCEPTED — phosphor overload, power level: 9001", HL)]);
+			print([out(`  ${T.konamiLine}`, HL)]);
 			unlockEgg("konami", "you know the code");
 			setThemeName((t0) => (t0 === "green" ? "amber" : "green"));
 			setTimeout(
@@ -654,33 +504,34 @@ export function TerminalSection() {
 		};
 		window.addEventListener("keydown", onKey);
 		return () => window.removeEventListener("keydown", onKey);
-	}, [print, unlockEgg]);
+	}, [print, unlockEgg, T]);
 
 	/** Advance the guided journey by one chapter. */
 	const advance = useCallback(() => {
 		stopTimers();
 		const i = stepIdxRef.current + 1;
-		if (i >= JOURNEY.length) {
+		if (i >= T.journey.length) {
 			// finished — restart the whole journey on next Enter
 			stepIdxRef.current = -1;
 			setStepIdx(-1);
 			print([
-				out("  ★ that's the guided tour — you've seen the whole story."),
+				out(`  ${T.tourDoneA}`),
 				rich([
-					{ t: "  press " },
+					{ t: "  " + T.tourDoneB },
 					{ t: "Enter", cls: HL },
-					{ t: " to run it again, or explore: " },
-					{ t: "art", cls: `${HL} ${RUNNABLE}`, run: "art" },
+					{ t: " " + T.tourDoneC },
+					{ t: "intro", cls: `${HL} ${RUNNABLE}`, run: "intro" },
 					{ t: " / " },
-					{ t: "matrix", cls: `${HL} ${RUNNABLE}`, run: "matrix" },
+					{ t: "contact", cls: `${HL} ${RUNNABLE}`, run: "contact" },
 					{ t: " / " },
 					{ t: "help", cls: `${HL} ${RUNNABLE}`, run: "help" },
+					{ t: T.tourDoneD },
 				]),
 				out(""),
 			]);
 			return;
 		}
-		const step = JOURNEY[i];
+		const step = T.journey[i];
 		stepIdxRef.current = i;
 		setStepIdx(i);
 		print([out(`  ${step.label} — ${step.text}`)]);
@@ -701,7 +552,7 @@ export function TerminalSection() {
 				}, 500),
 			);
 		});
-	}, [stopTimers, print, ghostType]);
+	}, [stopTimers, print, ghostType, T]);
 
 	const run = useCallback(
 		(raw: string) => {
@@ -718,63 +569,64 @@ export function TerminalSection() {
 			const arg = args.join(" ");
 
 			switch (cmd) {
-				case "next":
-				case "skip":
-				case "start":
-					print([
-						echo,
-						out("  advancing to the next chapter…"),
-						out(""),
-					]);
-					advance();
-					break;
+			case "next":
+			case "skip":
+			case "start":
+				print([
+					echo,
+					out(`  ${T.advancing}`),
+					out(""),
+				]);
+				advance();
+				break;
 
-				case "tour":
-				case "restart": {
-					stepIdxRef.current = -1;
-					setStepIdx(-1);
-					print([
-						echo,
-						out("  restarting the guided tour from the top."),
-						out(""),
-					]);
-					break;
-				}
+			case "tour":
+			case "restart": {
+				stepIdxRef.current = -1;
+				setStepIdx(-1);
+				print([
+					echo,
+					out(`  ${T.restarting}`),
+					out(""),
+				]);
+				break;
+			}
 
-				case "hack":
-				case "hollywood":
-					printStaggered(
-						[
-							echo,
-							...HACK_LINES.map((l) =>
-								out(l, l.startsWith(">>") ? HL : undefined),
-							),
-							rich([
-								{ t: "   everything here is public — run " },
-								{ t: "skills", cls: `${HL} ${RUNNABLE}`, run: "skills" },
-								{ t: " — or enjoy the " },
-								{ t: "art", cls: `${HL} ${RUNNABLE}`, run: "art" },
-								{ t: " gallery." },
-							]),
-							out(""),
-						],
-						26,
-					);
-					break;
-
-				case "art":
-					print([
+			case "hack":
+			case "hollywood":
+				printStaggered(
+					[
 						echo,
-						out("  the gallery — click to unveil:"),
-						...GALLERY.map(([a, d]) =>
-							rich([
-								{ t: `  ${a.padEnd(10)}`, cls: `${HL} ${RUNNABLE}`, run: a },
-								{ t: d },
-							]),
+						...T.hackLines.map((l) =>
+							out(l, l.startsWith(">>") ? HL : undefined),
 						),
+						rich([
+							{ t: T.hackNote.a },
+							{ t: "intro", cls: `${HL} ${RUNNABLE}`, run: "intro" },
+							{ t: T.hackNote.intro },
+							{ t: "art", cls: `${HL} ${RUNNABLE}`, run: "art" },
+							{ t: T.hackNote.art },
+							{ t: T.hackNote.end },
+						]),
 						out(""),
-					]);
-					break;
+					],
+					26,
+				);
+				break;
+
+			case "art":
+				print([
+					echo,
+					out(`  ${T.galleryHeader}`),
+					...T.gallery.map(([a, d]) =>
+						rich([
+							{ t: `  ${a.padEnd(10)}`, cls: `${HL} ${RUNNABLE}`, run: a },
+							{ t: d },
+						]),
+					),
+					out(""),
+				]);
+				break;
 
 				case "buddha":
 					printStaggered(
@@ -800,167 +652,221 @@ export function TerminalSection() {
 					);
 					break;
 
-				case "dragon":
-					printStaggered(
-						[
-							echo,
-							...DRAGON_ART.map((l) => out(l, "text-[var(--tt-acc)]")),
-							out("  here be shipped products."),
-							out(""),
-						],
-						30,
-					);
-					break;
-
-				case "rocket":
-					printStaggered(
-						[
-							echo,
-							...ROCKET_ART.map((l) => out(l, "text-[var(--tt-acc)]")),
-							out("  T-0 confirmed. every project above left the pad."),
-							out(""),
-						],
-						30,
-					);
-					break;
-
-				case "help":
-					print([
+			case "dragon":
+				printStaggered(
+					[
 						echo,
-						out("available commands — click any of them:"),
-						...MANUAL.map(([c, d, r]) =>
-							rich([
-								{ t: `  ${c.padEnd(16)}`, cls: `${HL} ${RUNNABLE}`, run: r },
-								{ t: d },
-							]),
-						),
+						...DRAGON_ART.map((l) => out(l, "text-[var(--tt-acc)]")),
+						out(`  ${T.dragonCaption}`),
+						out(""),
+					],
+					30,
+				);
+				break;
+
+			case "rocket":
+				printStaggered(
+					[
+						echo,
+						...ROCKET_ART.map((l) => out(l, "text-[var(--tt-acc)]")),
+						out(`  ${T.rocketCaption}`),
+						out(""),
+					],
+					30,
+				);
+				break;
+
+			case "help":
+				print([
+					echo,
+					out(`  ${T.manualHeader}`),
+					...T.manual.map(([c, d, r]) =>
 						rich([
-							{ t: "  + ", cls: HL },
-							{ t: `${EGG_TOTAL} hidden eggs`, cls: HL },
-							{ t: " — real hackers don't read manuals." },
+							{ t: `  ${c.padEnd(16)}`, cls: `${HL} ${RUNNABLE}`, run: r },
+							{ t: d },
 						]),
-						out(""),
-					]);
-					break;
+					),
+					rich([
+						{ t: "  + ", cls: HL },
+						{ t: `${EGG_TOTAL} hidden eggs`, cls: HL },
+						{ t: ` — ${T.manualEgg}` },
+					]),
+					out(""),
+				]);
+				break;
 
-				case "man": {
-					const entry = MANUAL.find(([c]) =>
-						c.split(" /").some((n) => n.trim().startsWith(arg)),
-					);
-					print([
-						echo,
-						entry
-							? rich([
-									{ t: `  ${entry[0]}`, cls: `${HL} ${RUNNABLE}`, run: entry[2] },
-									{ t: ` — ${entry[1]}` },
-								])
-							: out(`  no manual entry for ${arg || "(nothing)"}`),
-						out(""),
-					]);
-					break;
-				}
+			case "man": {
+				const entry = T.manual.find(([c]) =>
+					c.split(" /").some((n) => n.trim().startsWith(arg)),
+				);
+				print([
+					echo,
+					entry
+						? rich([
+								{ t: `  ${entry[0]}`, cls: `${HL} ${RUNNABLE}`, run: entry[2] },
+								{ t: ` — ${entry[1]}` },
+							])
+						: out(`  ${T.manNoEntry(arg)}`),
+					out(""),
+				]);
+				break;
+			}
 
-				case "cat": {
-					if (arg === "about.txt") return run("about");
-					if (arg === "skills.txt") return run("skills");
-					if (arg === "contact.txt") return run("contact");
-					print([
-						echo,
-						out(
-							arg
-								? `  cat: ${arg}: no such file (try: about.txt, skills.txt, contact.txt)`
-								: "  usage: cat <file>",
-						),
-						out(""),
-					]);
-					break;
-				}
+			case "cat": {
+				if (arg === "about.txt") return run("about");
+				if (arg === "skills.txt") return run("skills");
+				if (arg === "contact.txt") return run("contact");
+				print([
+					echo,
+					out(arg ? `  ${T.catNoFile(arg)}` : `  ${T.catUsage}`),
+					out(""),
+				]);
+				break;
+			}
 
-				case "skills": {
-					const rows: Line[] = [
-						echo,
-						out("  capability self-assessment — calibrated on metal floors:"),
-						out(""),
-					];
-					for (const [k, lvl, v] of SKILLS) {
-						rows.push(
-							rich([
-								{ t: `  ${k}  `, cls: HL },
-								{
-									t: `[${"#".repeat(lvl)}${"-".repeat(10 - lvl)}] `,
-									cls: "text-[var(--tt-acc)]",
-								},
-								...emphasize(v),
-							]),
-						);
-					}
-					rows.push(out(""));
+			case "skills": {
+				const rows: Line[] = [
+					echo,
+					out(`  ${T.skillsHeader}`),
+					out(""),
+				];
+				for (const [k, lvl, v] of T.skills) {
 					rows.push(
 						rich([
-							{ t: "  every bar above has " },
-							{ t: "shipped hardware", cls: EMPH },
-							{ t: " behind it." },
+							{ t: `  ${k.padEnd(10)}`, cls: HL },
+							{
+								t: `[${"#".repeat(lvl)}${"·".repeat(10 - lvl)}]  `,
+								cls: "text-[var(--tt-acc)]",
+							},
+							...emphasize(v),
 						]),
 					);
-					rows.push(out(""));
-					printStaggered(rows, 90);
+				}
+				rows.push(out(""));
+				rows.push(
+					rich([
+						{ t: `  ${T.skillsFooterA}` },
+						{ t: T.skillsFooterB, cls: EMPH },
+						{ t: " behind it." },
+					]),
+				);
+				rows.push(out(""));
+				printStaggered(rows, 90);
+				break;
+			}
+
+			case "about":
+			case "whoami":
+				print([
+					echo,
+					rich([{ t: "  Jason Chen", cls: EMPH }, { t: ` — ${T.aboutRole}` }]),
+					out(""),
+					rich([{ t: "  I build " }, ...emphasize(T.aboutBody)]),
+					out(""),
+					rich([{ t: "  " }, { t: T.aboutFacts1, cls: EMPH }, { t: " · " }, { t: T.aboutFacts2, cls: EMPH }, { t: ", one rule:" }]),
+					rich([{ t: "  if it doesn't work on the " }, { t: T.aboutRuleA, cls: EMPH }, { t: T.aboutRuleB }]),
+					out(""),
+					rich([{ t: `  ${T.aboutStack}` }, ...emphasize("C/C++ · STM32 · PCB · RTK/GNSS · Jetson · Python · TypeScript")]),
+					out(""),
+				]);
+				break;
+
+				case "intro":
+				case "me":
+				case "who": {
+					// The payoff: a tidy, aligned self-introduction.
+					// Header prints atomically, then a label→value table
+					// flows in with perfectly aligned columns.
+					print([
+						echo,
+						out(""),
+						rich([
+							{ t: "  ╔══════════════════════════════════════╗" },
+						]),
+						rich([
+							{ t: "  ║        " },
+							{ t: "JASON CHEN", cls: "font-extrabold tracking-[0.18em]" },
+							{ t: "        ║" },
+						]),
+						rich([
+							{ t: "  ║     " },
+							{ t: T.introSub, cls: EMPH },
+							{ t: "     ║" },
+						]),
+						rich([
+							{ t: "  ╚══════════════════════════════════════╝" },
+						]),
+						out(""),
+					]);
+					printStaggered(
+						[
+							rich([
+								{ t: "  EXPERIENCE   ", cls: "text-[var(--tt-acc)]" },
+								{ t: T.introRows.exp, cls: EMPH },
+								{ t: " turning ideas into working hardware" },
+							]),
+							rich([
+								{ t: "  DELIVERED    ", cls: "text-[var(--tt-acc)]" },
+								{ t: T.introRows.delivered, cls: EMPH },
+								{ t: " · " },
+								{ t: T.aboutFacts1, cls: EMPH },
+								{ t: " · PCB → metal floor" },
+							]),
+							rich([
+								{ t: "  STACK        ", cls: "text-[var(--tt-acc)]" },
+								...emphasize(T.introRows.stack),
+							]),
+							rich([
+								{ t: "  RULE         ", cls: "text-[var(--tt-acc)]" },
+								{ t: T.introRuleA, cls: EMPH },
+								{ t: T.introRuleB },
+							]),
+							out(""),
+						],
+						130,
+						220,
+					);
 					break;
 				}
 
-				case "about":
-				case "whoami":
-					print([
-						echo,
-						rich([{ t: "  Jason Chen", cls: EMPH }, { t: " — electronics engineer, Guangzhou." }]),
-						out(""),
-						rich([{ t: "  I build " }, ...emphasize("landed hardware: education robots, Beidou RTK for farm machines, industrial AGVs — from PCB to metal floor.")]),
-						out(""),
-						rich([{ t: "  " }, { t: "2 companies", cls: EMPH }, { t: " · " }, { t: "9 shipped products", cls: EMPH }, { t: ", one rule:" }]),
-						rich([{ t: "  if it doesn't work on the " }, { t: "bench", cls: EMPH }, { t: ", it never leaves." }]),
-						out(""),
-						rich([{ t: "  daily stack → " }, ...emphasize("C/C++ · STM32 · PCB · RTK/GNSS · Jetson · Python · TypeScript")]),
-						out(""),
-					]);
-					break;
-
-				case "summary":
-				case "stats":
-				case "resume":
-					print([
-						echo,
-						out("  — at a glance —"),
-						out(""),
-						...STATS.map(([k, v]) =>
-							rich([
-								{ t: `  ${k.padEnd(12)} `, cls: HL },
-								{ t: "» " },
-								...emphasize(v),
-							]),
-						),
-						out(""),
+			case "summary":
+			case "stats":
+			case "resume":
+				print([
+					echo,
+					out(`  ── ${T.statsHeader} ──────────────────────────`),
+					out(""),
+					...T.stats.map(([k, v]) =>
 						rich([
-							{ t: "  run " },
-							{ t: "skills", cls: `${HL} ${RUNNABLE}`, run: "skills" },
-							{ t: " for the deep dive, or " },
-							{ t: "contact", cls: `${HL} ${RUNNABLE}`, run: "contact" },
-							{ t: " to reach me." },
+							{ t: `  ${k.padEnd(14)}`, cls: "text-[var(--tt-acc)]" },
+							...emphasize(v),
 						]),
-						out(""),
-					]);
-					break;
+					),
+					out(""),
+					rich([
+						{ t: "  run " },
+						{ t: "skills", cls: `${HL} ${RUNNABLE}`, run: "skills" },
+						{ t: T.summaryCta1 },
+						{ t: "contact", cls: `${HL} ${RUNNABLE}`, run: "contact" },
+						{ t: T.summaryCta2 },
+						{ t: T.summaryCta3 },
+					]),
+					out(""),
+				]);
+				break;
 
-				case "contact":
-				case "social":
-					print([
-						echo,
-						rich([
-							{ t: "  email  ", cls: HL },
-							{
-								t: "1106467336@qq.com",
-								href: "mailto:1106467336@qq.com",
-								cls: "underline underline-offset-4 opacity-90 hover:opacity-100",
-							},
-						]),
+			case "contact":
+			case "social":
+				print([
+					echo,
+					rich([
+						{ t: `  ${T.emailLabel}  `, cls: HL },
+						{
+							t: "1106467336@qq.com",
+							href: "mailto:1106467336@qq.com",
+							cls: "underline underline-offset-4 opacity-90 hover:opacity-100",
+						},
+					]),
 						...SOCIALS.map((s) =>
 							rich([
 								{ t: `  ${s.label}  `, cls: HL },
@@ -979,28 +885,28 @@ export function TerminalSection() {
 					print([echo, out("  1106467336@qq.com"), out("")]);
 					break;
 
-				case "neofetch": {
-					const rows: Line[] = [echo];
-					const n = Math.max(NEOFETCH_LOGO.length, NEOFETCH_INFO.length);
-					for (let i = 0; i < n; i++) {
-						const logo = NEOFETCH_LOGO[i] ?? " ".repeat(20);
-						const info = NEOFETCH_INFO[i];
-						rows.push(
-							rich([
-								{ t: logo, cls: "text-[var(--tt-acc)]" },
-								...(info
-									? ([
-											{ t: `${info[0]}: `, cls: HL },
-											...emphasize(info[1]),
-										] as Segment[])
-									: []),
-							]),
-						);
-					}
-					rows.push(out(""));
-					printStaggered(rows, 40);
-					break;
+			case "neofetch": {
+				const rows: Line[] = [echo];
+				const n = Math.max(NEOFETCH_LOGO.length, T.neofetchInfo.length);
+				for (let i = 0; i < n; i++) {
+					const logo = NEOFETCH_LOGO[i] ?? " ".repeat(20);
+					const info = T.neofetchInfo[i];
+					rows.push(
+						rich([
+							{ t: logo, cls: "text-[var(--tt-acc)]" },
+							...(info
+								? ([
+										{ t: `${info[0]}: `, cls: HL },
+										...emphasize(info[1]),
+									] as Segment[])
+								: []),
+						]),
+					);
 				}
+				rows.push(out(""));
+				printStaggered(rows, 40);
+				break;
+			}
 
 				case "banner":
 					print([
@@ -1010,127 +916,125 @@ export function TerminalSection() {
 					]);
 					break;
 
-				case "matrix":
-					print([echo, out("  wake up, Neo… (any key to exit)"), out("")]);
-					setMatrixOn(true);
-					break;
+			case "matrix":
+				print([echo, out(`  ${T.matrixWake}`), out("")]);
+				setMatrixOn(true);
+				break;
 
-				case "theme":
-					setThemeName((t0) => (t0 === "green" ? "amber" : "green"));
+			case "theme":
+				setThemeName((t0) => (t0 === "green" ? "amber" : "green"));
+				print([
+					echo,
+					out(
+						`  ${T.themeSet(themeName === "green" ? "amber" : "green")}`,
+					),
+					out(""),
+				]);
+				break;
+
+			case "git":
+				if (args[0] === "log") {
 					print([
 						echo,
-						out(
-							`  phosphor set to ${themeName === "green" ? "amber" : "green"} — run again to flip back`,
-						),
-						out(""),
-					]);
-					break;
-
-				case "git":
-					if (args[0] === "log") {
-						print([
-							echo,
-							...GIT_LOG.map((l) =>
-								rich([
-									{ t: l.slice(0, 8), cls: HL },
-									...emphasize(l.slice(8)),
-								]),
-							),
-							out(""),
-						]);
-					} else if (args[0] === "status") {
-						print([
-							echo,
-							out("  on branch main"),
-							out("  nothing to commit, working tree clean"),
-							out("  (shipping is the default state)"),
-							out(""),
-						]);
-					} else {
-						print([echo, out("  usage: git log | git status"), out("")]);
-					}
-					break;
-
-				case "ping": {
-					const host = arg || "github.com";
-					const fake = Array.from({ length: 4 }, (_, i) =>
-						out(
-							`  64 bytes from ${host}: icmp_seq=${i + 1} ttl=57 time=${(8 + Math.random() * 22).toFixed(1)} ms`,
-						),
-					);
-					printStaggered(
-						[
-							echo,
-							out(`  PING ${host} 56(84) bytes of data.`),
-							...fake,
-							out(`  --- ${host} ping statistics ---`),
-							out("  4 transmitted, 4 received, 0% packet loss"),
-							out(""),
-						],
-						260,
-					);
-					break;
-				}
-
-				case "top":
-				case "htop":
-					print([
-						echo,
-						out("    PID  COMMAND        %CPU  %MEM"),
-						...[
-							["1337", "agv-bring-up", "42.0", "12.1"],
-							["1024", "rtk-survey", "18.6", "8.4"],
-							["0512", "pid-tuner", "13.7", "4.2"],
-							["0256", "pcb-router", "9.9", "6.6"],
-							["0001", "curiosity", "100.0", "∞"],
-						].map(([pid, c, cpu, mem]) =>
+						...T.gitLog.map((l) =>
 							rich([
-								{ t: `  ${pid.padStart(6)}  ` },
-								{ t: c.padEnd(15), cls: HL },
-								{ t: `${cpu.padStart(5)}  ${mem.padStart(5)}` },
+								{ t: l.slice(0, 8), cls: HL },
+								...emphasize(l.slice(8)),
 							]),
 						),
 						out(""),
 					]);
-					break;
-
-				case "uname":
-					print([echo, out("  JasonOS 2.6.10-portfolio #1 SMP x86_64 GNU/Web"), out("")]);
-					break;
-
-				case "uptime":
+				} else if (args[0] === "status") {
 					print([
 						echo,
-						out("  up 4+ years, 9 shipped projects, 2 companies,"),
-						out("  load average: solder, firmware, repeat"),
+						...T.gitStatus.map((l) => out(`  ${l}`)),
 						out(""),
 					]);
-					break;
+				} else {
+					print([echo, out(`  ${T.gitUsage}`), out("")]);
+				}
+				break;
 
-				case "fortune":
-					print([
+			case "ping": {
+				const host = arg || "github.com";
+				const fake = Array.from({ length: 4 }, (_, i) =>
+					out(
+						`  64 bytes from ${host}: icmp_seq=${i + 1} ttl=57 time=${(8 + Math.random() * 22).toFixed(1)} ms`,
+					),
+				);
+				printStaggered(
+					[
 						echo,
-						out(`  ${FORTUNES[Math.floor(Math.random() * FORTUNES.length)]}`),
+						out(`  ${T.pingHeader(host)}`),
+						...fake,
+						out(`  ${T.pingStats(host)}`),
+						out(`  ${T.pingLost}`),
 						out(""),
-					]);
-					break;
+					],
+					260,
+				);
+				break;
+			}
 
-				case "python":
-				case "python3":
-					print([
-						echo,
+			case "top":
+			case "htop":
+				print([
+					echo,
+					out(`    ${T.topHeader}`),
+					...[
+						["1337", "agv-bring-up", "42.0", "12.1"],
+						["1024", "rtk-survey", "18.6", "8.4"],
+						["0512", "pid-tuner", "13.7", "4.2"],
+						["0256", "pcb-router", "9.9", "6.6"],
+						["0001", "curiosity", "100.0", "∞"],
+					].map(([pid, c, cpu, mem]) =>
 						rich([
-							{ t: "  real python runs in-browser at " },
-							{
-								t: "/py",
-								href: "/py/",
-								cls: "underline underline-offset-4",
-							},
-							{ t: " (password-gated, numpy included)" },
+							{ t: `  ${pid.padStart(6)}  ` },
+							{ t: c.padEnd(15), cls: HL },
+							{ t: `${cpu.padStart(5)}  ${mem.padStart(5)}` },
 						]),
-						out(""),
-					]);
-					break;
+					),
+					out(""),
+				]);
+				break;
+
+			case "uname":
+				print([echo, out(`  ${T.unameLine}`), out("")]);
+				break;
+
+			case "uptime":
+				print([
+					echo,
+					out(`  ${T.uptimeLine1}`),
+					out(`  ${T.uptimeLine2}`),
+					out(""),
+				]);
+				break;
+
+			case "fortune":
+				print([
+					echo,
+					out(`  ${T.fortunes[Math.floor(Math.random() * T.fortunes.length)]}`),
+					out(""),
+				]);
+				break;
+
+			case "python":
+			case "python3":
+				print([
+					echo,
+					rich([
+						{ t: `  ${T.pythonLine1}` },
+						{
+							t: "/py",
+							href: "/py/",
+							cls: "underline underline-offset-4",
+						},
+						{ t: T.pythonLine2 },
+					]),
+					out(""),
+				]);
+				break;
 
 				case "history":
 					print([
@@ -1158,99 +1062,99 @@ export function TerminalSection() {
 					print([echo, out(`  ${arg}`), out("")]);
 					break;
 
-				case "sudo":
-					if (arg === "make me a sandwich") {
-						print([echo, out("  okay."), out("")]);
-						unlockEgg("sandwich", "xkcd 149, honored");
-					} else {
-						print([
-							echo,
-							out("  jason is not in the sudoers file. This incident will be reported."),
-							out(""),
-						]);
-					}
-					break;
-
-				case "rm":
-					print([echo, out("  nice try."), out("")]);
-					break;
-
-				case "exit":
-				case "quit":
+			case "sudo":
+				if (arg === "make me a sandwich") {
+					print([echo, out(`  ${T.sudoSandwich}`), out("")]);
+					unlockEgg("sandwich", "xkcd 149, honored");
+				} else {
 					print([
 						echo,
-						rich([
-							{ t: "  there is no escape. try " },
-							{ t: "skills", cls: `${HL} ${RUNNABLE}`, run: "skills" },
-							{ t: " instead." },
-						]),
-						out(""),
-					]);
-					break;
-
-				case "vim":
-				case "vi":
-				case "nano":
-				case "emacs":
-					print([
-						echo,
-						out(`  ${cmd}: editor not included. this portfolio is read-only anyway.`),
-						out(""),
-					]);
-					break;
-
-				case "hello":
-				case "hi":
-					print([
-						echo,
-						rich([
-							{ t: "  hello. click " },
-							{ t: "skills", cls: `${HL} ${RUNNABLE}`, run: "skills" },
-							{ t: " — that's why you're here." },
-						]),
-						out(""),
-					]);
-					break;
-
-				case "xyzzy":
-					print([echo, out("  a hollow voice says: keep shipping."), out("")]);
-					unlockEgg("xyzzy", "plugh");
-					break;
-
-				case "42":
-					print([echo, out("  correct. the answer to everything."), out("")]);
-					unlockEgg("42", "deep thought");
-					break;
-
-				default: {
-					const suggestion = COMMAND_NAMES.filter(
-						(c) => levenshtein(cmd, c) <= 2,
-					).sort((a, b) => levenshtein(cmd, a) - levenshtein(cmd, b))[0];
-					print([
-						echo,
-						out(`  command not found: ${cmd}`),
-						...(suggestion
-							? [
-									rich([
-										{ t: "  did you mean " },
-										{
-											t: suggestion,
-											cls: `${HL} ${RUNNABLE}`,
-											run: suggestion,
-										},
-										{ t: "?" },
-									]),
-								]
-							: [out("  (try: help)")]),
+						out(`  ${T.sudoDenied}`),
 						out(""),
 					]);
 				}
-			}
+				break;
 
-		},
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-		[print, printStaggered, themeName, unlockEgg, advance],
-	);
+			case "rm":
+				print([echo, out(`  ${T.rmReply}`), out("")]);
+				break;
+
+			case "exit":
+			case "quit":
+				print([
+					echo,
+					rich([
+						{ t: `  ${T.exitLine1}` },
+						{ t: "skills", cls: `${HL} ${RUNNABLE}`, run: "skills" },
+						{ t: T.exitLine2 },
+					]),
+					out(""),
+				]);
+				break;
+
+			case "vim":
+			case "vi":
+			case "nano":
+			case "emacs":
+				print([
+					echo,
+					out(`  ${T.editorReply(cmd)}`),
+					out(""),
+				]);
+				break;
+
+			case "hello":
+			case "hi":
+				print([
+					echo,
+					rich([
+						{ t: `  ${T.helloLine1}` },
+						{ t: "skills", cls: `${HL} ${RUNNABLE}`, run: "skills" },
+						{ t: T.helloLine2 },
+					]),
+					out(""),
+				]);
+				break;
+
+			case "xyzzy":
+				print([echo, out(`  ${T.xyzzyReply}`), out("")]);
+				unlockEgg("xyzzy", "plugh");
+				break;
+
+			case "42":
+				print([echo, out(`  ${T.fortyTwoReply}`), out("")]);
+				unlockEgg("42", "deep thought");
+				break;
+
+			default: {
+				const suggestion = COMMAND_NAMES.filter(
+					(c) => levenshtein(cmd, c) <= 2,
+				).sort((a, b) => levenshtein(cmd, a) - levenshtein(cmd, b))[0];
+				print([
+					echo,
+					out(`  ${T.cmdNotFound(cmd)}`),
+					...(suggestion
+						? [
+								rich([
+									{ t: `  ${T.didYouMean}` },
+									{
+										t: suggestion,
+										cls: `${HL} ${RUNNABLE}`,
+										run: suggestion,
+									},
+									{ t: "?" },
+								]),
+							]
+						: [out(`  ${T.tryHelp}`)]),
+					out(""),
+				]);
+			}
+		}
+
+	},
+	// eslint-disable-next-line react-hooks/exhaustive-deps
+	[print, printStaggered, themeName, unlockEgg, advance, T],
+);
 	runRef.current = run;
 
 	// After boot: show the first "press Enter" prompt.
@@ -1261,26 +1165,26 @@ export function TerminalSection() {
 			window.setTimeout(() => {
 				stepIdxRef.current = -1;
 				setStepIdx(-1);
-				print([
-					rich([
-						{ t: "  " },
-						{ t: ">>", cls: HL },
-						{ t: "  welcome. this terminal will walk you through me, " },
-					]),
-					rich([
-						{ t: "  " },
-						{ t: ">>", cls: HL },
-						{ t: "  one command at a time. just press " },
-						{ t: "Enter", cls: HL },
-						{ t: " to begin." },
-					]),
-					out(""),
-				]);
-				focusInput();
-			}, bootMs + 300),
-		);
-		return stopTimers;
-	}, [booted, bootLines, stopTimers, print, focusInput]);
+			print([
+				rich([
+					{ t: "  " },
+					{ t: ">>", cls: HL },
+					{ t: `  ${T.welcomeLine1}` },
+				]),
+				rich([
+					{ t: "  " },
+					{ t: ">>", cls: HL },
+					{ t: `  ${T.welcomeLine2a}` },
+					{ t: "Enter", cls: HL },
+					{ t: T.welcomeLine2b },
+				]),
+				out(""),
+			]);
+			focusInput();
+		}, bootMs + 300),
+	);
+	return stopTimers;
+}, [booted, bootLines, stopTimers, print, focusInput, T]);
 
 	const submit = (e: React.FormEvent) => {
 		e.preventDefault();
@@ -1347,46 +1251,176 @@ export function TerminalSection() {
 		<section
 			ref={sectionRef}
 			id="experience"
-			className="story-slide bg-[#0B1F1B]"
+			className="story-slide bg-[#F7F1E8]"
 		>
-			<style>{`.term-line{animation:termin .22s cubic-bezier(.22,1,.36,1)}@keyframes termin{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}`}</style>
+			<style>{`.term-line{animation:termin .3s ease-out}@keyframes termin{from{opacity:0}to{opacity:1}}.term-scroll{scrollbar-width:thin;scrollbar-color:rgba(22,43,38,0.18) transparent}.term-scroll::-webkit-scrollbar{width:6px}.term-scroll::-webkit-scrollbar-thumb{background:rgba(22,43,38,0.16);border-radius:999px}.term-scroll::-webkit-scrollbar-thumb:hover{background:rgba(22,43,38,0.28)}.term-scroll::-webkit-scrollbar-track{background:transparent}`}</style>
 			<div className="story-slide__body px-4 py-8 sm:px-8 lg:px-12">
-				<div className="mx-auto flex h-full w-full max-w-[820px] min-h-0 flex-col justify-center">
-					{/* one clean window — nothing else competes for attention */}
+				<div className="mx-auto flex h-full w-full max-w-[1080px] min-h-0 flex-col justify-center gap-5 md:flex-row">
+					{/* left nav rail — what's happening now, one glance */}
+					<aside
+						className="hidden shrink-0 md:flex md:w-[200px] md:flex-col md:gap-4 md:pt-1"
+						aria-label="journey progress"
+					>
+						<div className="rounded-xl px-1 py-2">
+							<div
+								className="mb-1 font-mono text-[0.62rem] font-semibold uppercase tracking-[0.2em]"
+								style={{ color: theme.barText }}
+							>
+								{T.navTitle}
+							</div>
+							<p
+								className="mb-4 text-[0.72rem] leading-snug"
+								style={{ color: theme.text }}
+							>
+								{T.navSubtitle}
+							</p>
+
+							<ol className="flex flex-col gap-0.5">
+								{T.journey.map((s, i) => {
+									const state =
+										stepIdx === i
+											? "active"
+											: stepIdx > i
+												? "done"
+												: "todo";
+									return (
+										<li key={s.cmd}>
+											<button
+												type="button"
+												onClick={() => {
+													cancelGhost();
+													// jump directly to this chapter
+													stepIdxRef.current = i - 1;
+													setStepIdx(i - 1);
+													advance();
+													focusInput();
+												}}
+												className={`group flex w-full items-baseline gap-2 rounded-md px-2 py-1 text-left transition-colors ${
+													state === "active"
+														? "bg-[#0F4C45]/10"
+														: "hover:bg-[#0F4C45]/5"
+												}`}
+												style={{
+													color:
+														state === "todo"
+															? theme.barText
+															: theme.text,
+												}}
+											>
+												<span
+													className="font-mono text-[0.62rem]"
+													style={{
+														color:
+															state === "active"
+																? theme.hl
+																: state === "done"
+																	? theme.acc
+																	: "rgba(22,43,38,0.3)",
+													}}
+												>
+													{String(i + 1).padStart(2, "0")}
+												</span>
+												<span
+													className={`text-[0.78rem] leading-tight ${
+														state === "active" ? "font-semibold" : ""
+													} ${state === "todo" ? "opacity-70" : ""}`}
+												>
+													{s.label.replace(/^\d+\s*·\s*/, "")}
+												</span>
+												{state === "done" ? (
+													<span
+														className="ml-auto font-mono text-[0.62rem]"
+														style={{ color: theme.acc }}
+													>
+														✓
+													</span>
+												) : null}
+												{state === "active" ? (
+													<span
+														className="ml-auto h-1.5 w-1.5 animate-pulse rounded-full"
+														style={{ background: theme.hl }}
+													/>
+												) : null}
+											</button>
+										</li>
+									);
+								})}
+							</ol>
+
+							{/* current status line */}
+							<div
+								className="mt-4 rounded-lg px-2 py-2 text-[0.7rem] leading-snug"
+								style={{
+									background: "rgba(15,76,69,0.06)",
+									color: theme.text,
+								}}
+							>
+								<span
+									className="mb-1 block font-mono text-[0.6rem] uppercase tracking-[0.15em]"
+									style={{ color: theme.acc }}
+								>
+									{T.navTitle}
+								</span>
+								{stepIdx >= 0 && stepIdx < T.journey.length
+									? T.journey[stepIdx].takeaway
+									: T.navNotStarted}
+							</div>
+						</div>
+					</aside>
+
+					{/* terminal + suggestions stacked in one column */}
+					<div className="flex min-h-0 flex-1 flex-col">
+					{/* Apple-style frosted glass slab — layered depth + top highlight */}
 					<div
-						className="relative flex min-h-0 flex-1 flex-col border shadow-[0_40px_100px_rgba(0,0,0,0.5)] transition-colors duration-300"
+						className="relative flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl shadow-[0_24px_70px_-20px_rgba(22,43,38,0.35),0_6px_18px_-8px_rgba(22,43,38,0.18)] ring-1 ring-white/40 backdrop-blur-2xl transition-colors duration-300"
 						style={
 							{
-								backgroundColor: theme.bg,
-								borderColor: theme.border,
+								background:
+									"linear-gradient(145deg, rgba(255,255,255,0.72) 0%, rgba(255,253,249,0.48) 55%, rgba(246,240,230,0.55) 100%)",
+								border: "1px solid rgba(255,255,255,0.65)",
 								"--tt-acc": theme.acc,
 								"--tt-hl": theme.hl,
 								"--tt-text": theme.text,
 							} as React.CSSProperties
 						}
 					>
+						{/* top glass highlight — the subtle sheen Apple windows have */}
+						<div
+							className="pointer-events-none absolute inset-x-0 top-0 h-px"
+							style={{
+								background:
+									"linear-gradient(90deg, transparent, rgba(255,255,255,0.9) 30%, rgba(255,255,255,0.9) 70%, transparent)",
+							}}
+						/>
+						<div
+							className="pointer-events-none absolute inset-0 rounded-2xl"
+							style={{
+								background:
+									"linear-gradient(180deg, rgba(255,255,255,0.35) 0%, rgba(255,255,255,0) 22%)",
+							}}
+						/>
 						{/* title bar */}
 						<div
-							className="flex shrink-0 items-center gap-2 border-b px-4 py-3"
-							style={{ borderColor: theme.border }}
+							className="relative flex shrink-0 items-center gap-2 px-4 py-3"
+							style={{ borderBottom: "1px solid rgba(22,43,38,0.08)" }}
 						>
-							<span className="h-2.5 w-2.5 bg-[#C0554A]" />
-							<span className="h-2.5 w-2.5 bg-[#E8C468]" />
-							<span className="h-2.5 w-2.5 bg-[#6FA98C]" />
+							<span className="h-3 w-3 rounded-full bg-[#FF5F57] shadow-[inset_0_-1px_1px_rgba(0,0,0,0.15)]" />
+							<span className="h-3 w-3 rounded-full bg-[#FEBC2E] shadow-[inset_0_-1px_1px_rgba(0,0,0,0.15)]" />
+							<span className="h-3 w-3 rounded-full bg-[#28C840] shadow-[inset_0_-1px_1px_rgba(0,0,0,0.15)]" />
 							<span
-								className="ml-3 font-mono text-[0.68rem]"
+								className="ml-3 font-mono text-[0.68rem] font-medium"
 								style={{ color: theme.barText }}
 							>
 								jason@portfolio
 							</span>
-							{stepIdx >= 0 && stepIdx < JOURNEY.length ? (
-								<span
-									className="ml-auto font-mono text-[0.62rem]"
-									style={{ color: theme.barText }}
-								>
-									{`guided tour ${stepIdx + 1}/${JOURNEY.length}`}
-								</span>
-							) : null}
+						{stepIdx >= 0 && stepIdx < T.journey.length ? (
+							<span
+								className="ml-auto font-mono text-[0.62rem]"
+								style={{ color: theme.barText }}
+							>
+								{`${T.guidedTour} ${stepIdx + 1}/${T.journey.length}`}
+							</span>
+						) : null}
 						</div>
 
 						{/* scrollback */}
@@ -1396,7 +1430,7 @@ export function TerminalSection() {
 								cancelGhost();
 								focusInput();
 							}}
-							className="min-h-0 flex-1 cursor-text scroll-smooth overflow-y-auto px-5 py-5 font-mono text-[0.82rem] leading-[1.6] sm:px-7 sm:text-[0.88rem]"
+							className="term-scroll min-h-0 flex-1 cursor-text scroll-smooth overflow-y-auto px-5 py-5 font-mono text-[0.82rem] leading-[1.6] sm:px-7 sm:text-[0.88rem]"
 							style={{ color: theme.text }}
 						>
 							{lines.map((line) => (
@@ -1462,16 +1496,16 @@ export function TerminalSection() {
 												color: theme.hl,
 											}}
 										>
-											⏎ press Enter to continue
-										</button>
-										<span
-											className="font-mono text-[0.66rem]"
-											style={{ color: theme.barText }}
-										>
-											{stepIdx >= 0 && stepIdx < JOURNEY.length
-												? `${JOURNEY[stepIdx].label} / ${JOURNEY.length}`
-												: "or type a command · help"}
-										</span>
+										{T.pressEnterToContinue}
+									</button>
+									<span
+										className="font-mono text-[0.66rem]"
+										style={{ color: theme.barText }}
+									>
+										{stepIdx >= 0 && stepIdx < T.journey.length
+											? `${T.journey[stepIdx].label} / ${T.journey.length}`
+											: T.orTypeACommand}
+									</span>
 									</div>
 
 									<form onSubmit={submit} className="flex items-center">
@@ -1492,8 +1526,8 @@ export function TerminalSection() {
 											spellCheck={false}
 											autoComplete="off"
 											autoCapitalize="off"
-											placeholder="press Enter to continue, or type help"
-											aria-label="terminal input"
+										placeholder={T.inputPlaceholder}
+										aria-label="terminal input"
 											className="w-full min-w-0 flex-1 bg-transparent outline-none placeholder:opacity-30"
 											style={{
 												color: theme.text,
@@ -1521,7 +1555,7 @@ export function TerminalSection() {
 						{SUGGESTIONS.map((q, i) => (
 							<span key={q} className="flex items-center gap-2">
 								{i > 0 ? (
-									<span className="text-[#6FA98C]/30">·</span>
+									<span className="text-[#0F4C45]/30">·</span>
 								) : null}
 								<button
 									type="button"
@@ -1530,12 +1564,13 @@ export function TerminalSection() {
 										run(q);
 										focusInput();
 									}}
-									className="text-[#6FA98C]/70 transition hover:text-[#E8C468]"
+									className="text-[#0F4C45]/70 transition hover:text-[#043439]"
 								>
 									{q}
 								</button>
 							</span>
 						))}
+					</div>
 					</div>
 				</div>
 			</div>

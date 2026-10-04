@@ -6,6 +6,7 @@ import {
 	useContext,
 	useEffect,
 	useMemo,
+	useState,
 	type ReactNode,
 } from "react";
 
@@ -934,11 +935,26 @@ type LocaleContextValue = {
 	locale: Locale;
 	setLocale: (locale: Locale) => void;
 	t: (key: string) => string;
+	/** Always-English translation — used to keep the first page unaffected. */
+	tEn: (key: string) => string;
 	isZh: boolean;
 };
 
 const LocaleContext = createContext<LocaleContextValue | null>(null);
 const CopyOverrideContext = createContext<Dict>({});
+
+const STORAGE_KEY = "techfolio-locale";
+
+function readStoredLocale(): Locale | null {
+	if (typeof window === "undefined") return null;
+	try {
+		const raw = window.localStorage.getItem(STORAGE_KEY);
+		if (raw === "en" || raw === "zh-Hans" || raw === "zh-Hant") return raw;
+	} catch {
+		/* ignore */
+	}
+	return null;
+}
 
 export function getDict(locale: Locale): Dict {
 	return dictionaries[locale];
@@ -960,22 +976,39 @@ export function CopyOverrideProvider({
 }
 
 export function LocaleProvider({ children }: { children: ReactNode }) {
-	const setLocale = useCallback((_next: Locale) => {
-		/* Site is English-only for now */
+	// Default to English; hydrate from localStorage on mount so the switch
+	// survives reloads. The hero (first page) is rendered English-only via
+	// `tEn` regardless of this value.
+	const [locale, setLocaleState] = useState<Locale>("en");
+
+	useEffect(() => {
+		const stored = readStoredLocale();
+		if (stored) setLocaleState(stored);
+	}, []);
+
+	const setLocale = useCallback((next: Locale) => {
+		setLocaleState(next);
+		try {
+			window.localStorage.setItem(STORAGE_KEY, next);
+		} catch {
+			/* ignore */
+		}
 	}, []);
 
 	useEffect(() => {
-		document.documentElement.lang = "en";
-	}, []);
+		document.documentElement.lang =
+			locale === "zh-Hans" ? "zh-CN" : locale === "zh-Hant" ? "zh-TW" : "en";
+	}, [locale]);
 
 	const value = useMemo<LocaleContextValue>(
 		() => ({
-			locale: "en",
+			locale,
 			setLocale,
-			t: (key: string) => dictionaries.en[key] ?? key,
-			isZh: false,
+			t: (key: string) => dictionaries[locale][key] ?? dictionaries.en[key] ?? key,
+			tEn: (key: string) => dictionaries.en[key] ?? key,
+			isZh: locale !== "en",
 		}),
-		[setLocale],
+		[locale, setLocale],
 	);
 
 	return (
@@ -993,5 +1026,9 @@ export function useLocale() {
 		(key: string) => overrides[key] ?? ctx.t(key),
 		[ctx, overrides],
 	);
-	return { ...ctx, t };
+	const tEn = useCallback(
+		(key: string) => ctx.tEn(key),
+		[ctx],
+	);
+	return { ...ctx, t, tEn };
 }

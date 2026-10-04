@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { HomeScrollPreloader } from "./HomeScrollPreloader";
 import { CornerNav } from "./CornerNav";
+import { LangSwitch } from "./LangSwitch";
 import { HeroNameFlip } from "./HeroNameFlip";
 import { FeaturedProjectsRail } from "./FeaturedProjectsRail";
 import { TerminalSection } from "./terminal/TerminalSection";
@@ -21,7 +22,6 @@ import { StoryProgress, STORY_STAGES } from "./StoryProgress";
 import { useLocale } from "../lib/i18n";
 import {
 	PageSectionFrame,
-	LayoutText,
 	orderedVisible,
 } from "../lib/use-page-layout";
 import type { PageLayoutFile, PageSectionId } from "../lib/page-layout";
@@ -69,7 +69,7 @@ export function PortfolioDeck({
 	/** `projects` → the project rail; `terminal` → the interactive shell. */
 	experienceVariant?: "projects" | "terminal";
 }) {
-	const { t } = useLocale();
+	const { t, tEn } = useLocale();
 	const router = useRouter();
 	const fullOrder = orderedVisible(pageLayout);
 	const sectionOrder = sections
@@ -282,53 +282,53 @@ export function PortfolioDeck({
 						<div className="story-slide__body">
 							<div className="mx-auto grid h-full w-full max-w-[1160px] flex-1 grid-cols-1 items-center gap-6 px-5 pb-16 pt-[4.5rem] sm:gap-8 sm:px-8 sm:py-10 md:px-10 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] lg:gap-12 lg:px-12 xl:max-w-[1220px] xl:px-14">
 								<div className="order-2 mx-auto w-full max-w-[540px] text-left lg:order-1 lg:max-w-none">
-									<button
-										type="button"
-										onClick={onStudioTap}
-										className="cursor-default text-left"
-									>
+								<button
+									type="button"
+									onClick={onStudioTap}
+									className="cursor-default text-left"
+								>
 									<p className="text-[0.78rem] font-semibold uppercase tracking-[0.18em] text-[#0F4C45]/60">
-										<LayoutText k="hero.role" />
+										{tEn("hero.role")}
 									</p>
 								</button>
 
-				<h1 className="mt-7 text-left text-[2.55rem] font-extrabold leading-[0.95] tracking-tight text-[#162b26] sm:mt-9 sm:text-[3.6rem] lg:text-[4.2rem] xl:text-[4.6rem]">
-					<span className="hero-name-greeting block">
-						<span>{t("hero.hello")}, </span>
-						<span>{t("hero.iam")} </span>
-					</span>
-					<span className="mt-[0.12em] block">
-						<HeroNameFlip />
-					</span>
-				</h1>
+							<h1 className="mt-7 text-left text-[2.55rem] font-extrabold leading-[0.95] tracking-tight text-[#162b26] sm:mt-9 sm:text-[3.6rem] lg:text-[4.2rem] xl:text-[4.6rem]">
+								<span className="hero-name-greeting block">
+									<span>{tEn("hero.hello")}, </span>
+									<span>{tEn("hero.iam")} </span>
+								</span>
+								<span className="mt-[0.12em] block">
+									<HeroNameFlip />
+								</span>
+							</h1>
 
 							<p className={`mt-6 max-w-[28rem] text-[1rem] leading-8 text-[#3E514D] sm:text-[1.05rem] ${lora.className}`}>
-								<LayoutText k="hero.blurb" multiline />
+								{tEn("hero.blurb")}
 							</p>
 
-									<p className="mt-8 text-[0.72rem] font-semibold uppercase tracking-[0.16em] text-[#0F4C45]/70">
-										{(
-											[
-												"hero.chip.electronics",
-												"hero.chip.embedded",
-												"hero.chip.robotics",
-												"hero.chip.ai",
-												"hero.chip.uav",
-											] as const
-										)
-											.map((key) => t(key))
-											.join(" · ")}
-									</p>
+								<p className="mt-8 text-[0.72rem] font-semibold uppercase tracking-[0.16em] text-[#0F4C45]/70">
+									{(
+										[
+											"hero.chip.electronics",
+											"hero.chip.embedded",
+											"hero.chip.robotics",
+											"hero.chip.ai",
+											"hero.chip.uav",
+										] as const
+									)
+										.map((key) => tEn(key))
+										.join(" · ")}
+								</p>
 
-								<div className="mt-8 flex flex-wrap items-center gap-3">
-									<Link
-										href={contactHref}
-										onClick={(event) => handleNavClick(event, contactHref)}
-										className="cursor-pointer rounded-full bg-[#043439] px-6 py-2.5 text-sm font-semibold text-white transition hover:opacity-90"
-									>
-										{t("hero.contact")}
-									</Link>
-								</div>
+							<div className="mt-8 flex flex-wrap items-center gap-3">
+								<Link
+									href={contactHref}
+									onClick={(event) => handleNavClick(event, contactHref)}
+									className="cursor-pointer rounded-full bg-[#043439] px-6 py-2.5 text-sm font-semibold text-white transition hover:opacity-90"
+								>
+									{tEn("hero.contact")}
+								</Link>
+							</div>
 								</div>
 
 								<div className="order-1 flex items-center justify-center lg:order-2">
@@ -362,7 +362,7 @@ export function PortfolioDeck({
 									ref={cueDotRef}
 									className="block h-8 w-px bg-[#0F4C45]/35"
 								/>
-								<span ref={cueTextRef}>{t("hero.scroll")}</span>
+								<span ref={cueTextRef}>{tEn("hero.scroll")}</span>
 							</a>
 						</div>
 					</section>
@@ -451,6 +451,23 @@ export function PortfolioDeck({
 				}
 			>
 				<CornerNav mode={cornerNav} />
+			</div>
+
+			{/* Language switch appears from the "about" slide onward — the
+			    first (hero) page stays English, so it only shows once you
+			    scroll past it. On the homepage it swaps with the menu orb in
+			    the top-right corner; on inner decks it sits just left of the
+			    back orb so the two never overlap. */}
+			<div
+				className={`fixed top-5 z-50 transition-all duration-300 ${
+					cornerNav === "back" ? "right-[4.5rem]" : "right-5"
+				} ${
+					heroInView
+						? "pointer-events-none -translate-y-2 opacity-0"
+						: "translate-y-0 opacity-100"
+				}`}
+			>
+				<LangSwitch />
 			</div>
 			{showStory ? (
 				<StoryProgress
