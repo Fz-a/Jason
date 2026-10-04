@@ -9,6 +9,7 @@ export const CONTACT_EMAIL = "1106467336@qq.com";
 export const SOCIAL_LINKS = [
 	{ label: "GitHub", href: "https://github.com/Fz-a" },
 	{ label: "Gitee", href: "https://gitee.com/Fz_z" },
+	{ label: "CSDN", href: "https://blog.csdn.net/Fz_a" },
 ];
 
 function GitHubIcon() {
@@ -37,12 +38,37 @@ function GiteeIcon() {
 	);
 }
 
+function CsdnIcon() {
+	return (
+		<svg
+			aria-hidden="true"
+			viewBox="0 0 24 24"
+			className="h-4 w-4"
+			fill="currentColor"
+		>
+			<text
+				x="12"
+				y="16.5"
+				textAnchor="middle"
+				fontSize="12"
+				fontWeight="700"
+				fontFamily="Arial, sans-serif"
+				fill="currentColor"
+			>
+				C
+			</text>
+		</svg>
+	);
+}
+
 function SocialIcon({ label }: { label: string }) {
 	switch (label) {
 		case "GitHub":
 			return <GitHubIcon />;
 		case "Gitee":
 			return <GiteeIcon />;
+		case "CSDN":
+			return <CsdnIcon />;
 		default:
 			return null;
 	}
@@ -107,15 +133,6 @@ export function ContactSection() {
 						className="rounded-full bg-[#043439] px-5 py-2 text-[0.82rem] font-semibold text-white transition hover:opacity-90 lg:px-6 lg:py-2.5 lg:text-[0.88rem]"
 					>
 						{t("contact.emailMe")}
-					</a>
-					<a
-						href="/Jason-Chen-Resume.pdf"
-						download="Jason-Chen-Resume.pdf"
-						target="_blank"
-						rel="noreferrer"
-						className="rounded-full border border-[#0F4C45]/25 px-5 py-2 text-[0.82rem] font-semibold text-[#0F4C45] transition hover:bg-[#0F4C45] hover:text-white lg:px-6 lg:py-2.5 lg:text-[0.88rem]"
-					>
-						{t("nav.cv")}
 					</a>
 				</div>
 			</div>

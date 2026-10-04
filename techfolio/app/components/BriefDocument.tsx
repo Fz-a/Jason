@@ -4,25 +4,31 @@ import Image from "next/image";
 import { useState, type ReactNode } from "react";
 import type { BriefBlock, BriefDoc, BriefImage } from "../lib/brief-types";
 import { imageFocusStyle } from "../lib/image-focus";
+import { ZoomableFrame } from "./ImageLightbox";
 
 function Figure({ image }: { image: BriefImage }) {
 	const contain = image.fit === "contain";
 	return (
 		<figure className="group overflow-hidden rounded-2xl bg-[#F4F5F2] ring-1 ring-[#162b26]/5 shadow-[0_1px_2px_rgba(22,43,38,0.04)] transition-shadow duration-500 hover:shadow-[0_18px_40px_-18px_rgba(22,43,38,0.35)]">
-			<div className="relative aspect-[4/3] overflow-hidden">
-				<Image
-					src={image.src}
-					alt={image.alt || ""}
-					fill
-					sizes="700px"
-					className={
-						contain
-							? "object-contain transition-transform duration-700 group-hover:scale-[1.02]"
-							: "object-cover transition-transform duration-700 group-hover:scale-[1.03]"
-					}
-					style={contain ? undefined : imageFocusStyle(image)}
-				/>
-			</div>
+			<ZoomableFrame
+				image={{ src: image.src, alt: image.alt || "", caption: image.caption }}
+				className="block w-full"
+			>
+				<div className="relative aspect-[4/3] overflow-hidden">
+					<Image
+						src={image.src}
+						alt={image.alt || ""}
+						fill
+						sizes="700px"
+						className={
+							contain
+								? "object-contain transition-transform duration-700 group-hover:scale-[1.02]"
+								: "object-cover transition-transform duration-700 group-hover:scale-[1.03]"
+						}
+						style={contain ? undefined : imageFocusStyle(image)}
+					/>
+				</div>
+			</ZoomableFrame>
 			{image.caption ? (
 				<figcaption className="flex items-baseline gap-2.5 px-4 py-3 text-[0.74rem] text-[#7E8B87]">
 					<span className="h-px w-4 shrink-0 translate-y-[-0.25em] bg-[#0F4C45]/30" />
@@ -100,21 +106,26 @@ function Blocks({ blocks }: { blocks: BriefBlock[] }) {
 function Hero({ pull, image }: { pull: string; image: BriefImage }) {
 	return (
 		<figure className="mt-8 overflow-hidden rounded-2xl ring-1 ring-[#162b26]/5 shadow-[0_1px_2px_rgba(22,43,38,0.04)]">
-			<div className="relative aspect-[16/10] overflow-hidden">
-				<Image
-					src={image.src}
-					alt={image.alt || ""}
-					fill
-					sizes="720px"
-					className="object-cover"
-					style={imageFocusStyle(image)}
-				/>
-				<div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#0F2A24]/85 via-[#0F2A24]/40 to-transparent p-5 pt-16 sm:p-7 sm:pt-20">
-					<p className="max-w-xl text-[1.05rem] font-medium leading-snug text-white/95 sm:text-[1.2rem]">
-						{pull}
-					</p>
+			<ZoomableFrame
+				image={{ src: image.src, alt: image.alt || "", caption: image.caption }}
+				className="block w-full"
+			>
+				<div className="relative aspect-[16/10] overflow-hidden">
+					<Image
+						src={image.src}
+						alt={image.alt || ""}
+						fill
+						sizes="720px"
+						className="object-cover"
+						style={imageFocusStyle(image)}
+					/>
+					<div className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#0F2A24]/85 via-[#0F2A24]/40 to-transparent p-5 pt-16 sm:p-7 sm:pt-20">
+						<p className="max-w-xl text-[1.05rem] font-medium leading-snug text-white/95 sm:text-[1.2rem]">
+							{pull}
+						</p>
+					</div>
 				</div>
-			</div>
+			</ZoomableFrame>
 		</figure>
 	);
 }

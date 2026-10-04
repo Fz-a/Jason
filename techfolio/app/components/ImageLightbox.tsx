@@ -6,8 +6,9 @@ import { useCallback, useEffect, useRef, useState, type ReactNode } from "react"
 type LightboxImage = {
 	src: string;
 	alt: string;
-	width: number;
-	height: number;
+	/** Intrinsic size — omit when unknown; a plain <img> keeps natural ratio. */
+	width?: number;
+	height?: number;
 	caption?: string;
 };
 
@@ -83,17 +84,27 @@ export function ImageLightbox({
 				}}
 				onClick={(e) => e.stopPropagation()}
 			>
-				<Image
-					src={image.src}
-					alt={image.alt}
-					width={image.width}
-					height={image.height}
-					quality={90}
-					sizes="92vw"
-					draggable={false}
-					priority
-					className="pointer-events-none h-auto max-h-[90svh] w-auto max-w-[92vw] select-none object-contain"
-				/>
+				{image.width && image.height ? (
+					<Image
+						src={image.src}
+						alt={image.alt}
+						width={image.width}
+						height={image.height}
+						quality={90}
+						sizes="92vw"
+						draggable={false}
+						priority
+						className="pointer-events-none h-auto max-h-[90svh] w-auto max-w-[92vw] select-none object-contain"
+					/>
+				) : (
+					/* eslint-disable-next-line @next/next/no-img-element -- intrinsic size unknown */
+					<img
+						src={image.src}
+						alt={image.alt}
+						draggable={false}
+						className="pointer-events-none h-auto max-h-[90svh] w-auto max-w-[92vw] select-none object-contain"
+					/>
+				)}
 			</div>
 		</div>
 	);

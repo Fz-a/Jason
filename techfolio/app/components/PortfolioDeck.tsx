@@ -7,8 +7,10 @@ import { Montserrat, Lora } from "next/font/google";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { HomeScrollPreloader } from "./HomeScrollPreloader";
+import { CornerNav } from "./CornerNav";
 import { HeroNameFlip } from "./HeroNameFlip";
 import { FeaturedProjectsRail } from "./FeaturedProjectsRail";
+import { TerminalSection } from "./terminal/TerminalSection";
 import { AgendaSection } from "./AgendaSection";
 import { AboutSection } from "./AboutSection";
 import { GoalSection } from "./GoalSection";
@@ -50,7 +52,8 @@ export function PortfolioDeck({
 	sections,
 	contactVariant = "compact",
 	avatarVariant = "home",
-	showEnterIntroduce = true,
+	cornerNav = "menu",
+	experienceVariant = "projects",
 }: {
 	layout: PageLayoutFile;
 	sections?: readonly PageSectionId[];
@@ -61,8 +64,10 @@ export function PortfolioDeck({
 	contactVariant?: "feature" | "compact";
 	/** Which avatar to show in the hero ("home" | "introduce"). */
 	avatarVariant?: AvatarVariant;
-	/** Show the hero "Enter Introduce" link (off on /Introduce/ itself). */
-	showEnterIntroduce?: boolean;
+	/** Top-right corner orb: "menu" on the homepage, "back" on inner decks. */
+	cornerNav?: "menu" | "back";
+	/** `projects` → the project rail; `terminal` → the interactive shell. */
+	experienceVariant?: "projects" | "terminal";
 }) {
 	const { t } = useLocale();
 	const router = useRouter();
@@ -253,6 +258,22 @@ export function PortfolioDeck({
 	const nextAfterHome =
 		deckIds[0] ?? sectionOrder.find((id) => id !== "home") ?? "agenda";
 
+	// Corner orb visibility follows the hero slide directly — the
+	// activeSection scroll math can miss the return-to-top case after
+	// client-side navigation or keyboard jumps.
+	const [heroInView, setHeroInView] = useState(true);
+	useEffect(() => {
+		const hero = document.getElementById("home");
+		if (!hero) return;
+		const io = new IntersectionObserver(
+			(entries) =>
+				setHeroInView(entries.some((e) => e.isIntersecting)),
+			{ threshold: 0.2 },
+		);
+		io.observe(hero);
+		return () => io.disconnect();
+	}, []);
+
 	const renderSection = (id: PageSectionId): ReactNode => {
 		switch (id) {
 			case "home":
@@ -307,14 +328,6 @@ export function PortfolioDeck({
 									>
 										{t("hero.contact")}
 									</Link>
-									{showEnterIntroduce ? (
-										<Link
-											href="/Introduce/"
-											className="cursor-pointer rounded-full border border-[#0F4C45]/25 px-6 py-2.5 text-sm font-semibold text-[#0F4C45] transition hover:bg-[#0F4C45] hover:text-white"
-										>
-											{t("hero.enterIntroduce")}
-										</Link>
-									) : null}
 								</div>
 								</div>
 
@@ -358,8 +371,12 @@ export function PortfolioDeck({
 				return <AgendaSection onNavigate={scrollToSection} />;
 			case "about":
 				return <AboutSection />;
-			case "experience":
-				return <FeaturedProjectsRail />;
+		case "experience":
+			return experienceVariant === "terminal" ? (
+				<TerminalSection />
+			) : (
+				<FeaturedProjectsRail />
+			);
 			case "research":
 				return <ResearchSection />;
 			case "goal":
@@ -392,15 +409,6 @@ export function PortfolioDeck({
 										>
 											{t("contact.email")}
 										</a>
-										<a
-											href="/Jason-Chen-Resume.pdf"
-											download="Jason-Chen-Resume.pdf"
-											target="_blank"
-											rel="noreferrer"
-											className="text-[0.85rem] font-semibold text-[#0F4C45] underline-offset-4 hover:underline"
-										>
-											{t("nav.cv")}
-										</a>
 										{SOCIAL_LINKS.map((link) => (
 											<a
 												key={link.label}
@@ -429,6 +437,21 @@ export function PortfolioDeck({
 	return (
 		<main className={`${montserrat.className} bg-[#F7F1E8] text-[#162b26]`}>
 			<HomeScrollPreloader />
+			{/* Menu orb only lives on the hero slide; the back orb stays put
+			    so inner decks never lose their way home. */}
+			<div
+				className={
+					cornerNav === "menu"
+						? `transition-opacity duration-300 ${
+								heroInView
+									? "opacity-100"
+									: "pointer-events-none opacity-0"
+							}`
+						: undefined
+				}
+			>
+				<CornerNav mode={cornerNav} />
+			</div>
 			{showStory ? (
 				<StoryProgress
 					activeId={storyProgressId}

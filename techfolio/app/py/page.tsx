@@ -1,19 +1,18 @@
 "use client";
 
 import { useState } from "react";
+import { isGateUnlocked, tryUnlockGate } from "../lib/gate";
 
-/** Change your password here. */
-const PASSWORD = "1029";
 const JL_URL = "/jl/lab/index.html";
 
 export default function PyGate() {
 	const [input, setInput] = useState("");
-	const [unlocked, setUnlocked] = useState(false);
+	const [unlocked, setUnlocked] = useState(() => isGateUnlocked());
 	const [error, setError] = useState(false);
 
 	function submit(e: React.FormEvent) {
 		e.preventDefault();
-		if (input === PASSWORD) {
+		if (tryUnlockGate(input)) {
 			setUnlocked(true);
 		} else {
 			setError(true);

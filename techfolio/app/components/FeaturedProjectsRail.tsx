@@ -33,6 +33,7 @@ type GroupId = ProjectCatalogGroup;
 
 const GROUP_META: { id: GroupId; labelKey: string }[] = [
 	{ id: "work", labelKey: "core.group.work" },
+	{ id: "companies", labelKey: "core.group.companies" },
 	{ id: "university", labelKey: "core.group.university" },
 	{ id: "diy", labelKey: "core.group.diy" },
 	{ id: "society", labelKey: "core.group.society" },
@@ -132,11 +133,13 @@ function buildCatalog(
 				section:
 					entry.group === "work"
 						? "Work"
-						: entry.group === "university"
-							? "University"
-							: entry.group === "diy"
-								? "MAKE"
-								: "Society",
+						: entry.group === "companies"
+							? "Companies"
+							: entry.group === "university"
+								? "University"
+								: entry.group === "diy"
+									? "MAKE"
+									: "Society",
 				imageSrc: cover?.src ?? s.cardImage.src,
 				imageAlt: cover?.alt || s.cardImage.alt,
 				imageScale: cover?.scale,

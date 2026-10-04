@@ -12,7 +12,12 @@ import { societyShowcases } from "./society-showcases";
 import { universityProjectShowcases } from "./university-showcases";
 import { workCompanies, workShowcases } from "./work-showcases";
 
-export type ProjectCatalogGroup = "work" | "university" | "diy" | "society";
+export type ProjectCatalogGroup =
+	| "work"
+	| "companies"
+	| "university"
+	| "diy"
+	| "society";
 
 export type ProjectCatalogKind =
 	| "showcase"
@@ -40,6 +45,7 @@ export type ProjectOrderFile = {
 /** Studio sidebar labels (zh) ↔ site group ids */
 export const PROJECT_GROUP_LABEL_ZH: Record<ProjectCatalogGroup, string> = {
 	work: "工作",
+	companies: "公司",
 	university: "大学",
 	diy: "造物",
 	society: "社会",
@@ -47,6 +53,7 @@ export const PROJECT_GROUP_LABEL_ZH: Record<ProjectCatalogGroup, string> = {
 
 export const PROJECT_GROUP_ZH_TO_ID: Record<string, ProjectCatalogGroup> = {
 	工作: "work",
+	公司: "companies",
 	大学: "university",
 	造物: "diy",
 	社会: "society",
@@ -54,6 +61,7 @@ export const PROJECT_GROUP_ZH_TO_ID: Record<string, ProjectCatalogGroup> = {
 
 export const PROJECT_GROUP_ORDER: ProjectCatalogGroup[] = [
 	"work",
+	"companies",
 	"university",
 	"diy",
 	"society",
@@ -70,12 +78,15 @@ export function defaultProjectCatalog(): ProjectCatalogEntry[] {
 	const entries: ProjectCatalogEntry[] = [];
 
 	for (const item of workShowcases) {
-		entries.push({ id: item.id, group: "work", kind: "showcase" });
+		// TechMore is a company engagement, not an owned product — it lives
+		// under Companies with the internships/full-time entries below.
+		const group = item.id === "techmore" ? "companies" : "work";
+		entries.push({ id: item.id, group, kind: "showcase" });
 	}
 	for (const company of workCompanies) {
 		if (company.id === "moore") continue;
 		if (workShowcases.some((w) => w.id === company.id)) continue;
-		entries.push({ id: company.id, group: "work", kind: "company" });
+		entries.push({ id: company.id, group: "companies", kind: "company" });
 	}
 
 	for (const item of universityProjectShowcases) {

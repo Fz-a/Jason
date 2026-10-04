@@ -13,6 +13,7 @@ export default function Home() {
 				layout={pageLayout}
 				sections={["home", "about", "experience", "contact"]}
 				contactVariant="feature"
+				experienceVariant="terminal"
 			/>
 		</PageLayoutRoot>
 	);

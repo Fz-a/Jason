@@ -1,5 +1,6 @@
 "use client";
 
+import { GateLock } from "../components/GateLock";
 import { PortfolioDeck } from "../components/PortfolioDeck";
 import { PageLayoutRoot, usePageLayout } from "../lib/use-page-layout";
 
@@ -8,21 +9,23 @@ export default function Introduce() {
 	const pageLayout = usePageLayout();
 
 	return (
-		<PageLayoutRoot layout={pageLayout}>
-			<PortfolioDeck
-				layout={pageLayout}
-				avatarVariant="introduce"
-				showEnterIntroduce={false}
-				sections={[
-					"home",
-					"agenda",
-					"experience",
-					"research",
-					"goal",
-					"next",
-					"contact",
-				]}
-			/>
-		</PageLayoutRoot>
+		<GateLock kicker="Introduce" title="The full story">
+			<PageLayoutRoot layout={pageLayout}>
+				<PortfolioDeck
+					layout={pageLayout}
+					avatarVariant="introduce"
+					cornerNav="back"
+					sections={[
+						"home",
+						"agenda",
+						"experience",
+						"research",
+						"goal",
+						"next",
+						"contact",
+					]}
+				/>
+			</PageLayoutRoot>
+		</GateLock>
 	);
 }
