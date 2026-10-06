@@ -13,7 +13,7 @@ import { AgendaSection } from "../components/AgendaSection";
 import { GoalSection } from "../components/GoalSection";
 import { ResearchFitNext } from "../components/ResearchFitNext";
 import { ResearchSection } from "../components/ResearchSection";
-import { CopyOverrideProvider, getDict, type Locale } from "../lib/i18n";
+import { CopyOverrideProvider, getDict } from "../lib/i18n";
 import {
 	DEFAULT_ELEMENT_LAYOUT,
 	PAGE_SECTIONS,
@@ -126,7 +126,6 @@ export function PageLayoutEditor({ onTip }: Props) {
 	const [layout, setLayout] = useState<PageLayoutFile>(() =>
 		normalizePageLayout(pageLayoutSeed),
 	);
-	const [locale, setLocale] = useState<Locale>("en");
 	const [sectionId, setSectionId] = useState<PageSectionId>("goal");
 	const [activeKey, setActiveKey] = useState<string | null>(null);
 	const [previewScale, setPreviewScale] = useState(0.52);
@@ -135,8 +134,8 @@ export function PageLayoutEditor({ onTip }: Props) {
 	const dragId = useRef<PageSectionId | null>(null);
 	const dirty = useRef(false);
 
-	const baseDict = useMemo(() => getDict(locale), [locale]);
-	const overrides = layout.copy[locale] ?? {};
+	const baseDict = useMemo(() => getDict("en"), []);
+	const overrides = layout.copy;
 	const sectionMeta = META[sectionId];
 
 	const getText = useCallback(
@@ -164,7 +163,7 @@ export function PageLayoutEditor({ onTip }: Props) {
 				if (!cancelled) {
 					setLayout(defaultPageLayout());
 					setReady(true);
-					onTip?.("版型配置读取失败，已用默认");
+					onTip?.("Could not read layout config, using defaults");
 				}
 			}
 		})();
@@ -176,11 +175,11 @@ export function PageLayoutEditor({ onTip }: Props) {
 	const setText = (key: string, value: string) => {
 		dirty.current = true;
 		setLayout((prev) => {
-			const bag = { ...(prev.copy[locale] ?? {}) };
+			const bag = { ...prev.copy };
 			const base = baseDict[key] ?? "";
 			if (value === base) delete bag[key];
 			else bag[key] = value;
-			return { ...prev, copy: { ...prev.copy, [locale]: bag } };
+			return { ...prev, copy: bag };
 		});
 	};
 
@@ -238,9 +237,9 @@ export function PageLayoutEditor({ onTip }: Props) {
 			});
 			if (!res.ok) throw new Error("save failed");
 			dirty.current = false;
-			onTip?.("已写入 — 回站刷新查看");
+			onTip?.("Written — go back and refresh");
 		} catch {
-			onTip?.("写入失败（需本地 dev）");
+			onTip?.("Write failed (needs local dev)");
 		} finally {
 			setSaving(false);
 		}
@@ -268,30 +267,8 @@ export function PageLayoutEditor({ onTip }: Props) {
 	return (
 		<div className="flex h-full min-h-0 flex-col">
 			<div className="flex shrink-0 flex-wrap items-center gap-2 border-b border-[#0F4C45]/10 px-3 py-2">
-				<div className="flex items-center gap-0.5 rounded-full bg-[#0F4C45]/[0.06] p-0.5">
-					{(
-						[
-							["en", "EN"],
-							["zh-Hans", "简"],
-							["zh-Hant", "繁"],
-						] as const
-					).map(([id, label]) => (
-						<button
-							key={id}
-							type="button"
-							onClick={() => setLocale(id)}
-							className={`rounded-full px-2.5 py-0.5 text-[0.68rem] font-semibold ${
-								locale === id
-									? "bg-[#043439] text-white"
-									: "text-[#0F4C45]/70"
-							}`}
-						>
-							{label}
-						</button>
-					))}
-				</div>
 				<label className="flex items-center gap-2 text-[0.68rem] text-[#6A7A76]">
-					预览
+					Preview
 					<input
 						type="range"
 						min={0.35}
@@ -305,8 +282,8 @@ export function PageLayoutEditor({ onTip }: Props) {
 				</label>
 				<span className="hidden text-[0.68rem] text-[#8A9692] md:inline">
 					{ready
-						? "点预览里的文字 → 红框选中 · 拖角放大 · ✥ 平移 · 直接改字"
-						: "加载中…"}
+						? "Click preview text → red box selects · drag corner to scale · ✥ to move · edit inline"
+						: "Loading…"}
 				</span>
 				<div className="ml-auto flex gap-1">
 					<button
@@ -317,7 +294,7 @@ export function PageLayoutEditor({ onTip }: Props) {
 						}}
 						className="rounded-full px-2.5 py-1 text-[0.7rem] font-semibold text-[#0F4C45] hover:bg-white/70"
 					>
-						重置
+						Reset
 					</button>
 					<button
 						type="button"
@@ -325,7 +302,7 @@ export function PageLayoutEditor({ onTip }: Props) {
 						onClick={() => void save()}
 						className="rounded-full bg-[#043439] px-3 py-1 text-[0.7rem] font-semibold text-white disabled:opacity-50"
 					>
-						{saving ? "写入中…" : "写入"}
+						{saving ? "Writing…" : "Write"}
 					</button>
 				</div>
 			</div>
@@ -333,7 +310,7 @@ export function PageLayoutEditor({ onTip }: Props) {
 			<div className="flex min-h-0 flex-1">
 				<aside className="hidden w-[11rem] shrink-0 flex-col border-r border-[#0F4C45]/10 bg-[#F7F1E8]/50 lg:flex">
 					<p className="px-3 pt-3 text-[0.62rem] font-semibold uppercase tracking-[0.16em] text-[#0F4C45]/45">
-						主界
+						Main
 					</p>
 					<ul className="mt-2 space-y-0.5 overflow-y-auto px-2 pb-3">
 						{layout.order.map((id, i) => {
@@ -430,12 +407,12 @@ export function PageLayoutEditor({ onTip }: Props) {
 									onClick={() => resetElement(activeKey)}
 									className="mt-2 rounded-full bg-[#0F4C45]/[0.06] px-2.5 py-1 text-[0.68rem] font-semibold text-[#0F4C45]"
 								>
-									复位此组件
+									Reset this component
 								</button>
 							</>
 						) : (
 							<p className="mt-2 text-[0.78rem] leading-5 text-[#6A7A76]">
-								在预览里点任意文字，会出现红框，像 InDesign 一样改。
+								Click any text in the preview to get a red frame — edit it like InDesign.
 							</p>
 						)}
 						<button
@@ -443,7 +420,7 @@ export function PageLayoutEditor({ onTip }: Props) {
 							onClick={() => toggleHidden(sectionId)}
 							className="mt-3 rounded-full bg-[#0F4C45]/[0.06] px-2.5 py-1 text-[0.68rem] font-semibold text-[#0F4C45]"
 						>
-							{isHidden ? "显示此屏" : "隐藏此屏"}
+							{isHidden ? "Show this section" : "Hide this section"}
 						</button>
 					</div>
 
@@ -451,7 +428,7 @@ export function PageLayoutEditor({ onTip }: Props) {
 						<div className="space-y-4 overflow-y-auto px-3 py-3">
 							<label className="block">
 								<span className="flex justify-between text-[0.68rem] text-[#6A7A76]">
-									<span>字号</span>
+									<span>Size</span>
 									<span className="font-mono">
 										{Math.round(activeLay.fontScale * 100)}%
 									</span>
@@ -472,7 +449,7 @@ export function PageLayoutEditor({ onTip }: Props) {
 							</label>
 							<label className="block">
 								<span className="flex justify-between text-[0.68rem] text-[#6A7A76]">
-									<span>左右</span>
+									<span>Horizontal</span>
 									<span className="font-mono">
 										{activeLay.offsetX.toFixed(1)}
 									</span>
@@ -493,7 +470,7 @@ export function PageLayoutEditor({ onTip }: Props) {
 							</label>
 							<label className="block">
 								<span className="flex justify-between text-[0.68rem] text-[#6A7A76]">
-									<span>上下</span>
+									<span>Vertical</span>
 									<span className="font-mono">
 										{activeLay.offsetY.toFixed(1)}
 									</span>
@@ -516,7 +493,7 @@ export function PageLayoutEditor({ onTip }: Props) {
 					) : (
 						<div className="px-3 py-3">
 							<p className="text-[0.62rem] font-semibold uppercase tracking-[0.14em] text-[#0F4C45]/40">
-								此屏组件
+								Section elements
 							</p>
 							<ul className="mt-2 space-y-0.5">
 								{sectionMeta.fields.map((f) => (

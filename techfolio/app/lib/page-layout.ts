@@ -1,4 +1,3 @@
-import type { Locale } from "./i18n";
 
 export const PAGE_SECTION_IDS = [
 	"home",
@@ -32,88 +31,88 @@ export const PAGE_SECTIONS: PageSectionMeta[] = [
 	{
 		id: "home",
 		label: "Home",
-		hint: "首页 Hero",
+		hint: "Home hero",
 		fields: [
-			{ key: "hero.headline", label: "主标题", multiline: true, role: "display" },
-			{ key: "hero.blurb", label: "简介", multiline: true, role: "body" },
-			{ key: "hero.role", label: "角色", role: "label" },
-			{ key: "hero.hello", label: "问候", role: "label" },
-			{ key: "hero.contact", label: "按钮", role: "label" },
+			{ key: "hero.headline", label: "Headline", multiline: true, role: "display" },
+			{ key: "hero.blurb", label: "Intro", multiline: true, role: "body" },
+			{ key: "hero.role", label: "Role", role: "label" },
+			{ key: "hero.hello", label: "Greeting", role: "label" },
+			{ key: "hero.contact", label: "Button", role: "label" },
 		],
 	},
 	{
 		id: "about",
 		label: "About",
-		hint: "个人简介（首页第二页）",
+		hint: "Personal intro (second slide)",
 		fields: [
 			{ key: "about.kicker", label: "Kicker", role: "label" },
-			{ key: "about.heading", label: "标题", role: "display" },
-			{ key: "about.body1", label: "正文 1", multiline: true, role: "body" },
-			{ key: "about.body2", label: "正文 2", multiline: true, role: "body" },
+			{ key: "about.heading", label: "Heading", role: "display" },
+			{ key: "about.body1", label: "Body 1", multiline: true, role: "body" },
+			{ key: "about.body2", label: "Body 2", multiline: true, role: "body" },
 		],
 	},
 	{
 		id: "agenda",
 		label: "Agenda",
-		hint: "议程总览",
+		hint: "Agenda overview",
 		fields: [
-			{ key: "agenda.word", label: "大词", role: "display" },
-			{ key: "agenda.title", label: "标题", role: "title" },
-			{ key: "agenda.blurb", label: "说明", multiline: true, role: "body" },
-			{ key: "agenda.c1.title", label: "01 标题", role: "title" },
-			{ key: "agenda.c1.blurb", label: "01 说明", multiline: true, role: "body" },
-			{ key: "agenda.c2.title", label: "02 标题", role: "title" },
-			{ key: "agenda.c2.blurb", label: "02 说明", multiline: true, role: "body" },
-			{ key: "agenda.c3.title", label: "03 标题", role: "title" },
-			{ key: "agenda.c3.blurb", label: "03 说明", multiline: true, role: "body" },
-			{ key: "agenda.c4.title", label: "04 标题", role: "title" },
-			{ key: "agenda.c4.blurb", label: "04 说明", multiline: true, role: "body" },
+			{ key: "agenda.word", label: "Display word", role: "display" },
+			{ key: "agenda.title", label: "Heading", role: "title" },
+			{ key: "agenda.blurb", label: "Caption", multiline: true, role: "body" },
+			{ key: "agenda.c1.title", label: "01 Heading", role: "title" },
+			{ key: "agenda.c1.blurb", label: "01 Caption", multiline: true, role: "body" },
+			{ key: "agenda.c2.title", label: "02 Heading", role: "title" },
+			{ key: "agenda.c2.blurb", label: "02 Caption", multiline: true, role: "body" },
+			{ key: "agenda.c3.title", label: "03 Heading", role: "title" },
+			{ key: "agenda.c3.blurb", label: "03 Caption", multiline: true, role: "body" },
+			{ key: "agenda.c4.title", label: "04 Heading", role: "title" },
+			{ key: "agenda.c4.blurb", label: "04 Caption", multiline: true, role: "body" },
 		],
 	},
 	{
 		id: "experience",
 		label: "Projects",
-		hint: "项目墙（内容走详情库）",
+		hint: "Project wall (detail data)",
 		fields: [
 			{ key: "core.kicker", label: "Kicker", role: "label" },
-			{ key: "core.title", label: "标题", role: "display" },
-			{ key: "core.blurb", label: "说明", multiline: true, role: "body" },
+			{ key: "core.title", label: "Heading", role: "display" },
+			{ key: "core.blurb", label: "Caption", multiline: true, role: "body" },
 		],
 	},
 	{
 		id: "research",
 		label: "Explore",
-		hint: "研究方向",
+		hint: "Research directions",
 		fields: [
 			{ key: "research.kicker", label: "Kicker", role: "label" },
-			{ key: "research.title", label: "标题", role: "display" },
-			{ key: "research.d1.title", label: "01 标题", role: "title" },
-			{ key: "research.d1.body", label: "01 正文", multiline: true, role: "body" },
-			{ key: "research.d2.title", label: "02 标题", role: "title" },
-			{ key: "research.d2.body", label: "02 正文", multiline: true, role: "body" },
-			{ key: "research.d3.title", label: "03 标题", role: "title" },
-			{ key: "research.d3.body", label: "03 正文", multiline: true, role: "body" },
-			{ key: "research.d4.title", label: "04 标题", role: "title" },
-			{ key: "research.d4.body", label: "04 正文", multiline: true, role: "body" },
-			{ key: "research.q.kicker", label: "问题标签", role: "label" },
-			{ key: "research.q.body", label: "研究问题", multiline: true, role: "title" },
+			{ key: "research.title", label: "Heading", role: "display" },
+			{ key: "research.d1.title", label: "01 Heading", role: "title" },
+			{ key: "research.d1.body", label: "01 Body", multiline: true, role: "body" },
+			{ key: "research.d2.title", label: "02 Heading", role: "title" },
+			{ key: "research.d2.body", label: "02 Body", multiline: true, role: "body" },
+			{ key: "research.d3.title", label: "03 Heading", role: "title" },
+			{ key: "research.d3.body", label: "03 Body", multiline: true, role: "body" },
+			{ key: "research.d4.title", label: "04 Heading", role: "title" },
+			{ key: "research.d4.body", label: "04 Body", multiline: true, role: "body" },
+			{ key: "research.q.kicker", label: "Question kicker", role: "label" },
+			{ key: "research.q.body", label: "Research question", multiline: true, role: "title" },
 		],
 	},
 	{
 		id: "goal",
 		label: "Goal",
-		hint: "目标页",
+		hint: "Goal",
 		fields: [
 			{ key: "goal.kicker", label: "Kicker", role: "label" },
-			{ key: "goal.headline", label: "主标题", role: "display" },
-			{ key: "goal.lede", label: "副文", multiline: true, role: "body" },
-			{ key: "goal.path.current", label: "01 标签", role: "label" },
-			{ key: "goal.current.dest", label: "01 标题", role: "title" },
-			{ key: "goal.path.grad", label: "02 标签", role: "label" },
-			{ key: "goal.grad.title", label: "02 标题", role: "title" },
-			{ key: "goal.path.vision", label: "03 标签", role: "label" },
-			{ key: "goal.flag.vision.blurb", label: "03 左侧", role: "title" },
-			{ key: "goal.vision.title", label: "Vision 标题", multiline: true, role: "title" },
+			{ key: "goal.headline", label: "Headline", role: "display" },
+			{ key: "goal.lede", label: "Sub-copy", multiline: true, role: "body" },
+			{ key: "goal.path.current", label: "01 Kicker", role: "label" },
+			{ key: "goal.current.dest", label: "01 Heading", role: "title" },
+			{ key: "goal.path.grad", label: "02 Kicker", role: "label" },
+			{ key: "goal.grad.title", label: "02 Heading", role: "title" },
+			{ key: "goal.path.vision", label: "03 Kicker", role: "label" },
+			{ key: "goal.flag.vision.blurb", label: "03 Left column", role: "title" },
+			{ key: "goal.vision.title", label: "Vision title", multiline: true, role: "title" },
 			{ key: "goal.panel.vision.p1", label: "Vision p1", multiline: true, role: "body" },
 			{ key: "goal.panel.vision.p2", label: "Vision p2", multiline: true, role: "body" },
 			{ key: "goal.panel.vision.p3", label: "Vision p3", multiline: true, role: "body" },
@@ -123,12 +122,12 @@ export const PAGE_SECTIONS: PageSectionMeta[] = [
 	{
 		id: "next",
 		label: "Next Step",
-		hint: "下一步",
+		hint: "Next steps",
 		fields: [
 			{ key: "next.kicker", label: "Kicker", role: "label" },
-			{ key: "next.title", label: "主标题", role: "display" },
-			{ key: "next.sub", label: "副标题", role: "title" },
-			{ key: "next.blurb", label: "说明", multiline: true, role: "body" },
+			{ key: "next.title", label: "Headline", role: "display" },
+			{ key: "next.sub", label: "Subtitle", role: "title" },
+			{ key: "next.blurb", label: "Caption", multiline: true, role: "body" },
 			{ key: "next.s1.title", label: "01", role: "title" },
 			{ key: "next.s2.title", label: "02", role: "title" },
 			{ key: "next.s3.title", label: "03", role: "title" },
@@ -140,11 +139,11 @@ export const PAGE_SECTIONS: PageSectionMeta[] = [
 	{
 		id: "contact",
 		label: "Contact",
-		hint: "联系页",
+		hint: "Contact",
 		fields: [
 			{ key: "contact.kicker", label: "Kicker", role: "label" },
-			{ key: "hero.role", label: "角色（共用）", role: "title" },
-			{ key: "nav.cv", label: "简历文案", role: "label" },
+			{ key: "hero.role", label: "Role (shared)", role: "title" },
+			{ key: "nav.cv", label: "Resume copy", role: "label" },
 		],
 	},
 ];
@@ -175,7 +174,7 @@ export type PageLayoutFile = {
 	sections: Partial<Record<PageSectionId, SectionLayout>>;
 	/** Fine-grained text widgets. */
 	elements: Record<string, ElementLayout>;
-	copy: Partial<Record<Locale, Record<string, string>>>;
+	copy: Record<string, string>;
 };
 
 export const DEFAULT_SECTION_LAYOUT: SectionLayout = {
@@ -250,17 +249,16 @@ export function normalizePageLayout(raw: unknown): PageLayoutFile {
 		}
 	}
 
-	const copy: PageLayoutFile["copy"] = {};
-	if (data.copy && typeof data.copy === "object") {
-		for (const loc of ["en", "zh-Hans", "zh-Hant"] as Locale[]) {
-			const bag = data.copy[loc];
-			if (!bag || typeof bag !== "object") continue;
-			const out: Record<string, string> = {};
-			for (const [k, v] of Object.entries(bag)) {
-				if (typeof v === "string") out[k] = v;
-			}
-			if (Object.keys(out).length) copy[loc] = out;
-		}
+	// Older files nested overrides per locale; only the English bag is read.
+	const rawCopy = (data.copy ?? {}) as Record<string, unknown>;
+	const legacy = rawCopy.en;
+	const source =
+		typeof legacy === "object" && legacy !== null
+			? (legacy as Record<string, unknown>)
+			: rawCopy;
+	const copy: Record<string, string> = {};
+	for (const [k, v] of Object.entries(source)) {
+		if (typeof v === "string") copy[k] = v;
 	}
 
 	return {

@@ -5,7 +5,7 @@ import {
 	defaultProjectCatalog,
 	applyProjectOrder,
 	isProjectCatalogGroup,
-	PROJECT_GROUP_LABEL_ZH,
+	PROJECT_GROUP_LABEL,
 	type ProjectCatalogGroup,
 	type ProjectOrderFile,
 } from "../../projects/project-catalog";
@@ -68,7 +68,7 @@ function entriesForClient(order: ProjectOrderFile): CatalogEntry[] {
 	return applyProjectOrder(defaultProjectCatalog(), order).map((e) => ({
 		id: e.id,
 		title: e.id,
-		group: PROJECT_GROUP_LABEL_ZH[e.group],
+		group: PROJECT_GROUP_LABEL[e.group],
 		source: e.kind,
 	}));
 }
@@ -88,7 +88,7 @@ export async function POST(req: Request) {
 	try {
 		const body = (await req.json()) as CatalogPersist;
 		if (!Array.isArray(body.hidden)) {
-			return NextResponse.json({ error: "格式无效" }, { status: 400 });
+			return NextResponse.json({ error: "Invalid format" }, { status: 400 });
 		}
 
 		const orderFromBody =
@@ -131,7 +131,7 @@ export async function POST(req: Request) {
 
 		return NextResponse.json({ ok: true });
 	} catch (err) {
-		const message = err instanceof Error ? err.message : "保存失败";
+		const message = err instanceof Error ? err.message : "Save failed";
 		return NextResponse.json({ error: message }, { status: 500 });
 	}
 }

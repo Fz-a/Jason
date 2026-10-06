@@ -9,6 +9,7 @@ import {
 } from "react";
 import { useLocale } from "../../lib/i18n";
 import { getTermStrings } from "./term-strings";
+import type { TermSection } from "./term-strings";
 
 /**
  * Home "experience" slide — one clean terminal that anyone can drive,
@@ -32,34 +33,46 @@ const HIGHLIGHTS = [
 	"Beidou", "C/C++", "Python", "TypeScript", "Next.js", "embedded",
 ];
 
-const SOCIALS = [
-	{ label: "github", href: "https://github.com/Fz-a" },
-	{ label: "gitee ", href: "https://gitee.com/Fz_z" },
-	{ label: "csdn  ", href: "https://blog.csdn.net/Fz_a" },
-];
-
 const COMMAND_NAMES = [
 	...new Set([
-		"next", "skip", "start", "restart", "tour", "skills", "hack",
-		"hollywood", "art", "buddha", "neumann", "dragon", "rocket", "help",
-		"about", "whoami", "intro", "me", "who", "summary", "stats", "resume",
-		"contact", "social", "email", "clear", "pwd", "date", "echo",
-		"history", "man", "neofetch", "banner", "matrix", "theme", "top",
-		"htop", "ping", "git", "uname", "uptime", "fortune", "python",
-		"python3", "cat", "sudo", "rm", "exit", "quit", "vim", "vi",
-		"nano", "emacs", "hello", "hi", "xyzzy", "42",
+		"next", "skip", "start", "restart", "tour", "role", "work", "path",
+		"skills", "hack", "hollywood", "art", "buddha", "neumann", "dragon",
+		"rocket", "help", "about", "whoami", "intro", "me", "who", "summary",
+		"stats", "resume", "contact", "social", "email", "clear", "pwd",
+		"date", "echo", "history", "man", "neofetch", "banner", "matrix",
+		"theme", "top", "htop", "ping", "git", "uname", "uptime", "fortune",
+		"python", "python3", "cat", "sudo", "rm", "exit", "quit", "vim",
+		"vi", "nano", "emacs", "hello", "hi", "xyzzy", "42",
 	]),
 ];
 
 /** Three quiet suggestions under the window — the only chrome we keep. */
-const SUGGESTIONS = ["help", "art", "matrix"];
+const SUGGESTIONS = ["role", "work", "skills"];
 
 /**
- * The guided journey — a linear story the shell tells, one chapter at a
- * time. The visitor never picks; they just press Enter (or click the
- * [ Enter ↵ ] prompt) to advance. `text` is typed by the shell first as
- * narration, then the command runs and its output reveals the chapter.
+ * Chapter banner: a numbered section rule that makes the structure of the
+ * tour obvious at a glance instead of a wall of undifferentiated output.
+ * Built from the journey label, which is already "01 · who I am".
  */
+function chapter(label: string): Line {
+	const [n, ...rest] = label.split("· ");
+	const title = (rest.join("· ") || label).trim();
+	return rich([
+		{ t: `  ══ ${n.trim()} `, cls: "text-[var(--tt-acc)] font-bold" },
+		{ t: title.toUpperCase(), cls: "font-bold tracking-[0.16em]" },
+		{ t: " ", cls: "text-[var(--tt-acc)]" },
+	]);
+}
+
+/** Banner for content that isn't one of the six numbered chapters. */
+function banner(title: string): Line {
+	return rich([
+		{ t: "  ══ ", cls: "text-[var(--tt-acc)] font-bold" },
+		{ t: title.toUpperCase(), cls: "font-bold tracking-[0.16em]" },
+		{ t: " ", cls: "text-[var(--tt-acc)]" },
+	]);
+}
+
 const BANNER = [
 	"     _                        ",
 	"    | | __ _ ___  ___  _ __   ",
@@ -273,6 +286,138 @@ function escapeRegExp(s: string): string {
 	return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
+/**
+ * Render one chapter as an ordered list of sections.
+ *
+ * This is the single place chapter content is drawn. A section is its `field`
+ * prose (header → body → content → footer) followed by whatever content
+ * blocks the author put under it, so adding a chapter or giving an existing
+ * one a second argument needs no code change at all — only new Markdown.
+ */
+function renderSections(sections: TermSection[]): Line[] {
+	const rows: Line[] = [];
+	for (const sec of sections) {
+		const { header, body, footer, hint, rule, cta } = sec.copy;
+		if (header) {
+			rows.push(out(`  ${header}`, EMPH));
+			rows.push(out(""));
+		}
+		if (body) {
+			rows.push(rich([{ t: `  ${body}`, cls: "opacity-85" }]));
+			rows.push(out(""));
+		}
+
+		for (const b of sec.blocks) {
+			switch (b.t) {
+				case "identity": {
+					const c = b.card;
+					rows.push(
+						rich([
+							{ t: "  " },
+							{ t: c.name ?? "", cls: "font-extrabold tracking-[0.18em]" },
+						]),
+					);
+					if (c.title)
+						rows.push(rich([{ t: "  " }, { t: c.title, cls: EMPH }]));
+					if (c.meta)
+						rows.push(rich([{ t: "  " }, { t: c.meta, cls: "opacity-60" }]));
+					if (c.oneLine) {
+						rows.push(out(""));
+						rows.push(rich([{ t: `  ${c.oneLine}`, cls: "opacity-85" }]));
+					}
+					rows.push(out(""));
+					break;
+				}
+
+				case "items":
+					for (const [k, v] of b.items) {
+						rows.push(
+							rich([
+								{ t: "  ▸ ", cls: "text-[var(--tt-acc)]" },
+								{ t: k, cls: EMPH },
+								...(v ? [{ t: "\n     " }, ...emphasize(v)] : []),
+							]),
+						);
+					}
+					if (b.items.length) rows.push(out(""));
+					break;
+
+				case "bars":
+					for (const g of b.groups) {
+						rows.push(out(`  ${g.title}`, HL));
+						// Pad to the widest label in the whole chapter, so the
+						// bars line up even when a name is longer than 10 chars.
+						const w = Math.max(
+							...b.groups.flatMap((x) => x.rows.map((r) => r[0].length)),
+							6,
+						);
+						for (const [k, lvl, v] of g.rows) {
+							rows.push(
+								rich([
+									{ t: `    ${k.padEnd(w)} `, cls: HL },
+									{
+										t: `[${"#".repeat(lvl)}${"·".repeat(10 - lvl)}]  `,
+										cls: "text-[var(--tt-acc)]",
+									},
+									...emphasize(v),
+								]),
+							);
+						}
+						rows.push(out(""));
+					}
+					break;
+
+				case "links": {
+					const w = Math.max(...b.links.map((l) => l.label.length), 0);
+					for (const l of b.links) {
+						rows.push(
+							rich([
+								{ t: `  ${l.label.padEnd(w)}  `, cls: HL },
+								{
+									t: l.text,
+									href: l.href,
+									cls: "underline underline-offset-4 opacity-90 hover:opacity-100",
+								},
+							]),
+						);
+					}
+					rows.push(out(""));
+					break;
+				}
+
+				case "index":
+					for (const [n, label] of b.rows) {
+						rows.push(
+							rich([
+								{ t: `  ${n}   `, cls: "text-[var(--tt-acc)] font-bold" },
+								{ t: label, cls: "opacity-85" },
+							]),
+						);
+					}
+					if (b.rows.length) rows.push(out(""));
+					break;
+
+				case "note":
+					for (const l of b.lines) rows.push(out(`  ${l}`, "opacity-75"));
+					rows.push(out(""));
+					break;
+			}
+		}
+
+		if (rule) {
+			rows.push(rich([{ t: `  ${rule}`, cls: EMPH }]));
+			rows.push(out(""));
+		}
+		if (footer) {
+			rows.push(rich([{ t: `  ${footer}`, cls: "opacity-70" }]));
+			rows.push(out(""));
+		}
+		if (hint) rows.push(out(`  ${hint}`, "opacity-70"));
+		if (cta) rows.push(out(`  ${cta}`, "opacity-70"));
+	}
+	return rows;
+}
+
 function levenshtein(a: string, b: string): number {
 	const m = a.length;
 	const n = b.length;
@@ -295,9 +440,14 @@ function levenshtein(a: string, b: string): number {
 
 const EGG_TOTAL = 4;
 
+/**
+ * Gallery keys that have ASCII art behind them, so `art` may render them as
+ * click-to-run. Everything else in a `gallery` block is a plain label.
+ */
+const ART_TARGETS = new Set(["buddha", "neumann", "dragon", "rocket"]);
+
 export function TerminalSection() {
-	const { locale } = useLocale();
-	const T = useMemo(() => getTermStrings(locale), [locale]);
+	const T = useMemo(() => getTermStrings(), []);
 	const [lines, setLines] = useState<Line[]>([]);
 	const [value, setValue] = useState("");
 	const [booted, setBooted] = useState(false);
@@ -405,10 +555,6 @@ export function TerminalSection() {
 		return () => cancelAnimationFrame(raf);
 	}, [lines, stepIdx]);
 
-	const focusInput = useCallback(() => {
-		inputRef.current?.focus({ preventScroll: true });
-	}, []);
-
 	/**
 	 * Visitor takes over: kill the tour AND every pending timer, so a
 	 * new action can never interleave with stale staggered output —
@@ -417,23 +563,6 @@ export function TerminalSection() {
 	const cancelGhost = useCallback(() => {
 		stopTimers();
 	}, [stopTimers]);
-
-	/** Ghost-types `text` into the prompt, char by char. */
-	const ghostType = useCallback(
-		(text: string, startMs: number, onDone?: () => void) => {
-			for (let i = 1; i <= text.length; i++) {
-				timerRef.current.push(
-					window.setTimeout(() => setValue(text.slice(0, i)), startMs + i * 70),
-				);
-			}
-			if (onDone) {
-				timerRef.current.push(
-					window.setTimeout(onDone, startMs + text.length * 70 + 400),
-				);
-			}
-		},
-		[],
-	);
 
 	// Matrix rain overlay.
 	useEffect(() => {
@@ -511,18 +640,19 @@ export function TerminalSection() {
 		stopTimers();
 		const i = stepIdxRef.current + 1;
 		if (i >= T.journey.length) {
-			// finished — restart the whole journey on next Enter
+			// finished — hand them the recap and a way to restart
 			stepIdxRef.current = -1;
 			setStepIdx(-1);
 			print([
-				out(`  ${T.tourDoneA}`),
+				out(`  ${T.tourDoneA}`, EMPH),
 				rich([
-					{ t: "  " + T.tourDoneB },
-					{ t: "Enter", cls: HL },
-					{ t: " " + T.tourDoneC },
-					{ t: "intro", cls: `${HL} ${RUNNABLE}`, run: "intro" },
-					{ t: " / " },
-					{ t: "contact", cls: `${HL} ${RUNNABLE}`, run: "contact" },
+					{ t: `  ${T.tourDoneB}` },
+					{ t: T.tourDoneCmd, cls: `${HL} ${RUNNABLE}`, run: T.tourDoneCmd },
+					{ t: T.tourDoneC },
+				]),
+				rich([
+					{ t: "  " },
+					{ t: "restart", cls: `${HL} ${RUNNABLE}`, run: "restart" },
 					{ t: " / " },
 					{ t: "help", cls: `${HL} ${RUNNABLE}`, run: "help" },
 					{ t: T.tourDoneD },
@@ -534,25 +664,29 @@ export function TerminalSection() {
 		const step = T.journey[i];
 		stepIdxRef.current = i;
 		setStepIdx(i);
-		print([out(`  ${step.label} — ${step.text}`)]);
-		// ghost-type the command so it's obvious what's happening, then run it.
-		ghostType(step.cmd, 300, () => {
-			runRef.current(step.cmd);
-			setValue("");
-			// land the takeaway: a one-line highlight after each chapter.
-			timerRef.current.push(
-				window.setTimeout(() => {
-					print([
-						rich([
-							{ t: "  └─ ", cls: "text-[var(--tt-acc)]" },
-							{ t: step.takeaway, cls: EMPH },
-						]),
-						out(""),
-					]);
-				}, 500),
-			);
-		});
-	}, [stopTimers, print, ghostType, T]);
+		// Narration only — the chapter handler prints its own numbered banner,
+		// so the label never appears twice.
+		print([out(`  ${step.text}`, "opacity-70")]);
+		// show the command line, then run it after a short beat so the
+		// narration reads before the output pours in.
+		timerRef.current.push(
+			window.setTimeout(() => {
+				runRef.current(step.cmd);
+				// land the takeaway: a one-line highlight after each chapter.
+				timerRef.current.push(
+					window.setTimeout(() => {
+						print([
+							rich([
+								{ t: "  └─ ", cls: "text-[var(--tt-acc)]" },
+								{ t: step.takeaway, cls: EMPH },
+							]),
+							out(""),
+						]);
+					}, 500),
+				);
+			}, 650),
+		);
+	}, [stopTimers, print, T]);
 
 	const run = useCallback(
 		(raw: string) => {
@@ -594,6 +728,8 @@ export function TerminalSection() {
 
 			case "hack":
 			case "hollywood":
+				// `hackLines` is optional — a theater file may drop the fake
+				// intrusion entirely and keep only the pointer note.
 				printStaggered(
 					[
 						echo,
@@ -619,10 +755,15 @@ export function TerminalSection() {
 					echo,
 					out(`  ${T.galleryHeader}`),
 					...T.gallery.map(([a, d]) =>
-						rich([
-							{ t: `  ${a.padEnd(10)}`, cls: `${HL} ${RUNNABLE}`, run: a },
-							{ t: d },
-						]),
+						// A gallery row is clickable only when its key is a real
+						// command with ASCII art behind it; conceptual rows
+						// (hardware, rtk, agv…) are labels, not run targets.
+						ART_TARGETS.has(a)
+							? rich([
+									{ t: `  ${a.padEnd(10)}`, cls: `${HL} ${RUNNABLE}`, run: a },
+									{ t: d },
+								])
+							: rich([{ t: `  ${a.padEnd(10)}`, cls: HL }, { t: d }]),
 					),
 					out(""),
 				]);
@@ -724,166 +865,67 @@ export function TerminalSection() {
 				break;
 			}
 
-			case "skills": {
+	// ── chapters 01-06 · one generic renderer ───────────────────────
+			// A chapter is just a number plus a list of sections, so adding or
+			// reshaping one is a Markdown edit — never a code edit here.
+			case "role":
+			case "do":
+			case "job":
+			case "work":
+			case "projects":
+			case "skills":
+			case "path":
+			case "career":
+			case "exp":
+			case "about":
+			case "whoami":
+			case "intro":
+			case "me":
+			case "who":
+			case "contact":
+			case "social": {
+				// Each chapter's own `cmd` names it, so whatever the visitor
+				// typed is all we need to find both the journey step and the
+				// chapter body — no hardcoded chapter table to keep in sync.
+				const at = T.journey.findIndex((s) => s.cmd === cmd);
+				if (at < 0) break;
 				const rows: Line[] = [
 					echo,
-					out(`  ${T.skillsHeader}`),
+					chapter(T.journey[at].label),
 					out(""),
 				];
-				for (const [k, lvl, v] of T.skills) {
-					rows.push(
-						rich([
-							{ t: `  ${k.padEnd(10)}`, cls: HL },
-							{
-								t: `[${"#".repeat(lvl)}${"·".repeat(10 - lvl)}]  `,
-								cls: "text-[var(--tt-acc)]",
-							},
-							...emphasize(v),
-						]),
-					);
-				}
-				rows.push(out(""));
 				rows.push(
-					rich([
-						{ t: `  ${T.skillsFooterA}` },
-						{ t: T.skillsFooterB, cls: EMPH },
-						{ t: " behind it." },
-					]),
+					...renderSections(T.chapters[T.journey[at].label.slice(0, 2)] ?? []),
 				);
-				rows.push(out(""));
-				printStaggered(rows, 90);
+				printStaggered(rows, 70);
 				break;
 			}
 
-			case "about":
-			case "whoami":
-				print([
-					echo,
-					rich([{ t: "  Jason Chen", cls: EMPH }, { t: ` — ${T.aboutRole}` }]),
-					out(""),
-					rich([{ t: "  I build " }, ...emphasize(T.aboutBody)]),
-					out(""),
-					rich([{ t: "  " }, { t: T.aboutFacts1, cls: EMPH }, { t: " · " }, { t: T.aboutFacts2, cls: EMPH }, { t: ", one rule:" }]),
-					rich([{ t: "  if it doesn't work on the " }, { t: T.aboutRuleA, cls: EMPH }, { t: T.aboutRuleB }]),
-					out(""),
-					rich([{ t: `  ${T.aboutStack}` }, ...emphasize("C/C++ · STM32 · PCB · RTK/GNSS · Jetson · Python · TypeScript")]),
-					out(""),
-				]);
-				break;
-
-				case "intro":
-				case "me":
-				case "who": {
-					// The payoff: a tidy, aligned self-introduction.
-					// Header prints atomically, then a label→value table
-					// flows in with perfectly aligned columns.
-					print([
-						echo,
-						out(""),
-						rich([
-							{ t: "  ╔══════════════════════════════════════╗" },
-						]),
-						rich([
-							{ t: "  ║        " },
-							{ t: "JASON CHEN", cls: "font-extrabold tracking-[0.18em]" },
-							{ t: "        ║" },
-						]),
-						rich([
-							{ t: "  ║     " },
-							{ t: T.introSub, cls: EMPH },
-							{ t: "     ║" },
-						]),
-						rich([
-							{ t: "  ╚══════════════════════════════════════╝" },
-						]),
-						out(""),
-					]);
-					printStaggered(
-						[
-							rich([
-								{ t: "  EXPERIENCE   ", cls: "text-[var(--tt-acc)]" },
-								{ t: T.introRows.exp, cls: EMPH },
-								{ t: " turning ideas into working hardware" },
-							]),
-							rich([
-								{ t: "  DELIVERED    ", cls: "text-[var(--tt-acc)]" },
-								{ t: T.introRows.delivered, cls: EMPH },
-								{ t: " · " },
-								{ t: T.aboutFacts1, cls: EMPH },
-								{ t: " · PCB → metal floor" },
-							]),
-							rich([
-								{ t: "  STACK        ", cls: "text-[var(--tt-acc)]" },
-								...emphasize(T.introRows.stack),
-							]),
-							rich([
-								{ t: "  RULE         ", cls: "text-[var(--tt-acc)]" },
-								{ t: T.introRuleA, cls: EMPH },
-								{ t: T.introRuleB },
-							]),
-							out(""),
-						],
-						130,
-						220,
-					);
-					break;
-				}
-
+			// ── chapter 07 · the recap ────────────────────────────────────
 			case "summary":
 			case "stats":
 			case "resume":
-				print([
-					echo,
-					out(`  ── ${T.statsHeader} ──────────────────────────`),
-					out(""),
-					...T.stats.map(([k, v]) =>
-						rich([
-							{ t: `  ${k.padEnd(14)}`, cls: "text-[var(--tt-acc)]" },
-							...emphasize(v),
-						]),
-					),
-					out(""),
+			case "index": {
+				const rows: Line[] = [echo, banner(T.navTitle), out("")];
+				rows.push(...renderSections(T.chapters["07"] ?? []));
+				rows.push(
 					rich([
-						{ t: "  run " },
-						{ t: "skills", cls: `${HL} ${RUNNABLE}`, run: "skills" },
-						{ t: T.summaryCta1 },
-						{ t: "contact", cls: `${HL} ${RUNNABLE}`, run: "contact" },
-						{ t: T.summaryCta2 },
-						{ t: T.summaryCta3 },
+						{ t: "  " },
+						{ t: "summary", cls: `${HL} ${RUNNABLE}`, run: "summary" },
+						{ t: " · " },
+						{ t: "restart", cls: `${HL} ${RUNNABLE}`, run: "restart" },
+						{ t: " · " },
+						{ t: "help", cls: `${HL} ${RUNNABLE}`, run: "help" },
 					]),
-					out(""),
-				]);
+				);
+				rows.push(out(""));
+				printStaggered(rows, 70);
 				break;
+			}
 
-			case "contact":
-			case "social":
-				print([
-					echo,
-					rich([
-						{ t: `  ${T.emailLabel}  `, cls: HL },
-						{
-							t: "1106467336@qq.com",
-							href: "mailto:1106467336@qq.com",
-							cls: "underline underline-offset-4 opacity-90 hover:opacity-100",
-						},
-					]),
-						...SOCIALS.map((s) =>
-							rich([
-								{ t: `  ${s.label}  `, cls: HL },
-								{
-									t: s.href.replace("https://", ""),
-									href: s.href,
-									cls: "underline underline-offset-4 opacity-90 hover:opacity-100",
-								},
-							]),
-						),
-						out(""),
-					]);
-					break;
-
-				case "email":
-					print([echo, out("  1106467336@qq.com"), out("")]);
-					break;
+			case "email":
+				print([echo, out("  1106467336@qq.com"), out("")]);
+				break;
 
 			case "neofetch": {
 				const rows: Line[] = [echo];
@@ -1176,16 +1218,17 @@ export function TerminalSection() {
 					{ t: ">>", cls: HL },
 					{ t: `  ${T.welcomeLine2a}` },
 					{ t: "Enter", cls: HL },
-					{ t: T.welcomeLine2b },
-				]),
-				out(""),
-			]);
-			focusInput();
+				{ t: T.welcomeLine2b },
+			]),
+			out(""),
+		]);
 		}, bootMs + 300),
 	);
 	return stopTimers;
-}, [booted, bootLines, stopTimers, print, focusInput, T]);
+}, [booted, bootLines, stopTimers, print, T]);
 
+	// Enter is handled by the form's onSubmit below (empty = next chapter,
+	// text = run that command), so there is no separate global key handler.
 	const submit = (e: React.FormEvent) => {
 		e.preventDefault();
 		const v = value.trim();
@@ -1193,18 +1236,17 @@ export function TerminalSection() {
 			// empty Enter = advance the guided journey one chapter
 			cancelGhost();
 			advance();
-			setValue("");
 		} else {
 			cancelGhost();
 			run(v);
-			setValue("");
 		}
+		setValue("");
 	};
 
 	const onKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-		cancelGhost();
 		const hist = historyRef.current;
 		if (e.key === "ArrowUp") {
+			e.preventDefault();
 			if (!hist.length) return;
 			historyIdxRef.current =
 				historyIdxRef.current === -1
@@ -1230,6 +1272,7 @@ export function TerminalSection() {
 				if (matches.length === 1) {
 					setValue(matches[0] + " ");
 				} else if (matches.length > 1 && prefix) {
+					cancelGhost();
 					print([cmdLine(value), out("  " + matches.join("   "))]);
 				}
 			} else if (parts[0] === "cat") {
@@ -1238,12 +1281,15 @@ export function TerminalSection() {
 				const matches = files.filter((f) => f.startsWith(prefix));
 				if (matches.length === 1) setValue(`cat ${matches[0]}`);
 				else if (matches.length > 1 && prefix) {
+					cancelGhost();
 					print([cmdLine(value), out("  " + matches.join("   "))]);
 				}
 			}
 		} else if (e.key === "l" && e.ctrlKey) {
 			e.preventDefault();
 			setLines([]);
+		} else if (e.key === "Escape") {
+			setValue("");
 		}
 	};
 
@@ -1287,14 +1333,13 @@ export function TerminalSection() {
 										<li key={s.cmd}>
 											<button
 												type="button"
-												onClick={() => {
-													cancelGhost();
-													// jump directly to this chapter
-													stepIdxRef.current = i - 1;
-													setStepIdx(i - 1);
-													advance();
-													focusInput();
-												}}
+											onClick={() => {
+												cancelGhost();
+												// jump directly to this chapter
+												stepIdxRef.current = i - 1;
+												setStepIdx(i - 1);
+												advance();
+											}}
 												className={`group flex w-full items-baseline gap-2 rounded-md px-2 py-1 text-left transition-colors ${
 													state === "active"
 														? "bg-[#0F4C45]/10"
@@ -1423,16 +1468,12 @@ export function TerminalSection() {
 						) : null}
 						</div>
 
-						{/* scrollback */}
-						<div
-							ref={scrollRef}
-							onClick={() => {
-								cancelGhost();
-								focusInput();
-							}}
-							className="term-scroll min-h-0 flex-1 cursor-text scroll-smooth overflow-y-auto px-5 py-5 font-mono text-[0.82rem] leading-[1.6] sm:px-7 sm:text-[0.88rem]"
-							style={{ color: theme.text }}
-						>
+					{/* scrollback */}
+					<div
+						ref={scrollRef}
+						className="term-scroll min-h-0 flex-1 scroll-smooth overflow-y-auto px-5 py-5 font-mono text-[0.82rem] leading-[1.6] sm:px-7 sm:text-[0.88rem]"
+						style={{ color: theme.text }}
+					>
 							{lines.map((line) => (
 								<div
 									key={line.id}
@@ -1454,16 +1495,15 @@ export function TerminalSection() {
 											<button
 												key={i}
 												type="button"
-												className={seg.cls}
-												onClick={(e) => {
-													e.stopPropagation();
-													cancelGhost();
-													run(seg.run!);
-													focusInput();
-												}}
-											>
-												{seg.t}
-											</button>
+											className={seg.cls}
+											onClick={(e) => {
+												e.stopPropagation();
+												cancelGhost();
+												run(seg.run!);
+											}}
+										>
+											{seg.t}
+										</button>
 										) : (
 											<span key={i} className={seg.cls}>
 												{seg.t}
@@ -1473,44 +1513,16 @@ export function TerminalSection() {
 								</div>
 							))}
 
-							{booted ? (
-								<>
-									{/* guided prompt — the one clear call to action */}
-									<div
-										className={`mt-1 mb-1.5 flex flex-wrap items-center gap-x-1.5 gap-y-1 transition-opacity duration-300 ${
-											value ? "opacity-30" : "opacity-100"
-										}`}
-									>
-										<button
-											type="button"
-											onClick={(e) => {
-												e.stopPropagation();
-												cancelGhost();
-												advance();
-												setValue("");
-												focusInput();
-											}}
-											className="animate-pulse border px-2 py-0.5 font-mono text-[0.68rem] transition-colors duration-200"
-											style={{
-												borderColor: theme.hl,
-												color: theme.hl,
-											}}
-										>
-										{T.pressEnterToContinue}
-									</button>
-									<span
-										className="font-mono text-[0.66rem]"
-										style={{ color: theme.barText }}
-									>
-										{stepIdx >= 0 && stepIdx < T.journey.length
-											? `${T.journey[stepIdx].label} / ${T.journey.length}`
-											: T.orTypeACommand}
-									</span>
-									</div>
-
-									<form onSubmit={submit} className="flex items-center">
+						{booted ? (
+							<>
+								{/* prompt + input on the left, submit button on the right */}
+								<div
+									className="mt-3 flex items-center gap-2 border-t px-1 pt-3"
+									style={{ borderColor: "rgba(22,43,38,0.08)" }}
+								>
+									<form onSubmit={submit} className="flex min-w-0 flex-1 items-center gap-2">
 										<span
-											className="mr-2 shrink-0"
+											className="shrink-0 font-mono text-[0.82rem] sm:text-[0.88rem]"
 											style={{ color: theme.acc }}
 										>
 											{PROMPT}
@@ -1518,26 +1530,54 @@ export function TerminalSection() {
 										<input
 											ref={inputRef}
 											value={value}
-											onChange={(e) => {
-												cancelGhost();
-												setValue(e.target.value);
-											}}
+											onChange={(e) => setValue(e.target.value)}
 											onKeyDown={onKeyDown}
 											spellCheck={false}
 											autoComplete="off"
 											autoCapitalize="off"
-										placeholder={T.inputPlaceholder}
-										aria-label="terminal input"
-											className="w-full min-w-0 flex-1 bg-transparent outline-none placeholder:opacity-30"
-											style={{
-												color: theme.text,
-												caretColor: theme.hl,
-											}}
+											placeholder={T.inputPlaceholder}
+											aria-label="terminal input"
+											className="min-w-0 flex-1 bg-transparent font-mono text-[0.82rem] outline-none placeholder:opacity-30 sm:text-[0.88rem]"
+											style={{ color: theme.text, caretColor: theme.hl }}
 										/>
 									</form>
-								</>
-							) : null}
-						</div>
+									<button
+										type="button"
+										onClick={(e) => {
+											e.stopPropagation();
+											if (value.trim()) {
+												cancelGhost();
+												run(value);
+												setValue("");
+											} else {
+												cancelGhost();
+												advance();
+											}
+											inputRef.current?.blur();
+										}}
+										title={T.pressEnterToContinue}
+										aria-label={T.pressEnterToContinue}
+										className="flex shrink-0 items-center gap-1.5 rounded-lg px-3 py-1.5 text-[0.78rem] font-semibold text-white shadow-sm transition-transform duration-150 hover:scale-[1.02] active:scale-[0.98]"
+										style={{ background: theme.acc }}
+									>
+										<span>{value.trim() ? T.btnRun : T.btnNext}</span>
+										<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+											<path d="M5 12h14" />
+											<path d="m13 6 6 6-6 6" />
+										</svg>
+									</button>
+								</div>
+								<p
+									className="mt-1.5 text-center font-mono text-[0.64rem]"
+									style={{ color: theme.barText }}
+								>
+									{stepIdx >= 0 && stepIdx < T.journey.length
+										? `${T.journey[stepIdx].label} · ${stepIdx + 1} / ${T.journey.length}`
+										: T.orTypeACommand}
+								</p>
+							</>
+						) : null}
+					</div>
 
 						{/* matrix overlay */}
 						{matrixOn ? (
@@ -1557,17 +1597,16 @@ export function TerminalSection() {
 								{i > 0 ? (
 									<span className="text-[#0F4C45]/30">·</span>
 								) : null}
-								<button
-									type="button"
-									onClick={() => {
-										cancelGhost();
-										run(q);
-										focusInput();
-									}}
-									className="text-[#0F4C45]/70 transition hover:text-[#043439]"
-								>
-									{q}
-								</button>
+							<button
+								type="button"
+								onClick={() => {
+									cancelGhost();
+									run(q);
+								}}
+								className="text-[#0F4C45]/70 transition hover:text-[#043439]"
+							>
+								{q}
+							</button>
 							</span>
 						))}
 					</div>

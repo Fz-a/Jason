@@ -199,7 +199,7 @@ export function StudioTextFrame({
 						{k} · {Math.round(lay.fontScale * 100)}%
 					</span>
 					<span
-						title="拖移位置"
+						title="Drag to reposition"
 						className="absolute -top-[18px] right-0 z-30 cursor-grab rounded-[2px] bg-[#9f1239] px-1 py-0.5 text-[9px] leading-none text-white active:cursor-grabbing"
 						onPointerDown={(e) => begin(e, "move")}
 						onPointerMove={onMove}
@@ -219,7 +219,7 @@ export function StudioTextFrame({
 						<span
 							key={pos}
 							role="presentation"
-							title="拖角缩放字号"
+							title="Drag the corner to resize"
 							className={`${handle} ${pos}`}
 							style={{ cursor: `${cur}-resize` }}
 							onPointerDown={(e) => begin(e, "scale")}

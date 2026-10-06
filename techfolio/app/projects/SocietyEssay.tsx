@@ -62,11 +62,6 @@ function ChapterBlock({
 					<h2 className="text-[1.45rem] font-extrabold tracking-tight text-[#162b26] sm:text-[1.7rem]">
 						{block.title}
 					</h2>
-					{block.titleZh ? (
-						<p className="mt-1 text-[0.82rem] tracking-[0.04em] text-[#6A7A76]">
-							{block.titleZh}
-						</p>
-					) : null}
 				</div>
 			</div>
 
@@ -148,11 +143,6 @@ function DuoExhibitBlock({
 					<h2 className="text-[1.45rem] font-extrabold tracking-tight text-[#162b26] sm:text-[1.7rem]">
 						{block.title}
 					</h2>
-					{block.titleZh ? (
-						<p className="mt-1 text-[0.82rem] tracking-[0.04em] text-[#6A7A76]">
-							{block.titleZh}
-						</p>
-					) : null}
 				</div>
 			</div>
 

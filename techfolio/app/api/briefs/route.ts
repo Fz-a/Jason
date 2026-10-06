@@ -20,12 +20,12 @@ export async function POST(req: Request) {
 	try {
 		const body = await req.json();
 		if (!body || typeof body !== "object" || Array.isArray(body)) {
-			return NextResponse.json({ error: "需要 briefs 对象" }, { status: 400 });
+			return NextResponse.json({ error: "Missing briefs object" }, { status: 400 });
 		}
 		await writeFile(FILE, `${JSON.stringify(body, null, 2)}\n`, "utf8");
 		return NextResponse.json({ ok: true, path: "content/briefs.json" });
 	} catch (err) {
-		const message = err instanceof Error ? err.message : "写入失败";
+		const message = err instanceof Error ? err.message : "Write failed";
 		return NextResponse.json({ error: message }, { status: 500 });
 	}
 }

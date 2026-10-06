@@ -10,7 +10,6 @@ export type MakeImage = {
 export type MakeDiyItem = {
 	id: string;
 	title: string;
-	titleZh: string;
 	year: string;
 	image: MakeImage;
 };
@@ -26,7 +25,6 @@ export type MakeEssayBlock =
 			type: "helmet";
 			num: string;
 			title: string;
-			titleZh: string;
 			pull: string;
 			body: string[];
 			images: MakeImage[];
@@ -35,7 +33,6 @@ export type MakeEssayBlock =
 			type: "diy-wall";
 			num: string;
 			title: string;
-			titleZh: string;
 			lede: string;
 			items: MakeDiyItem[];
 	  };
@@ -52,7 +49,6 @@ export const makeEssay: MakeEssayBlock[] = [
 		type: "helmet",
 		num: "01",
 		title: "Smart Helmet",
-		titleZh: "智能头盔 · 展示与摆摊",
 		pull: "Own the problem, the board, and the conversation when strangers stop to ask what it does.",
 		body: [
 			"The Smart Helmet is the lead MAKE story: a wearable I designed and iterated myself — sensors, firmware, and the loop from desk to something people can put on their head.",
@@ -86,14 +82,12 @@ export const makeEssay: MakeEssayBlock[] = [
 		type: "diy-wall",
 		num: "02",
 		title: "Built on the desk",
-		titleZh: "桌面造物",
 		lede:
 			"Nine builds in a quiet gallery — drag or tap through each piece, framed the way a product shot deserves.",
 		items: [
 			{
 				id: "night-light",
 				title: "Snowflake Night Light",
-				titleZh: "雪花小夜灯",
 				year: "2024",
 				image: {
 					src: "/experience/make/night-light.webp",
@@ -105,7 +99,6 @@ export const makeEssay: MakeEssayBlock[] = [
 			{
 				id: "heart-domes",
 				title: "Heart Dome Lights",
-				titleZh: "心形玻璃罩小夜灯",
 				year: "2024",
 				image: {
 					src: "/experience/make/heart-domes.webp",
@@ -117,7 +110,6 @@ export const makeEssay: MakeEssayBlock[] = [
 			{
 				id: "stereo-display",
 				title: "Hologram Visualizer",
-				titleZh: "立体频谱显示",
 				year: "2025",
 				image: {
 					src: "/experience/make/stereo-display.webp",
@@ -129,7 +121,6 @@ export const makeEssay: MakeEssayBlock[] = [
 			{
 				id: "anime-pcb",
 				title: "Anime PCB Art",
-				titleZh: "动漫灯板",
 				year: "2025",
 				image: {
 					src: "/experience/make/anime-pcb.webp",
@@ -141,7 +132,6 @@ export const makeEssay: MakeEssayBlock[] = [
 			{
 				id: "kb-acrylic",
 				title: "Acrylic Keyboard",
-				titleZh: "亚克力机械键盘",
 				year: "2025",
 				image: {
 					src: "/experience/make/kb-acrylic.webp",
@@ -153,7 +143,6 @@ export const makeEssay: MakeEssayBlock[] = [
 			{
 				id: "balance-triangle",
 				title: "Self-Balancing Triangle",
-				titleZh: "自平衡三角",
 				year: "2024",
 				image: {
 					src: "/experience/make/balance-triangle.webp",
@@ -165,7 +154,6 @@ export const makeEssay: MakeEssayBlock[] = [
 			{
 				id: "esp-audio",
 				title: "ESP32 Audio Proto",
-				titleZh: "ESP32 音频板",
 				year: "2024",
 				image: {
 					src: "/experience/make/esp-audio-board.webp",
@@ -177,7 +165,6 @@ export const makeEssay: MakeEssayBlock[] = [
 			{
 				id: "pov-ring",
 				title: "POV Display",
-				titleZh: "旋转 POV 显示",
 				year: "2025",
 				image: {
 					src: "/experience/make/pov-ring.webp",
@@ -189,7 +176,6 @@ export const makeEssay: MakeEssayBlock[] = [
 			{
 				id: "keyboard",
 				title: "Shin-chan Numpad",
-				titleZh: "蜡笔小新数字键盘",
 				year: "2025",
 				image: {
 					src: "/experience/make/keyboard.webp",

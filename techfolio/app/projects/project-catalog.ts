@@ -42,21 +42,21 @@ export type ProjectOrderFile = {
 	starred?: string[];
 };
 
-/** Studio sidebar labels (zh) ↔ site group ids */
-export const PROJECT_GROUP_LABEL_ZH: Record<ProjectCatalogGroup, string> = {
-	work: "工作",
-	companies: "公司",
-	university: "大学",
-	diy: "造物",
-	society: "社会",
+/** Studio sidebar labels ↔ site group ids. */
+export const PROJECT_GROUP_LABEL: Record<ProjectCatalogGroup, string> = {
+	work: "Work",
+	companies: "Companies",
+	university: "University",
+	diy: "Make",
+	society: "Society",
 };
 
-export const PROJECT_GROUP_ZH_TO_ID: Record<string, ProjectCatalogGroup> = {
-	工作: "work",
-	公司: "companies",
-	大学: "university",
-	造物: "diy",
-	社会: "society",
+export const PROJECT_GROUP_LABEL_TO_ID: Record<string, ProjectCatalogGroup> = {
+	Work: "work",
+	Companies: "companies",
+	University: "university",
+	Make: "diy",
+	Society: "society",
 };
 
 export const PROJECT_GROUP_ORDER: ProjectCatalogGroup[] = [
@@ -187,7 +187,7 @@ export function groupOverridesFromCatalog(
 	for (const item of items) {
 		if (item.source === "custom" || item.id.startsWith("custom_")) continue;
 		const zh = item.group;
-		const gid = PROJECT_GROUP_ZH_TO_ID[zh];
+		const gid = PROJECT_GROUP_LABEL_TO_ID[zh];
 		if (!gid) continue;
 		const def = defaults.get(item.id);
 		if (def && gid !== def) out[item.id] = gid;

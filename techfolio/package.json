@@ -4,9 +4,11 @@
   "private": false,
   "scripts": {
     "dev": "next dev -p 4321",
-    "build": "next build",
+    "build": "npm run content:build && next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "content:build": "node scripts/build-terminal-content.mjs",
+    "content:check": "node scripts/build-terminal-content.mjs --check"
   },
   "dependencies": {
     "gsap": "^3.15.0",

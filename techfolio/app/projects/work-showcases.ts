@@ -89,7 +89,7 @@ export const workShowcases: WorkShowcase[] = [
 					alt: "Lecture on Zongheng Robot IoT system analysis",
 					width: 1024,
 					height: 768,
-					caption: "Lecture — 纵横机器人 · IoT system analysis",
+					caption: "Lecture — Zongheng Robotics · IoT system analysis",
 				},
 				imageTone: "light",
 			},
@@ -97,7 +97,7 @@ export const workShowcases: WorkShowcase[] = [
 	},
 	{
 		id: "shixun-car",
-		title: "实讯小车",
+		title: "Shixun Car",
 		subtitle: "Shixun · Mecanum training car",
 		cardImage: {
 			src: "/experience/work/zongheng/shixun-car.webp",
@@ -109,7 +109,7 @@ export const workShowcases: WorkShowcase[] = [
 			{
 				type: "product-hero",
 				kicker: "01 · Product",
-				title: "实讯小车",
+				title: "Shixun Car",
 				subtitle:
 					"Mecanum training platform for classroom fleets — paired with Zongheng robots for hands-on IoT and motion labs.",
 				image: {
@@ -117,7 +117,7 @@ export const workShowcases: WorkShowcase[] = [
 					alt: "Shixun Mecanum training car chassis",
 					width: 1024,
 					height: 1024,
-					caption: "实讯小车 — Mecanum training platform",
+					caption: "Shixun Car — Mecanum training platform",
 				},
 			},
 			{
@@ -157,7 +157,7 @@ export const workShowcases: WorkShowcase[] = [
 					alt: "Students learning around Shixun car and laptops",
 					width: 1024,
 					height: 768,
-					caption: "Lab class — hands-on with 实讯小车",
+					caption: "Lab class — hands-on with Shixun Car",
 				},
 				imageTone: "light",
 			},
@@ -166,7 +166,7 @@ export const workShowcases: WorkShowcase[] = [
 	{
 		id: "vxs-100",
 		title: "VXS-100",
-		subtitle: "Handheld voice module · Robot & 实讯 control",
+		subtitle: "Handheld voice module · Robot & Shixun control",
 		cardImage: {
 			src: "/experience/work/zongheng/vxs-100.webp",
 			alt: "Three VXS-100 handheld voice modules standing side by side",
@@ -225,7 +225,7 @@ export const workShowcases: WorkShowcase[] = [
 				heading: "Open chassis",
 				body: [
 					"Front open view of the assembled unit — USB-C, status LEDs, and board edge visible inside the silver shell.",
-					"Antenna mount on the end cap keeps the handheld radio link ready for robot and 实讯 demos.",
+					"Antenna mount on the end cap keeps the handheld radio link ready for robot and Shixun demos.",
 				],
 				image: {
 					src: "/experience/work/zongheng/vxs-100-open.webp",
@@ -291,7 +291,7 @@ export const workShowcases: WorkShowcase[] = [
 					alt: "RTK high-precision mobile measurement station on a desk",
 					width: 481,
 					height: 359,
-					caption: "RTK高精度流动测量站 — desk view",
+					caption: "RTKHigh-precision mobile survey station — desk view",
 				},
 				imageSide: "right",
 			},
@@ -426,7 +426,7 @@ export const workShowcases: WorkShowcase[] = [
 	{
 		id: "techmore",
 		title: "TechMore",
-		subtitle: "摩尔创展 · TouchDesigner interaction & exhibition tech",
+		subtitle: "Moore Creative · TouchDesigner interaction & exhibition tech",
 		cardImage: {
 			src: "/experience/work/techmore/exhibition-hall.jpg",
 			alt: "TechMore exhibition hall with large interactive displays",
@@ -439,13 +439,13 @@ export const workShowcases: WorkShowcase[] = [
 				kicker: "01 · Interaction",
 				title: "TechMore Interactive",
 				subtitle:
-					"Internship at Shenzhen TechMore (摩尔创展) — software–hardware interaction for exhibitions: sensors and firmware signals wired into TouchDesigner for realtime experiential output.",
+					"Internship at Shenzhen Moore Creative — software–hardware interaction for exhibitions: sensors and firmware signals wired into TouchDesigner for realtime experiential output.",
 				image: {
 					src: "/experience/work/techmore/robot-arm.jpg",
 					alt: "Robotic arm interactive installation with laser light lines",
 					width: 1080,
 					height: 1920,
-					caption: "点亮光 — robotic arm + laser interactive installation.",
+					caption: "Light Up — robotic arm + laser interactive installation.",
 				},
 			},
 			{
@@ -557,7 +557,6 @@ export const workInternships = [
 		id: "moore",
 		role: "Internship",
 		company: "Shenzhen Moore Creative",
-		companyZh: "深圳摩尔创展科技",
 		summary:
 			"Software–hardware interaction systems — TouchDesigner with sensor integration for real-time experiential output.",
 		highlights: [
@@ -581,7 +580,6 @@ export const workInternships = [
 		id: "cvte",
 		role: "Internship",
 		company: "Guangzhou CVTE",
-		companyZh: "广州视源电子",
 		summary:
 			"Display PCB layout in Altium Designer — high-speed routing, impedance matching, and SMT-aware placement.",
 		highlights: [
@@ -590,7 +588,7 @@ export const workInternships = [
 			"SMT-ready placement discipline",
 		],
 		brief: [
-			"At Guangzhou CVTE (视源电子) I focused on display PCB layout in Altium Designer — high-speed routing, impedance matching, and placement that stays SMT-ready.",
+			"At Guangzhou CVTE I focused on display PCB layout in Altium Designer — high-speed routing, impedance matching, and placement that stays SMT-ready.",
 			"That layout discipline still shows up in every board I design after this internship.",
 		],
 		image: {
@@ -609,7 +607,6 @@ export const workCompanies = [
 		id: "zongheng",
 		role: "Full-time",
 		company: "Guangzhou Zongheng",
-		companyZh: "广州纵横智能科技",
 		summary:
 			"Electronics engineer on education robots, Beidou RTK, and industrial AGV remotes — boards, bring-up, and field results.",
 		highlights: [

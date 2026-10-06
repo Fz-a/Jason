@@ -8,7 +8,6 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { HomeScrollPreloader } from "./HomeScrollPreloader";
 import { CornerNav } from "./CornerNav";
-import { LangSwitch } from "./LangSwitch";
 import { HeroNameFlip } from "./HeroNameFlip";
 import { FeaturedProjectsRail } from "./FeaturedProjectsRail";
 import { TerminalSection } from "./terminal/TerminalSection";
@@ -69,7 +68,7 @@ export function PortfolioDeck({
 	/** `projects` → the project rail; `terminal` → the interactive shell. */
 	experienceVariant?: "projects" | "terminal";
 }) {
-	const { t, tEn } = useLocale();
+	const { t } = useLocale();
 	const router = useRouter();
 	const fullOrder = orderedVisible(pageLayout);
 	const sectionOrder = sections
@@ -274,6 +273,47 @@ export function PortfolioDeck({
 		return () => io.disconnect();
 	}, []);
 
+	// The back orb is a way out, not a persistent control — it only surfaces
+	// on the very first and very last page. Observed directly instead of
+	// derived from activeSection, which lags behind keyboard jumps.
+	const firstSection = sectionOrder[0] ?? "home";
+	const lastSection = sectionOrder[sectionOrder.length - 1] ?? "contact";
+	const [edgeInView, setEdgeInView] = useState({ first: true, last: false });
+	useEffect(() => {
+		const first = document.getElementById(firstSection);
+		const last = document.getElementById(lastSection);
+		if (!first || !last) return;
+		// IntersectionObserver only reports targets whose state changed, so
+		// keep a full visibility map and derive the two booleans from it.
+		const visible = new Map<Element, boolean>([
+			[first, true],
+			[last, false],
+		]);
+		const io = new IntersectionObserver(
+			(entries) => {
+				for (const entry of entries) visible.set(entry.target, entry.isIntersecting);
+				const next = {
+					first: visible.get(first) ?? false,
+					last: visible.get(last) ?? false,
+				};
+				setEdgeInView((prev) =>
+					prev.first === next.first && prev.last === next.last
+						? prev
+						: next,
+				);
+			},
+			{ threshold: 0.25 },
+		);
+		io.observe(first);
+		if (last !== first) io.observe(last);
+		return () => io.disconnect();
+	}, [firstSection, lastSection]);
+
+	const showCornerNav =
+		cornerNav === "menu"
+			? heroInView
+			: edgeInView.first || edgeInView.last;
+
 	const renderSection = (id: PageSectionId): ReactNode => {
 		switch (id) {
 			case "home":
@@ -288,14 +328,14 @@ export function PortfolioDeck({
 									className="cursor-default text-left"
 								>
 									<p className="text-[0.78rem] font-semibold uppercase tracking-[0.18em] text-[#0F4C45]/60">
-										{tEn("hero.role")}
+										{t("hero.role")}
 									</p>
 								</button>
 
 							<h1 className="mt-7 text-left text-[2.55rem] font-extrabold leading-[0.95] tracking-tight text-[#162b26] sm:mt-9 sm:text-[3.6rem] lg:text-[4.2rem] xl:text-[4.6rem]">
 								<span className="hero-name-greeting block">
-									<span>{tEn("hero.hello")}, </span>
-									<span>{tEn("hero.iam")} </span>
+									<span>{t("hero.hello")}, </span>
+									<span>{t("hero.iam")} </span>
 								</span>
 								<span className="mt-[0.12em] block">
 									<HeroNameFlip />
@@ -303,7 +343,7 @@ export function PortfolioDeck({
 							</h1>
 
 							<p className={`mt-6 max-w-[28rem] text-[1rem] leading-8 text-[#3E514D] sm:text-[1.05rem] ${lora.className}`}>
-								{tEn("hero.blurb")}
+								{t("hero.blurb")}
 							</p>
 
 								<p className="mt-8 text-[0.72rem] font-semibold uppercase tracking-[0.16em] text-[#0F4C45]/70">
@@ -316,7 +356,7 @@ export function PortfolioDeck({
 											"hero.chip.uav",
 										] as const
 									)
-										.map((key) => tEn(key))
+										.map((key) => t(key))
 										.join(" · ")}
 								</p>
 
@@ -326,7 +366,7 @@ export function PortfolioDeck({
 									onClick={(event) => handleNavClick(event, contactHref)}
 									className="cursor-pointer rounded-full bg-[#043439] px-6 py-2.5 text-sm font-semibold text-white transition hover:opacity-90"
 								>
-									{tEn("hero.contact")}
+									{t("hero.contact")}
 								</Link>
 							</div>
 								</div>
@@ -362,7 +402,7 @@ export function PortfolioDeck({
 									ref={cueDotRef}
 									className="block h-8 w-px bg-[#0F4C45]/35"
 								/>
-								<span ref={cueTextRef}>{tEn("hero.scroll")}</span>
+								<span ref={cueTextRef}>{t("hero.scroll")}</span>
 							</a>
 						</div>
 					</section>
@@ -437,38 +477,18 @@ export function PortfolioDeck({
 	return (
 		<main className={`${montserrat.className} bg-[#F7F1E8] text-[#162b26]`}>
 			<HomeScrollPreloader />
-			{/* Menu orb only lives on the hero slide; the back orb stays put
-			    so inner decks never lose their way home. */}
+			{/* The menu orb lives on the hero slide; the back orb only shows on
+			    the first and last page of the deck. */}
 			<div
-				className={
-					cornerNav === "menu"
-						? `transition-opacity duration-300 ${
-								heroInView
-									? "opacity-100"
-									: "pointer-events-none opacity-0"
-							}`
-						: undefined
-				}
+				className={`transition-opacity duration-300 ${
+					showCornerNav
+						? "opacity-100"
+						: "pointer-events-none opacity-0"
+				}`}
 			>
 				<CornerNav mode={cornerNav} />
 			</div>
 
-			{/* Language switch appears from the "about" slide onward — the
-			    first (hero) page stays English, so it only shows once you
-			    scroll past it. On the homepage it swaps with the menu orb in
-			    the top-right corner; on inner decks it sits just left of the
-			    back orb so the two never overlap. */}
-			<div
-				className={`fixed top-5 z-50 transition-all duration-300 ${
-					cornerNav === "back" ? "right-[4.5rem]" : "right-5"
-				} ${
-					heroInView
-						? "pointer-events-none -translate-y-2 opacity-0"
-						: "translate-y-0 opacity-100"
-				}`}
-			>
-				<LangSwitch />
-			</div>
 			{showStory ? (
 				<StoryProgress
 					activeId={storyProgressId}

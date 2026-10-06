@@ -1447,9 +1447,6 @@ button,
 		padding-left: 0.7rem;
 	}
 
-	.lang-switch {
-		animation: none;
-	}
 
 	.journey-drawer {
 		transform: none;
@@ -1500,21 +1497,6 @@ button,
 
 	.journey-spine-node--pulse > span:last-child {
 		animation: none;
-	}
-}
-
-.lang-switch {
-	animation: lang-switch-in 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
-}
-
-@keyframes lang-switch-in {
-	from {
-		opacity: 0;
-		transform: translateY(-6px);
-	}
-	to {
-		opacity: 1;
-		transform: translateY(0);
 	}
 }
 
@@ -2009,5 +1991,42 @@ button,
 @media (prefers-reduced-motion: reduce) {
 	.flip-carousel__ghost {
 		display: none;
+	}
+}
+
+/* —— Story rail (left progress indicator on the scroll deck) —— */
+/* Enters with a small slide so the rail feels mounted, not popped. */
+.story-rail--in {
+	animation: story-rail-in 620ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes story-rail-in {
+	from {
+		opacity: 0;
+		transform: translateY(-50%) translateX(-14px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(-50%) translateX(0);
+	}
+}
+
+/* One dark lozenge that glides between stage rows. */
+.story-rail__pill {
+	will-change: transform, height;
+	transition:
+		transform 420ms cubic-bezier(0.22, 1, 0.36, 1),
+		height 420ms cubic-bezier(0.22, 1, 0.36, 1),
+		background-color 500ms ease,
+		opacity 260ms ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.story-rail--in {
+		animation: none;
+	}
+
+	.story-rail__pill {
+		transition-duration: 1ms;
 	}
 }

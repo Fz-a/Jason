@@ -41,7 +41,7 @@ export const societyShowcases: SocietyShowcase[] = [
 					alt: "Guangdong Voluntary Service Time Certificate for Jinyang Chen",
 					width: 665,
 					height: 926,
-					caption: "证书 — 224小时31分钟 · 一星志愿者",
+					caption: "Certificate — 224h31min · One-star volunteer",
 				},
 				imageTone: "light",
 			},
@@ -49,7 +49,7 @@ export const societyShowcases: SocietyShowcase[] = [
 				type: "split",
 				heading: "Epidemic-response duty",
 				body: [
-					"抗疫 shifts meant PPE, a thermometer, and a public line — temperature screening under blue tents when showing up was the whole point.",
+					"Epidemic response shifts meant PPE, a thermometer, and a public line — temperature screening under blue tents when showing up was the whole point.",
 					"Same lesson as any bench job: prepare, hold your place, leave the line a little clearer than you found it.",
 				],
 				image: {
@@ -57,7 +57,7 @@ export const societyShowcases: SocietyShowcase[] = [
 					alt: "Temperature screening in PPE during epidemic-response volunteering",
 					width: 1024,
 					height: 682,
-					caption: "抗疫 — PPE screening on campus",
+					caption: "Epidemic response — PPE screening on campus",
 				},
 				imageSide: "right",
 			},
@@ -66,8 +66,8 @@ export const societyShowcases: SocietyShowcase[] = [
 				eyebrow: "03 · Focus",
 				heading: "What we did together",
 				body: [
-					"Anti-fraud education (防诈骗) sessions helped students spot common scams — practical briefings more than slogans.",
-					"Flag-raising (升旗) and related ceremony support meant showing up on time, standing the post, and keeping the program running with the rest of the volunteer team.",
+					"Anti-fraud education sessions helped students spot common scams — practical briefings more than slogans.",
+					"Flag-raising and related ceremony support meant showing up on time, standing the post, and keeping the program running with the rest of the volunteer team.",
 				],
 			},
 			{
@@ -84,7 +84,7 @@ export const societyShowcases: SocietyShowcase[] = [
 	{
 		id: "xinghuo",
 		title: "Xinghuo HUBDAY",
-		subtitle: "星火会 · Open-source hardware · Shenzhen 2025",
+		subtitle: "Xinghuo Society · Open-source hardware · Shenzhen 2025",
 		cardImage: {
 			src: "/experience/society/xinghuo-peers.webp",
 			alt: "Peers at Xinghuo HUBDAY 2025 reading pamphlets and phones",
@@ -95,7 +95,7 @@ export const societyShowcases: SocietyShowcase[] = [
 			{
 				type: "product-hero",
 				kicker: "01 · Xinghuo",
-				title: "星火会 HUBDAY 2025",
+				title: "Xinghuo HUBDAY 2025",
 				subtitle:
 					"The 3rd Open Source Hardware Xinghuo Meeting & Electronic Engineers Conference — Shenzhen, 24 May 2025.",
 				image: {
@@ -110,14 +110,14 @@ export const societyShowcases: SocietyShowcase[] = [
 				type: "split",
 				heading: "Badge on",
 				body: [
-					"Entry pass for 星火会 HUBDAY 2025 — photo livestream, Shenzhen. Showing up as an attendee in a room of builders and EDA / open-hardware people.",
+					"Entry pass for Xinghuo HUBDAY 2025 — photo livestream, Shenzhen. Showing up as an attendee in a room of builders and EDA / open-hardware people.",
 				],
 				image: {
 					src: "/experience/society/xinghuo-badge.webp",
 					alt: "Xinghuo HUBDAY 2025 event badge on a lanyard",
 					width: 767,
 					height: 1024,
-					caption: "Badge — 2025.05.24 · 深圳",
+					caption: "Badge — 2025.05.24 · Shenzhen",
 				},
 				imageSide: "right",
 			},
@@ -126,7 +126,7 @@ export const societyShowcases: SocietyShowcase[] = [
 				eyebrow: "02 · Hall",
 				heading: "Main stage",
 				body: [
-					"第三届开源硬件星火会暨电子工程师大会 — JLCPCB / EasyEDA / OSHW Hub on the wall. Less campus duty, more spark: how practice catches fire when people share unfinished work.",
+					"The 3rd Open-Source Hardware Xinghuo Conference & Electrical Engineer Summit — JLCPCB / EasyEDA / OSHW Hub on the wall. Less campus duty, more spark: how practice catches fire when people share unfinished work.",
 				],
 				image: {
 					src: "/experience/society/xinghuo-stage.webp",
@@ -167,7 +167,7 @@ export const societyShowcases: SocietyShowcase[] = [
 	{
 		id: "maker-meetings",
 		title: "Chaihuo Makers",
-		subtitle: "柴火创客 · Fab Lab exchange",
+		subtitle: "Chaihuo Makers · Fab Lab exchange",
 		cardImage: {
 			src: "/experience/society/chaihuo.webp",
 			alt: "Chaihuo maker community exchange",
@@ -178,7 +178,7 @@ export const societyShowcases: SocietyShowcase[] = [
 			{
 				type: "product-hero",
 				kicker: "01 · Maker",
-				title: "柴火创客",
+				title: "Chaihuo Makers",
 				subtitle:
 					"Maker exchanges at Chaihuo — where builds leave the classroom and meet other makers at the Fab Lab door.",
 				image: {
@@ -194,7 +194,7 @@ export const societyShowcases: SocietyShowcase[] = [
 				eyebrow: "02 · Sessions",
 				heading: "In the maker room",
 				body: [
-					"At Chaihuo (柴火) maker exchanges I met builders, watched demos, and traded notes on how projects leave the lab and meet people.",
+					"At Chaihuo maker exchanges I met builders, watched demos, and traded notes on how projects leave the lab and meet people.",
 					"If Xinghuo was the spark, Chaihuo was the forge — repeated contact with makers who keep the workbench open.",
 				],
 			},
@@ -203,14 +203,14 @@ export const societyShowcases: SocietyShowcase[] = [
 				eyebrow: "03 · Door",
 				heading: "At the Fab Lab door",
 				body: [
-					"柴火创客 CHAIHUO MAKERS — Fab Lab at the entrance. Showing up where builders keep the workbench open, not only where grades are posted.",
+					"CHAIHUO MAKERS — Fab Lab at the entrance. Showing up where builders keep the workbench open, not only where grades are posted.",
 				],
 				image: {
 					src: "/experience/society/chaihuo-entrance.webp",
 					alt: "At the entrance of Chaihuo Makers Fab Lab",
 					width: 1024,
 					height: 768,
-					caption: "柴火创客 — Fab Lab entrance",
+					caption: "Chaihuo Makers — Fab Lab entrance",
 				},
 				imageTone: "light",
 			},
@@ -262,7 +262,7 @@ export const societyShowcases: SocietyShowcase[] = [
 					alt: "Humanoid and robot dogs at police equipment and UAV exhibition",
 					width: 755,
 					height: 1024,
-					caption: "警用装备 · 人形与机器狗现场",
+					caption: "Police equipment · humanoid and robot dog on site",
 				},
 				imageTone: "light",
 			},
@@ -374,7 +374,7 @@ export const societyShowcases: SocietyShowcase[] = [
 					alt: "Holding an Excellent Volunteer award certificate in a yellow vest",
 					width: 1024,
 					height: 768,
-					caption: "奖状 — 优秀志愿者",
+					caption: "Commendation — Outstanding Volunteer",
 				},
 				imageTone: "light",
 			},
@@ -390,7 +390,7 @@ export const societyShowcases: SocietyShowcase[] = [
 					alt: "Large group photo of Safe Campus Service Team with defense education corps",
 					width: 1024,
 					height: 768,
-					caption: "Group — 平安校园 · 国防教育教导队",
+					caption: "Group — Safe Campus · Defense Education Team",
 				},
 				imageTone: "light",
 			},
@@ -432,7 +432,7 @@ export const societyShowcases: SocietyShowcase[] = [
 					alt: "Presenting drone workstation plans at the classroom podium",
 					width: 1024,
 					height: 768,
-					caption: "Briefing — 无人机工作站 at the podium",
+					caption: "Briefing — Drone Workstation at the podium",
 				},
 			},
 			{

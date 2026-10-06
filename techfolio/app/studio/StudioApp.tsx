@@ -27,9 +27,9 @@ import {
 	groupOverridesFromCatalog,
 	listProjectCatalog,
 	orderIdsFromCatalog,
-	PROJECT_GROUP_LABEL_ZH,
+	PROJECT_GROUP_LABEL,
 	PROJECT_GROUP_ORDER,
-	PROJECT_GROUP_ZH_TO_ID,
+	PROJECT_GROUP_LABEL_TO_ID,
 	type ProjectCatalogGroup,
 } from "../projects/project-catalog";
 import { universityProjectShowcases } from "../projects/university-showcases";
@@ -66,7 +66,7 @@ type CatalogPersist = {
 const CATALOG_LS_KEY = "techfolio-studio-catalog-v4";
 const LONG_PRESS_MS = 360;
 /** Must match FeaturedProjects groups via project-catalog */
-const GROUPS = PROJECT_GROUP_ORDER.map((g) => PROJECT_GROUP_LABEL_ZH[g]);
+const GROUPS = PROJECT_GROUP_ORDER.map((g) => PROJECT_GROUP_LABEL[g]);
 
 function catalogTitle(id: string, kind: CatalogEntry["source"]): string {
 	if (kind === "company") {
@@ -97,7 +97,7 @@ function buildCatalog(
 	return listProjectCatalog(override).map((e) => ({
 		id: e.id,
 		title: catalogTitle(e.id, e.kind),
-		group: PROJECT_GROUP_LABEL_ZH[e.group],
+		group: PROJECT_GROUP_LABEL[e.group],
 		source: e.kind,
 	}));
 }
@@ -126,7 +126,7 @@ function hydrateCatalog(persist: CatalogPersist | null): {
 		const migrated: Record<string, ProjectCatalogGroup> = {};
 		for (const raw of persist?.items ?? []) {
 			if (!raw?.id || raw.source === "custom") continue;
-			const gid = PROJECT_GROUP_ZH_TO_ID[raw.group];
+			const gid = PROJECT_GROUP_LABEL_TO_ID[raw.group];
 			if (gid) migrated[raw.id] = gid;
 		}
 		if (Object.keys(migrated).length > 0) groups = migrated;
@@ -145,8 +145,8 @@ function hydrateCatalog(persist: CatalogPersist | null): {
 		if (!c?.id) continue;
 		customs.push({
 			id: c.id,
-			title: c.title || "未命名",
-			group: GROUPS.includes(c.group) ? c.group : "工作",
+			title: c.title || "Untitled",
+			group: GROUPS.includes(c.group) ? c.group : "Work",
 			source: "custom",
 		});
 	}
@@ -156,8 +156,8 @@ function hydrateCatalog(persist: CatalogPersist | null): {
 			if (customs.some((c) => c.id === raw.id)) continue;
 			customs.push({
 				id: raw.id,
-				title: raw.title || "未命名",
-				group: GROUPS.includes(raw.group) ? raw.group : "工作",
+				title: raw.title || "Untitled",
+				group: GROUPS.includes(raw.group) ? raw.group : "Work",
 				source: "custom",
 			});
 		}
@@ -189,7 +189,7 @@ function blankDoc(id: string, title: string, group: string): BriefDoc {
 		blocks: [
 			{ id: newBlockId(), type: "kicker", text: group },
 			{ id: newBlockId(), type: "heading", text: title },
-			{ id: newBlockId(), type: "text", text: "从这里开始写。" },
+			{ id: newBlockId(), type: "text", text: "Start writing here." },
 		],
 	};
 }
@@ -408,7 +408,7 @@ function CatalogNav({
 							</p>
 							<button
 								type="button"
-								title={`在「${group}」增加一项`}
+								title={`Add to “${group}”`}
 								onClick={() => onAdd(group)}
 								className="flex h-5 w-5 items-center justify-center rounded-md text-[0.85rem] leading-none text-[#0F4C45]/45 transition hover:bg-[#0F4C45]/8 hover:text-[#0F4C45]"
 							>
@@ -547,8 +547,8 @@ function CatalogNav({
 												data-nav-star
 												title={
 													starredIds.includes(c.id)
-														? "取消星标"
-														: "星标突出（展示页静态显示）"
+														? "Unstar"
+														: "Starred (shown statically on the showcase)"
 												}
 												onClick={(e) => {
 													e.stopPropagation();
@@ -565,7 +565,7 @@ function CatalogNav({
 											<button
 												type="button"
 												data-nav-x
-												title="移出列表"
+												title="Remove from list"
 												onClick={(e) => {
 													e.stopPropagation();
 													onRemove(c.id);
@@ -589,7 +589,7 @@ function CatalogNav({
 											: "text-[#B0BBB7]"
 									}`}
 								>
-									空 · 拖到此处
+									Empty · drop here
 								</p>
 							) : null}
 						</ul>
@@ -597,7 +597,7 @@ function CatalogNav({
 				))}
 			</div>
 			<p className="shrink-0 border-t border-[#0F4C45]/6 px-2.5 py-1.5 text-[0.6rem] leading-4 text-[#A0ADA9]">
-				长按拖组 · ★ 星标 · 悬停 × 移除 · 与站点共用
+				Drag to reorder · ★ to star · hover × to remove · shared with the site
 			</p>
 		</div>
 	);
@@ -618,12 +618,11 @@ function buildDocFromSource(entry: CatalogEntry): BriefDoc | null {
 			return {
 				id: company.id,
 				title: company.company,
-				subtitle: company.companyZh,
+				subtitle: company.role,
 				section: company.role,
 				cardImage: { src: company.image.src, alt: company.image.alt },
 				blocks: [
 					{ id: newBlockId(), type: "heading", text: company.company },
-					{ id: newBlockId(), type: "subheading", text: company.companyZh },
 					{
 						id: newBlockId(),
 						type: "image",
@@ -644,14 +643,13 @@ function buildDocFromSource(entry: CatalogEntry): BriefDoc | null {
 			return {
 				id: "smart-helmet",
 				title: h.title,
-				subtitle: h.titleZh,
+				subtitle: h.title,
 				section: "MAKE",
 				cardImage: product
 					? { src: product.src, alt: product.alt }
 					: undefined,
 				blocks: [
 					{ id: newBlockId(), type: "heading", text: h.title },
-					{ id: newBlockId(), type: "subheading", text: h.titleZh },
 					{ id: newBlockId(), type: "pull", text: h.pull },
 					...h.body.map(
 						(text): BriefBlock => ({ id: newBlockId(), type: "text", text }),
@@ -707,14 +705,13 @@ function buildDocFromSource(entry: CatalogEntry): BriefDoc | null {
 			return {
 				id: "diy-wall",
 				title: diy.title,
-				subtitle: diy.titleZh,
+				subtitle: diy.title,
 				section: "MAKE · DIY",
 				cardImage: cover
 					? { src: cover.src, alt: cover.alt }
 					: undefined,
 				blocks: [
 					{ id: newBlockId(), type: "heading", text: diy.title },
-					{ id: newBlockId(), type: "subheading", text: diy.titleZh },
 					...diy.items.map(
 						(it): BriefBlock => ({
 							id: newBlockId(),
@@ -722,7 +719,7 @@ function buildDocFromSource(entry: CatalogEntry): BriefDoc | null {
 							image: {
 								src: it.image.src,
 								alt: it.image.alt,
-								caption: it.titleZh,
+								caption: it.title,
 							},
 						}),
 					),
@@ -773,7 +770,7 @@ function loadDoc(entry: CatalogEntry, store: BriefStore): BriefDoc {
 		title: entry.title,
 		blocks: [
 			{ id: newBlockId(), type: "heading", text: entry.title },
-			{ id: newBlockId(), type: "text", text: "点这里改文字" },
+			{ id: newBlockId(), type: "text", text: "Click to edit text" },
 		],
 	});
 }
@@ -832,7 +829,7 @@ function LiveText({
 	onChange,
 	className,
 	multiline = false,
-	placeholder = "点这里编辑",
+	placeholder = "Click to edit",
 }: {
 	value: string;
 	onChange: (v: string) => void;
@@ -956,18 +953,18 @@ function LiveImage({
 					}}
 					className="absolute right-2 top-2 z-[1] rounded-full bg-[#162b26]/72 px-2.5 py-1 text-[0.68rem] font-semibold text-white opacity-0 backdrop-blur-sm transition group-hover/img:opacity-100"
 				>
-					换图
+					Swap image
 				</button>
 				{onChange ? (
 					<p className="pointer-events-none absolute bottom-2 left-2 rounded-full bg-[#162b26]/55 px-2 py-0.5 text-[0.6rem] font-medium text-white/90 opacity-0 backdrop-blur-sm transition group-hover/img:opacity-100">
-						拖动平移 · 下方缩放
+						Drag to move · zoom below
 					</p>
 				) : null}
 			</div>
 			{onChange ? (
 				<div className="flex items-center gap-2 border-t border-black/[0.05] bg-white/70 px-3 py-2">
 					<span className="shrink-0 text-[0.62rem] font-semibold text-[#8A9692]">
-						缩放
+						Zoom
 					</span>
 					<input
 						type="range"
@@ -994,7 +991,7 @@ function LiveImage({
 						onClick={() => setFocus({ scale: 1, tx: 0, ty: 0 })}
 						className="shrink-0 rounded-full px-2 py-0.5 text-[0.62rem] font-semibold text-[#0F4C45]/70 hover:bg-[#0F4C45]/8 hover:text-[#0F4C45]"
 					>
-						复位
+						Reset
 					</button>
 				</div>
 			) : null}
@@ -1002,7 +999,7 @@ function LiveImage({
 				<LiveText
 					value={image.caption ?? ""}
 					onChange={onCaption}
-					placeholder="图片说明"
+					placeholder="Image caption"
 					className="px-3 py-2.5 text-center text-[0.74rem] text-[#8A9692]"
 				/>
 			) : image.caption ? (
@@ -1031,7 +1028,7 @@ function BlockRow({
 				type="button"
 				onClick={onRemove}
 				className="absolute -right-1 -top-1 z-[2] hidden h-6 w-6 items-center justify-center rounded-full bg-[#9b4a3c] text-[0.7rem] font-bold text-white shadow group-hover/block:flex"
-				title="删除这块"
+				title="Delete this block"
 			>
 				×
 			</button>
@@ -1083,7 +1080,7 @@ function BlockRow({
 						})
 					}
 					multiline
-					placeholder={"每行一项"}
+					placeholder={"One item per line"}
 					className="mt-4 text-[1rem] leading-8 text-[#333]"
 				/>
 			) : null}
@@ -1198,7 +1195,7 @@ export function StudioApp() {
 	const [doc, setDoc] = useState<BriefDoc>(() => {
 		const first = hydrateCatalog(null).items[0];
 		if (!first) {
-			return blankDoc("untitled", "未命名", "工作");
+			return blankDoc("untitled", "Untitled", "Work");
 		}
 		return loadDoc(first, structuredClone(seedBriefs) as BriefStore);
 	});
@@ -1337,7 +1334,7 @@ export function StudioApp() {
 	}, [doc]);
 
 	// Live briefs: the static JSON seed is a compile-time snapshot and can be
-	// stale (e.g. after 写入 from an earlier session). Load the saved store from
+	// stale (e.g. after Write from an earlier session). Load the saved store from
 	// disk on mount so edits start from the real data instead of clobbering it.
 	useEffect(() => {
 		let cancelled = false;
@@ -1401,7 +1398,7 @@ export function StudioApp() {
 
 	const addCatalogItem = useCallback((group: string) => {
 		const id = `custom_${Date.now().toString(36)}`;
-		const title = "未命名";
+		const title = "Untitled";
 		const entry: CatalogEntry = {
 			id,
 			title,
@@ -1422,7 +1419,7 @@ export function StudioApp() {
 		setStore((prev) => ({ ...prev, [id]: fresh }));
 		setActiveId(id);
 		setDoc(fresh);
-		setTip("已新增 · 中间改标题即可");
+		setTip("Added · rename it in the middle");
 		window.setTimeout(() => setTip(null), 2200);
 	}, []);
 
@@ -1436,7 +1433,7 @@ export function StudioApp() {
 				index,
 				wasHidden: entry.source !== "custom",
 			};
-			setUndoLabel(`已移除「${entry.title}」`);
+			setUndoLabel(`Removed「${entry.title}」`);
 			const next = catalog.filter((c) => c.id !== id);
 			setCatalog(next);
 			setStarredIds((s) => s.filter((x) => x !== id));
@@ -1474,7 +1471,7 @@ export function StudioApp() {
 		if (u.wasHidden) {
 			setHiddenIds((h) => h.filter((x) => x !== u.entry.id));
 		}
-		setTip("已撤销");
+		setTip("Undone");
 		window.setTimeout(() => setTip(null), 1600);
 	}, []);
 
@@ -1585,16 +1582,16 @@ export function StudioApp() {
 			const res = await fetch("/api/media/", { method: "POST", body: form });
 			const data = (await res.json()) as { path?: string; error?: string };
 			if (!res.ok || !data.path) {
-				throw new Error(data.error || "上传失败");
+				throw new Error(data.error || "Upload failed");
 			}
 			setExtraMedia((prev) =>
 				prev.includes(data.path!) ? prev : [data.path!, ...prev],
 			);
 			applyImage(data.path);
-			setTip("已从文件夹换上");
+			setTip("Swapped from folder");
 			window.setTimeout(() => setTip(null), 2000);
 		} catch (err) {
-			setTip(err instanceof Error ? err.message : "上传失败");
+			setTip(err instanceof Error ? err.message : "Upload failed");
 			window.setTimeout(() => setTip(null), 2800);
 		} finally {
 			setUploading(false);
@@ -1604,7 +1601,7 @@ export function StudioApp() {
 
 	const download = () => {
 		downloadJson({ ...store, [doc.id]: doc });
-		setTip("已下载 JSON · 也可点「写入」保存到磁盘");
+		setTip("Downloaded JSON · or press Write to save it to disk");
 		window.setTimeout(() => setTip(null), 2500);
 	};
 
@@ -1618,18 +1615,18 @@ export function StudioApp() {
 				body: JSON.stringify(payload),
 			});
 			const data = (await res.json()) as { path?: string; error?: string };
-			if (!res.ok) throw new Error(data.error || "写入失败");
+			if (!res.ok) throw new Error(data.error || "Write failed");
 			setStore(payload);
-			setTip(`已写入 ${data.path}`);
+			setTip(`Written ${data.path}`);
 		} catch (err) {
-			setTip(err instanceof Error ? err.message : "写入失败");
+			setTip(err instanceof Error ? err.message : "Write failed");
 		} finally {
 			setSaving(false);
 			window.setTimeout(() => setTip(null), 2500);
 		}
 	};
 
-	// 切换卡片：正文跟站点展台同步
+	// Switching cards: body copy syncs with the site stage
 	const switchCard = (id: string) => {
 		if (id === activeId) return;
 		const entry = catalog.find((c) => c.id === id);
@@ -1664,7 +1661,7 @@ export function StudioApp() {
 								: "text-[#0F4C45]/70 hover:text-[#0F4C45]"
 						}`}
 					>
-						详情
+						Details
 					</button>
 					<button
 						type="button"
@@ -1675,7 +1672,7 @@ export function StudioApp() {
 								: "text-[#0F4C45]/70 hover:text-[#0F4C45]"
 						}`}
 					>
-						版型
+						Layout
 					</button>
 					<button
 						type="button"
@@ -1686,7 +1683,7 @@ export function StudioApp() {
 								: "text-[#0F4C45]/70 hover:text-[#0F4C45]"
 						}`}
 					>
-						头像
+						Avatar
 					</button>
 				</div>
 
@@ -1697,10 +1694,10 @@ export function StudioApp() {
 						</span>
 					) : mode === "page" ? (
 						<span className="truncate text-[0.75rem] text-[#6A7A76]">
-							边预览边改 · 点文字出红框
+							Edit while previewing · click text for a red frame
 						</span>
 					) : (
-						<span className="truncate text-[0.75rem] text-[#6A7A76]">头像</span>
+						<span className="truncate text-[0.75rem] text-[#6A7A76]">Avatar</span>
 					)}
 				</div>
 
@@ -1710,10 +1707,10 @@ export function StudioApp() {
 							<div className="mr-0.5 hidden items-center gap-0.5 md:flex">
 								{(
 									[
-										["heading", "标题"],
-										["text", "正文"],
-										["image", "图"],
-										["duo", "双图"],
+										["heading", "Title"],
+										["text", "Body"],
+										["image", "Image"],
+										["duo", "Two images"],
 									] as const
 								).map(([type, label]) => (
 									<button
@@ -1731,7 +1728,7 @@ export function StudioApp() {
 								onClick={download}
 								className="rounded-full px-2.5 py-1 text-[0.7rem] font-semibold text-[#0F4C45] hover:bg-white/70"
 							>
-								下载
+								Download
 							</button>
 							<button
 								type="button"
@@ -1739,7 +1736,7 @@ export function StudioApp() {
 								onClick={() => void saveToDisk()}
 								className="rounded-full bg-[#043439] px-3 py-1 text-[0.7rem] font-semibold text-white disabled:opacity-60"
 							>
-								{saving ? "写入中…" : "写入"}
+								{saving ? "Writing…" : "Write"}
 							</button>
 						</>
 					) : mode === "avatar" ? (
@@ -1747,7 +1744,7 @@ export function StudioApp() {
 							<div className="flex items-center gap-0.5 rounded-full bg-white/70 p-0.5 ring-1 ring-[#0F4C45]/8">
 								{(
 									[
-										["home", "首页"],
+										["home", "Home"],
 										["introduce", "Introduce"],
 									] as const
 								).map(([id, label]) => (
@@ -1770,14 +1767,14 @@ export function StudioApp() {
 								onClick={() => avatarRef.current?.pickFile()}
 								className="rounded-full px-2.5 py-1 text-[0.7rem] font-semibold text-[#0F4C45] hover:bg-white/70"
 							>
-								上传
+								Upload
 							</button>
 							<button
 								type="button"
 								onClick={() => avatarRef.current?.save()}
 								className="rounded-full bg-[#043439] px-3 py-1 text-[0.7rem] font-semibold text-white"
 							>
-								保存
+								Save
 							</button>
 						</>
 					) : null}
@@ -1785,7 +1782,7 @@ export function StudioApp() {
 						href="/#home"
 						className="rounded-full px-2 py-1 text-[0.7rem] font-medium text-[#8A9692] hover:text-[#0F4C45]"
 					>
-						回站
+						Site
 					</Link>
 				</div>
 			</header>
@@ -1819,7 +1816,7 @@ export function StudioApp() {
 						/>
 					) : (
 						<p className="px-3 py-4 text-[0.74rem] leading-5 text-[#6A7A76]">
-							中间拖动调位置，右侧看首页圆形效果。
+							Drag in the middle to position; the home circle preview is on the right.
 						</p>
 					)}
 				</aside>
@@ -1858,10 +1855,10 @@ export function StudioApp() {
 											<div className="flex items-center justify-between px-3.5 py-2.5">
 												<div>
 													<p className="text-[0.62rem] font-semibold uppercase tracking-[0.2em] text-[#0F4C45]/45">
-														首页卡片图
+														Home card image
 													</p>
 													<p className="mt-0.5 text-[0.68rem] text-[#8A9692]">
-														Projects 舞台主图 · 与正文图片分开
+														Projects stage image · separate from body images
 													</p>
 												</div>
 												<button
@@ -1869,7 +1866,7 @@ export function StudioApp() {
 													onClick={() => setPickToken("meta::cardImage")}
 													className="rounded-full bg-white px-2.5 py-1 text-[0.68rem] font-semibold text-[#0F4C45] ring-1 ring-[#0F4C45]/12 transition hover:bg-[#043439] hover:text-white"
 												>
-													换图
+													Swap image
 												</button>
 											</div>
 											{doc.cardImage?.src ? (
@@ -1901,14 +1898,14 @@ export function StudioApp() {
 													onClick={() => setPickToken("meta::cardImage")}
 													className="flex aspect-[16/10] w-full items-center justify-center bg-[#EFE8DE] text-[0.8rem] font-semibold text-[#0F4C45]/55 transition hover:bg-[#E8E0D4]"
 												>
-													点击设置首页图
+													Click to set the home image
 												</button>
 											)}
 										</div>
 
 										<div className="mb-6 rounded-2xl bg-[#F7F1E8] p-3.5 ring-1 ring-[#0F4C45]/8">
 											<p className="text-[0.62rem] font-semibold uppercase tracking-[0.2em] text-[#0F4C45]/45">
-												标题 · 首页卡片显示
+												Title · shown on the home card
 											</p>
 											<LiveText
 												value={doc.title}
@@ -1916,7 +1913,7 @@ export function StudioApp() {
 													setDoc((p) => ({ ...p, title }))
 												}
 												className="mt-2 text-[1.5rem] font-extrabold tracking-tight text-[#162b26]"
-												placeholder="标题"
+												placeholder="Title"
 											/>
 											<LiveText
 												value={doc.subtitle ?? ""}
@@ -1924,7 +1921,7 @@ export function StudioApp() {
 													setDoc((p) => ({ ...p, subtitle }))
 												}
 												className="mt-1.5 text-[0.92rem] text-[#6A7A76]"
-												placeholder="副标题"
+												placeholder="Subtitle"
 											/>
 										</div>
 
@@ -1950,10 +1947,10 @@ export function StudioApp() {
 									<div className="mt-8 flex flex-wrap gap-1.5 md:hidden">
 										{(
 											[
-												["heading", "标题"],
-												["text", "正文"],
-												["image", "图"],
-												["duo", "双图"],
+												["heading", "Title"],
+												["text", "Body"],
+												["image", "Image"],
+												["duo", "Two images"],
 											] as const
 										).map(([type, label]) => (
 											<button
@@ -1979,7 +1976,7 @@ export function StudioApp() {
 						{mode === "avatar" ? (
 							<div className="flex flex-col items-center gap-3">
 								<p className="text-[0.6rem] font-semibold uppercase tracking-[0.2em] text-[#0F4C45]/40">
-									{avatarVariant === "introduce" ? "Introduce" : "首页"}
+									{avatarVariant === "introduce" ? "Introduce" : "Home"}
 								</p>
 								<div className="hero-avatar relative aspect-square w-[min(40vw,240px)]">
 									<div className="hero-avatar__frame relative h-full w-full overflow-hidden rounded-full shadow-[0_20px_48px_rgba(22,43,38,0.12)] ring-4 ring-white/70">
@@ -2003,10 +2000,10 @@ export function StudioApp() {
 							<div className="studio-preview-drawer flex max-h-[min(100%,48rem)] w-full max-w-[46rem] flex-col overflow-hidden">
 								<div className="flex shrink-0 items-center justify-between px-5 py-3">
 								<p className="text-[0.65rem] font-semibold uppercase tracking-[0.22em] text-[#0F4C45]/45">
-									站点预览
+									Site preview
 								</p>
 									<span className="text-[0.72rem] font-medium text-[#0F4C45]/30">
-										与 Projects 一致
+										Same as Projects
 									</span>
 								</div>
 								<div className="mx-4 mb-2 h-px bg-[#0F4C45]/[0.08]" />
@@ -2024,7 +2021,7 @@ export function StudioApp() {
 													/>
 												</div>
 												<figcaption className="px-3 py-2 text-center text-[0.62rem] font-medium tracking-[0.08em] text-[#8A9692]">
-													首页卡片
+													Home card
 												</figcaption>
 											</figure>
 										) : null}
@@ -2044,14 +2041,14 @@ export function StudioApp() {
 					<div className="flex max-h-[82vh] w-full max-w-md flex-col overflow-hidden rounded-t-2xl bg-[#F7F1E8] shadow-2xl sm:rounded-2xl">
 						<div className="flex items-center justify-between px-4 py-3">
 							<p className="text-[0.9rem] font-semibold text-[#0F4C45]">
-								{pickToken === "meta::cardImage" ? "换首页卡片图" : "换图"}
+								{pickToken === "meta::cardImage" ? "Swap home card image" : "Swap image"}
 							</p>
 							<button
 								type="button"
 								onClick={() => setPickToken(null)}
 								className="text-[0.78rem] font-semibold text-[#6A7A76]"
 							>
-								关闭
+								Close
 							</button>
 						</div>
 
@@ -2070,17 +2067,17 @@ export function StudioApp() {
 								onClick={() => filePickRef.current?.click()}
 								className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#043439] px-4 py-3 text-[0.86rem] font-semibold text-white disabled:opacity-60"
 							>
-								{uploading ? "上传中…" : "从文件夹选择"}
+								{uploading ? "Uploading…" : "Choose from folder"}
 							</button>
 							<p className="mt-2 text-center text-[0.7rem] text-[#8A9692]">
-								打开本机文件夹 · 不在图库里的图也能用
+								Opens a local folder · images outside the library work too
 							</p>
 						</div>
 
 						<div className="mx-4 mb-2 flex items-center gap-2">
 							<div className="h-px flex-1 bg-[#0F4C45]/10" />
 							<span className="text-[0.65rem] font-semibold tracking-[0.12em] text-[#9AA8A4]">
-								或从图库选
+								or pick from the library
 							</span>
 							<div className="h-px flex-1 bg-[#0F4C45]/10" />
 						</div>
@@ -2088,7 +2085,7 @@ export function StudioApp() {
 						<input
 							value={mediaQ}
 							onChange={(e) => setMediaQ(e.target.value)}
-							placeholder="搜索图库"
+							placeholder="Search the library"
 							className="mx-4 mb-2 rounded-xl border-0 bg-white px-3 py-2.5 text-[0.85rem] outline-none ring-1 ring-[#0F4C45]/10"
 						/>
 						<div className="grid grid-cols-3 gap-2 overflow-y-auto p-3 sm:grid-cols-4">
@@ -2121,7 +2118,7 @@ export function StudioApp() {
 						onClick={() => undoRemove()}
 						className="rounded-full bg-white/20 px-3 py-1 font-semibold text-white transition hover:bg-white/35"
 					>
-						撤销
+						Undo
 					</button>
 					<button
 						type="button"
@@ -2130,7 +2127,7 @@ export function StudioApp() {
 							setUndoLabel(null);
 						}}
 						className="rounded-full px-1.5 text-white/70 transition hover:text-white"
-						aria-label="关闭"
+						aria-label="Close"
 					>
 						×
 					</button>

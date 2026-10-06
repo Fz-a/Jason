@@ -66,9 +66,6 @@ function HelmetBlock({
 							<h2 className="text-[1.4rem] font-extrabold tracking-tight text-[#162b26] sm:text-[1.6rem]">
 								{block.title}
 							</h2>
-							<p className="mt-1 text-[0.8rem] tracking-[0.04em] text-[#6A7A76]">
-								{block.titleZh}
-							</p>
 						</div>
 					</div>
 
@@ -138,9 +135,6 @@ function DiyWallBlock({
 				<h2 className="mt-3 text-[1.5rem] font-extrabold tracking-tight text-[#162b26] sm:text-[1.8rem]">
 					{block.title}
 				</h2>
-				<p className="mt-1 text-[0.82rem] tracking-[0.04em] text-[#6A7A76]">
-					{block.titleZh}
-				</p>
 				<p className="mx-auto mt-4 max-w-[26rem] text-[0.9rem] leading-7 text-[#3E514D] sm:text-[0.94rem] sm:leading-8">
 					{block.lede}
 				</p>

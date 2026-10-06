@@ -36,7 +36,6 @@ export function InternshipBrief({
         <h2 className="mt-2 text-[1.55rem] font-extrabold tracking-tight text-[#111] sm:text-[1.75rem]">
           {item.company}
         </h2>
-        <p className="mt-1 text-[0.88rem] text-[#6A7A76]">{item.companyZh}</p>
       </div>
 
       <div className="px-6 pb-6 sm:px-10">
@@ -162,9 +161,6 @@ export function WorkInternships() {
               <h3 className="mt-1.5 text-[1.08rem] font-extrabold tracking-tight text-[#162b26]">
                 {item.company}
               </h3>
-              <p className="mt-0.5 text-[0.78rem] text-[#6A7A76]">
-                {item.companyZh}
-              </p>
               <p className="mt-3 text-[0.84rem] leading-6 text-[#3E514D]">
                 {item.summary}
               </p>

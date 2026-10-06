@@ -59,7 +59,7 @@ export function PageLayoutRoot({
 	layout: PageLayoutFile;
 	children: ReactNode;
 }) {
-	const overrides = layout.copy.en ?? {};
+	const overrides = layout.copy;
 	const elements = layout.elements ?? {};
 	return (
 		<CopyOverrideProvider overrides={overrides}>

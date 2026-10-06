@@ -65,7 +65,7 @@ export const projects: ProjectDetail[] = [
 		title: "University",
 		shortTitle: "University",
 		summary:
-			"Campus projects and campus departments — smart clothes, fire warning, Robotman, plus 国防教育教导队 and 无人机工作站.",
+			"Campus projects and campus departments — smart clothes, fire warning, Robotman, plus Defense Education Team and Drone Workstation.",
 		cardSummary:
 			"Three campus project briefs plus two departments: defense education cadre and drone workstation.",
 		cardImage: {
@@ -99,7 +99,7 @@ export const projects: ProjectDetail[] = [
 		title: "Society",
 		shortTitle: "Society",
 		summary:
-			"One continuous scroll — volunteering (certificate, service, 抗疫), Jia Lichuan’s Xinghuo HUBDAY, Chaihuo Fab Lab, then low-altitude UAV and robot exhibitions.",
+			"One continuous scroll — volunteering (certificate, service, Epidemic response), Jia Lichuan’s Xinghuo HUBDAY, Chaihuo Fab Lab, then low-altitude UAV and robot exhibitions.",
 		cardSummary:
 			"Volunteer service, Xinghuo & Chaihuo, low-altitude UAV and robot exhibitions — one Society scroll.",
 		cardImage: {

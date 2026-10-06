@@ -388,11 +388,11 @@ export const universityShowcases: UniversityShowcase[] = [
 	{
 		id: "robotman",
 		title: "Robotman Team",
-		subtitle: "萝卜丁 · Competitions · Lab builds · Pitches",
+		subtitle: "Robotman · Competitions · Lab builds · Pitches",
 		preview: [
 			"Lab builds and campus / Shaoguan pitches",
 			"Competition awards on the desk",
-			"Team model as the public face of 萝卜丁",
+			"Team model as the public face of Robotman",
 		],
 		cardImage: {
 			src: "/experience/university/robotman/team-model.webp",
@@ -404,7 +404,7 @@ export const universityShowcases: UniversityShowcase[] = [
 			{
 				type: "product-hero",
 				kicker: "01 · Team",
-				title: "Robotman · 萝卜丁",
+				title: "Robotman · Robotman",
 				subtitle:
 					"A campus engineering crew behind smart wearables, early fire warning, and competition demos.",
 				image: {
@@ -429,14 +429,14 @@ export const universityShowcases: UniversityShowcase[] = [
 				eyebrow: "03 · Identity",
 				heading: "The banner",
 				body: [
-					"ROBOT MAN · 萝卜丁 — the name we carry into contests and demos.",
+					"ROBOT MAN · Robotman — the name we carry into contests and demos.",
 				],
 				image: {
 					src: "/experience/university/robotman/robotman-banner.webp",
 					alt: "Robotman team holding the ROBOT MAN banner",
 					width: 1024,
 					height: 575,
-					caption: "Team banner — Robotman / 萝卜丁.",
+					caption: "Team banner — Robotman / Robotman.",
 				},
 				imageTone: "light",
 			},
@@ -506,7 +506,7 @@ export const universityProjectShowcases = universityShowcases;
 export const universityDepartmentShowcases: UniversityShowcase[] = [
 	{
 		id: "defense-education",
-		title: "国防教育教导队",
+		title: "Defense Education Team",
 		subtitle: "National Defense Education · Campus duty",
 		preview: [
 			"Organized campus service and drills",
@@ -515,7 +515,7 @@ export const universityDepartmentShowcases: UniversityShowcase[] = [
 		],
 		cardImage: {
 			src: "/experience/university/defense/team-group.webp",
-			alt: "国防教育教导队 group portrait on campus steps",
+			alt: "Defense Education Team group portrait on campus steps",
 			width: 1024,
 			height: 768,
 		},
@@ -523,12 +523,12 @@ export const universityDepartmentShowcases: UniversityShowcase[] = [
 			{
 				type: "product-hero",
 				kicker: "01 · Department",
-				title: "国防教育教导队",
+				title: "Defense Education Team",
 				subtitle:
 					"National Defense Education Teaching Team — campus duty, drills, and ceremony support with the cadre.",
 				image: {
 					src: "/experience/university/defense/team-group.webp",
-					alt: "国防教育教导队 full team with flag",
+					alt: "Defense Education Team full team with flag",
 					width: 1024,
 					height: 768,
 					caption: "Team portrait — campus steps",

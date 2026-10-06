@@ -155,7 +155,7 @@ export const AvatarEditor = forwardRef<AvatarEditorHandle, Props>(
 
 		const applyFile = (file: File) => {
 			if (!file.type.startsWith("image/")) {
-				flash("请选择图片文件（jpg / png / webp）");
+				flash("Choose an image file (jpg / png / webp)");
 				return;
 			}
 			const url = URL.createObjectURL(file);
@@ -179,10 +179,10 @@ export const AvatarEditor = forwardRef<AvatarEditorHandle, Props>(
 					1e6
 				).toFixed(1);
 				flash(
-					`已载入 ${probe.naturalWidth}×${probe.naturalHeight}（约 ${mp}MP）· 调好后点保存`,
+					`Loaded ${probe.naturalWidth}×${probe.naturalHeight} (~${mp}MPMP) · adjust, then press Save`,
 				);
 			};
-			probe.onerror = () => flash("图片无法读取，请换一张再试");
+			probe.onerror = () => flash("Image could not be read, try another");
 			probe.src = url;
 		};
 
@@ -296,7 +296,7 @@ export const AvatarEditor = forwardRef<AvatarEditorHandle, Props>(
 				};
 
 				if (!res.ok || !data.ok) {
-					flash(data.error ?? "保存失败，请确认本地 pnpm dev 正在运行");
+					flash(data.error ?? "Save failed — make sure the local pnpm dev is running");
 					return;
 				}
 
@@ -312,9 +312,9 @@ export const AvatarEditor = forwardRef<AvatarEditorHandle, Props>(
 				}
 				setUploadFile(null);
 				setFileName(null);
-				flash("已保存清晰头像，去刷新即可");
+				flash("High-res avatar saved — refresh to see it");
 			} catch {
-				flash("保存失败：开发服务器未开启或接口不可用");
+				flash("Save failed: dev server off or API unreachable");
 			} finally {
 				setSaving(false);
 			}
@@ -341,19 +341,19 @@ export const AvatarEditor = forwardRef<AvatarEditorHandle, Props>(
 				{!embedded ? (
 					<div className="text-center">
 						<h1 className="text-[1.25rem] font-extrabold tracking-tight text-[#162b26]">
-							头像
+							Avatar
 						</h1>
 						<p className="mt-1.5 text-[0.84rem] text-[#5A6B67]">
-							尽量上传原图/高清照片，保存后会自动导出清晰且体积小的网页头像
+							Upload the original or a hi-res photo — a sharp, small web avatar is exported on save
 						</p>
 					</div>
 				) : (
 					<div>
 						<h2 className="text-[1.05rem] font-extrabold text-[#162b26]">
-							编辑头像
+							Edit avatar
 						</h2>
 						<p className="mt-1 text-[0.78rem] text-[#6A7A76]">
-							拖动圆内画面 · 滚轮或下方按钮缩放
+							Drag inside the circle · scroll or use the buttons to zoom
 						</p>
 					</div>
 				)}
@@ -387,14 +387,14 @@ export const AvatarEditor = forwardRef<AvatarEditorHandle, Props>(
 						}`}
 					>
 						<span className="text-[0.95rem] font-bold text-[#0F4C45]">
-							{fileName ? "换一张图" : "点击选择图片"}
+							{fileName ? "Swap image" : "Click to choose an image"}
 						</span>
 						<span className="text-[0.78rem] text-[#6A7A76]">
-							或把照片拖到这里 · JPG / PNG
+							or drop a photo here · JPG / PNG
 						</span>
 						{fileName ? (
 							<span className="mt-1 max-w-full truncate rounded-full bg-[#0F4C45]/10 px-3 py-1 text-[0.72rem] font-medium text-[#0F4C45]">
-								当前：{fileName}
+								Current: {fileName}
 							</span>
 						) : null}
 					</button>
@@ -434,13 +434,13 @@ export const AvatarEditor = forwardRef<AvatarEditorHandle, Props>(
 						/>
 					</div>
 					<p className="text-[0.72rem] text-[#8A9692]">
-						{fileName ? `当前：${fileName}` : "可直接把图片拖到圆上"}
+						{fileName ? `Current: ${fileName}` : "Drop an image straight onto the circle"}
 					</p>
 				</div>
 
 				<div className="rounded-2xl border border-[#0F4C45]/10 bg-white/80 px-4 py-4">
 					<div className="flex items-center justify-between text-[0.78rem] font-semibold text-[#0F4C45]">
-						<span>缩放</span>
+						<span>Zoom</span>
 						<span>{settings.scale.toFixed(2)}×</span>
 					</div>
 					<input
@@ -467,21 +467,21 @@ export const AvatarEditor = forwardRef<AvatarEditorHandle, Props>(
 							onClick={() => nudge(-4, 0)}
 							className="rounded-full border border-[#0F4C45]/18 py-2 text-[0.8rem] font-semibold text-[#0F4C45]"
 						>
-							← 左移
+							← Left
 						</button>
 						<button
 							type="button"
 							onClick={() => nudge(0, -4)}
 							className="rounded-full border border-[#0F4C45]/18 py-2 text-[0.8rem] font-semibold text-[#0F4C45]"
 						>
-							↑ 上移
+							↑ Up
 						</button>
 						<button
 							type="button"
 							onClick={() => nudge(4, 0)}
 							className="rounded-full border border-[#0F4C45]/18 py-2 text-[0.8rem] font-semibold text-[#0F4C45]"
 						>
-							右移 →
+							Right →
 						</button>
 						<button
 							type="button"
@@ -497,14 +497,14 @@ export const AvatarEditor = forwardRef<AvatarEditorHandle, Props>(
 							}
 							className="rounded-full border border-[#0F4C45]/18 py-2 text-[0.8rem] font-semibold text-[#0F4C45]"
 						>
-							缩小
+							Zoom out
 						</button>
 						<button
 							type="button"
 							onClick={() => nudge(0, 4)}
 							className="rounded-full border border-[#0F4C45]/18 py-2 text-[0.8rem] font-semibold text-[#0F4C45]"
 						>
-							↓ 下移
+							↓ Down
 						</button>
 						<button
 							type="button"
@@ -520,7 +520,7 @@ export const AvatarEditor = forwardRef<AvatarEditorHandle, Props>(
 							}
 							className="rounded-full border border-[#0F4C45]/18 py-2 text-[0.8rem] font-semibold text-[#0F4C45]"
 						>
-							放大
+							Zoom in
 						</button>
 					</div>
 				</div>
@@ -533,7 +533,7 @@ export const AvatarEditor = forwardRef<AvatarEditorHandle, Props>(
 							onClick={() => void saveAll()}
 							className="w-full rounded-full bg-[#043439] py-3.5 text-[0.92rem] font-bold text-white disabled:opacity-60"
 						>
-							{saving ? "保存中…" : "保存"}
+							{saving ? "Saving…" : "Save"}
 						</button>
 						<button
 							type="button"
@@ -543,11 +543,11 @@ export const AvatarEditor = forwardRef<AvatarEditorHandle, Props>(
 								setPreviewSrc(next.source ?? next.src);
 								setUploadFile(null);
 								setFileName(null);
-								flash("已恢复");
+								flash("Restored");
 							}}
 							className="text-center text-[0.75rem] text-[#8A9692] underline-offset-2 hover:underline"
 						>
-							恢复站点当前头像
+							Restore the site's current avatar
 						</button>
 					</>
 				) : null}

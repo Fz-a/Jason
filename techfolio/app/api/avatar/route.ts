@@ -45,7 +45,7 @@ async function bakeDisplay(
 	const height = Math.min(dh - srcTop, size - dstTop);
 
 	if (width <= 0 || height <= 0) {
-		throw new Error("裁切区域无效，请调整位置后再保存");
+		throw new Error("Invalid crop area, adjust and save again");
 	}
 
 	const cropped = await sharp(resized)
@@ -88,7 +88,7 @@ async function makeSource(input: Buffer) {
 export async function POST(request: Request) {
 	if (process.env.NODE_ENV === "production") {
 		return NextResponse.json(
-			{ ok: false, error: "头像保存仅在本地开发模式可用" },
+			{ ok: false, error: "Avatar saving works in local dev only" },
 			{ status: 403 },
 		);
 	}
@@ -98,7 +98,7 @@ export async function POST(request: Request) {
 		const settingsRaw = form.get("settings");
 		if (typeof settingsRaw !== "string") {
 			return NextResponse.json(
-				{ ok: false, error: "缺少 settings" },
+				{ ok: false, error: "Missing settings" },
 				{ status: 400 },
 			);
 		}
@@ -144,7 +144,7 @@ export async function POST(request: Request) {
 
 		if (!inputBuf) {
 			return NextResponse.json(
-				{ ok: false, error: "找不到可处理的图片，请重新上传" },
+				{ ok: false, error: "No usable image found, re-upload" },
 				{ status: 400 },
 			);
 		}
@@ -181,7 +181,7 @@ export async function POST(request: Request) {
 			bytes: { display: displayBuf.length, source: sourceBuf.length },
 		});
 	} catch (error) {
-		const message = error instanceof Error ? error.message : "保存失败";
+		const message = error instanceof Error ? error.message : "Save failed";
 		return NextResponse.json({ ok: false, error: message }, { status: 500 });
 	}
 }

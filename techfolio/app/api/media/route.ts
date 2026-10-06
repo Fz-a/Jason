@@ -42,11 +42,11 @@ export async function POST(req: Request) {
 		const form = await req.formData();
 		const file = form.get("image");
 		if (!(file instanceof File) || file.size <= 0) {
-			return NextResponse.json({ error: "请选择图片文件" }, { status: 400 });
+			return NextResponse.json({ error: "Choose an image file" }, { status: 400 });
 		}
 		if (file.type && !ALLOWED.has(file.type)) {
 			return NextResponse.json(
-				{ error: "仅支持 JPG / PNG / WebP" },
+				{ error: "Only JPG / PNG / WebP" },
 				{ status: 400 },
 			);
 		}
@@ -88,7 +88,7 @@ export async function POST(req: Request) {
 
 		return NextResponse.json({ path: publicPath });
 	} catch (err) {
-		const message = err instanceof Error ? err.message : "上传失败";
+		const message = err instanceof Error ? err.message : "Upload failed";
 		return NextResponse.json({ error: message }, { status: 500 });
 	}
 }

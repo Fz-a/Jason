@@ -87,27 +87,7 @@ const SOCIETY_SECTION: Record<string, string> = {
 	exhibitions: "Society · Exhibit",
 };
 
-const SOCIETY_SECTION_ZH: Record<string, string> = {
-	robotman: "社会 · 团队",
-	"defense-education": "社会 · 部门",
-	"drone-workstation": "社会 · 部门",
-	"safe-campus-service": "社会 · 服务",
-	volunteering: "社会 · 志愿",
-	xinghuo: "社会 · 创客",
-	"maker-meetings": "社会 · 创客",
-	exhibitions: "社会 · 展览",
-};
 
-const SOCIETY_SECTION_ZH_HANT: Record<string, string> = {
-	robotman: "社會 · 團隊",
-	"defense-education": "社會 · 部門",
-	"drone-workstation": "社會 · 部門",
-	"safe-campus-service": "社會 · 服務",
-	volunteering: "社會 · 志願",
-	xinghuo: "社會 · 創客",
-	"maker-meetings": "社會 · 創客",
-	exhibitions: "社會 · 展覽",
-};
 
 const WORK_PRODUCT_IDS = new Set(["zongheng-robot", "rtk", "agv"]);
 
@@ -134,24 +114,9 @@ function cardId(card: HubCard) {
 	return "make-diy";
 }
 
-function cardMeta(
-	card: HubCard,
-	locale: "en" | "zh-Hans" | "zh-Hant",
-): CardMeta {
-	const isZh = locale !== "en";
-	const sectionZh =
-		locale === "zh-Hant" ? SOCIETY_SECTION_ZH_HANT : SOCIETY_SECTION_ZH;
-
+function cardMeta(card: HubCard): CardMeta {
 	switch (card.kind) {
 		case "showcase": {
-			const section = isZh
-				? WORK_PRODUCT_IDS.has(card.item.id)
-					? locale === "zh-Hant"
-						? "工作 · 產品"
-						: "工作 · 产品"
-					: (sectionZh[card.item.id] ??
-						(locale === "zh-Hant" ? "社會" : "社会"))
-				: card.section;
 			const cover = overrideCardImage(card.item.id);
 			return {
 				title: card.item.title,
@@ -167,7 +132,7 @@ function cardMeta(
 							ty: cover.ty,
 						}
 					: card.item.cardImage,
-				kindLabel: section,
+				kindLabel: card.section,
 			};
 		}
 		case "company": {
@@ -183,33 +148,19 @@ function cardMeta(
 						ty: cover.ty,
 					}
 				: card.item.image;
-			return isZh
-				? {
-						title: card.item.companyZh,
-						subtitle: card.item.company,
-						image,
-						kindLabel:
-							card.item.role === "Full-time"
-								? locale === "zh-Hant"
-									? "全職"
-									: "全职"
-								: locale === "zh-Hant"
-									? "實習"
-									: "实习",
-					}
-				: {
-						title: card.item.company,
-						subtitle: card.item.companyZh,
-						image,
-						kindLabel: card.item.role,
-					};
+			return {
+				title: card.item.company,
+				subtitle: card.item.company,
+				image,
+				kindLabel: card.item.role,
+			};
 		}
 		case "helmet": {
 			const cover = overrideCardImage("smart-helmet");
 			const fallback = card.item.images[0];
 			return {
-				title: isZh ? card.item.titleZh : card.item.title,
-				subtitle: isZh ? card.item.title : card.item.titleZh,
+				title: card.item.title,
+				subtitle: card.item.title,
 				image: cover
 					? {
 							src: cover.src,
@@ -221,45 +172,22 @@ function cardMeta(
 							ty: cover.ty,
 						}
 					: fallback,
-				kindLabel:
-					locale === "zh-Hant"
-						? "造物 · 創業"
-						: locale === "zh-Hans"
-							? "造物 · 创业"
-							: "MAKE · Venture",
+				kindLabel: "MAKE · Venture",
 			};
 		}
 		case "diy":
 			return {
 				title: "DIY",
-				subtitle: isZh
-					? `${card.item.items.length} 件桌面造物`
-					: `${card.item.items.length} desk builds`,
+				subtitle: `${card.item.items.length} desk builds`,
 				image: card.item.items[0]?.image,
-				kindLabel:
-					locale === "zh-Hant"
-						? "造物 · 工作台"
-						: locale === "zh-Hans"
-							? "造物 · 工作台"
-							: "MAKE · Bench",
+				kindLabel: "MAKE · Bench",
 			};
 		case "depts":
 			return {
-				title: isZh
-					? locale === "zh-Hant"
-						? "校園部門"
-						: "校园部门"
-					: "Campus Depts",
-				subtitle: isZh
-					? "国防教育教导队 · 无人机工作站"
-					: "Defense education · Drone workstation",
+				title: "Campus Depts",
+				subtitle: "Defense education · Drone workstation",
 				image: card.items[0]?.cardImage,
-				kindLabel:
-					locale === "zh-Hant"
-						? "社會 · 部門"
-						: locale === "zh-Hans"
-							? "社会 · 部门"
-							: "Society · Dept",
+				kindLabel: "Society · Dept",
 			};
 	}
 }
@@ -577,8 +505,7 @@ function BeatRow({
 	reducedMotion: boolean;
 	onCommit: () => void;
 }) {
-	const { locale } = useLocale();
-	const meta = cardMeta(beat.card, locale);
+	const meta = cardMeta(beat.card);
 	const { ref, seen } = useInViewOnce(!reducedMotion);
 
 	const moment = (align: "left" | "right") => (
@@ -844,7 +771,6 @@ function HelmetBrief({ item }: { item: HelmetBlock }) {
 			<h3 className="mt-4 text-[1.6rem] font-extrabold tracking-tight text-[#162b26] sm:text-[1.7rem]">
 				{item.title}
 			</h3>
-			<p className="mt-1.5 text-[0.95rem] text-[#6A7A76]">{item.titleZh}</p>
 			<p className="mt-5 max-w-[36rem] text-[1.02rem] font-medium leading-8 text-[#0F4C45]">
 				{item.pull}
 			</p>
@@ -941,7 +867,6 @@ function DiyBrief({ item }: { item: DiyWallBlock }) {
 			<h3 className="mt-4 text-[1.6rem] font-extrabold tracking-tight text-[#162b26] sm:text-[1.7rem]">
 				{item.title}
 			</h3>
-			<p className="mt-1.5 text-[0.95rem] text-[#6A7A76]">{item.titleZh}</p>
 			<p className="mt-4 text-[0.95rem] leading-7 text-[#333]">
 				{item.items.length} builds from the same desk — a compact wall, not a
 				long scroll.
@@ -963,7 +888,7 @@ function DiyBrief({ item }: { item: DiyWallBlock }) {
 						</div>
 						<figcaption className="px-2 py-2">
 							<p className="truncate text-[0.72rem] font-semibold tracking-tight text-[#162b26]">
-								{diy.titleZh}
+								{diy.title}
 							</p>
 							<p className="mt-0.5 truncate font-mono text-[0.58rem] tracking-[0.12em] text-[#8A9692]">
 								{diy.year}
@@ -985,9 +910,6 @@ function DeptsBrief({ items }: { items: UniversityShowcase[] }) {
 			<h3 className="mt-4 text-[1.6rem] font-extrabold tracking-tight text-[#162b26] sm:text-[1.7rem]">
 				Campus Departments
 			</h3>
-			<p className="mt-1.5 text-[0.95rem] text-[#6A7A76]">
-				国防教育教导队 · 无人机工作站
-			</p>
 			<p className="mt-4 text-[0.95rem] leading-7 text-[#0F4C45]">
 				Two campus posts in one brief — defense education duty, then the drone
 				workstation.

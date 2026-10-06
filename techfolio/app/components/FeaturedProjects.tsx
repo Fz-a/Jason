@@ -92,7 +92,7 @@ function firstSpreadBlurb(
 	return parts.length ? parts.join(" ") : undefined;
 }
 
-function buildCatalog(isZh: boolean, t: (k: string) => string): NavItem[] {
+function buildCatalog(t: (k: string) => string): NavItem[] {
 	const workById = new Map(workShowcases.map((s) => [s.id, s]));
 	const uniById = new Map(universityProjectShowcases.map((s) => [s.id, s]));
 	const societyById = new Map(societyShowcases.map((s) => [s.id, s]));
@@ -146,14 +146,14 @@ function buildCatalog(isZh: boolean, t: (k: string) => string): NavItem[] {
 			items.push({
 				key: c.id,
 				id: c.id,
-				label: isZh ? c.companyZh : c.company,
+				label: c.company,
 				section: c.role,
 				imageSrc: cover?.src ?? c.image.src,
 				imageAlt: cover?.alt || c.image.alt,
 				imageScale: cover?.scale,
 				imageTx: cover?.tx,
 				imageTy: cover?.ty,
-				subtitle: isZh ? c.company : c.companyZh,
+				subtitle: c.company,
 				summary: c.brief?.[0] ? `${c.summary} ${c.brief[0]}` : c.summary,
 				body: [...c.brief],
 				kind: "company",
@@ -168,7 +168,7 @@ function buildCatalog(isZh: boolean, t: (k: string) => string): NavItem[] {
 			items.push({
 				key: "smart-helmet",
 				id: "smart-helmet",
-				label: isZh ? helmet.titleZh : helmet.title,
+				label: helmet.title,
 				section: "MAKE",
 				imageSrc:
 					hCover?.src ??
@@ -178,7 +178,7 @@ function buildCatalog(isZh: boolean, t: (k: string) => string): NavItem[] {
 				imageScale: hCover?.scale,
 				imageTx: hCover?.tx,
 				imageTy: hCover?.ty,
-				subtitle: isZh ? helmet.title : helmet.titleZh,
+				subtitle: helmet.title,
 				summary: helmet.pull,
 				pull: helmet.pull,
 				body: helmet.body,
@@ -198,7 +198,7 @@ function buildCatalog(isZh: boolean, t: (k: string) => string): NavItem[] {
 			items.push({
 				key: "diy-wall",
 				id: "diy-wall",
-				label: isZh ? diyWall.titleZh : diyWall.title,
+				label: diyWall.title,
 				section: "MAKE · DIY",
 				imageSrc:
 					dCover?.src ??
@@ -210,7 +210,7 @@ function buildCatalog(isZh: boolean, t: (k: string) => string): NavItem[] {
 				imageScale: dCover?.scale,
 				imageTx: dCover?.tx,
 				imageTy: dCover?.ty,
-				subtitle: isZh ? diyWall.title : diyWall.titleZh,
+				subtitle: diyWall.title,
 				summary: t("core.diy.lede"),
 				diyItems: [...diyWall.items],
 				kind: "diy",
@@ -225,11 +225,9 @@ function buildCatalog(isZh: boolean, t: (k: string) => string): NavItem[] {
 
 function DiyGrid({
 	items,
-	isZh,
 	onOpen,
 }: {
 	items: MakeDiyItem[];
-	isZh: boolean;
 	onOpen: (item: MakeDiyItem) => void;
 }) {
 	return (
@@ -252,7 +250,7 @@ function DiyGrid({
 					</div>
 					<div className="px-2 py-2 sm:px-2.5">
 						<p className="truncate text-[0.7rem] font-semibold tracking-tight text-[#162b26]">
-							{isZh ? diy.titleZh : diy.title}
+							{diy.title}
 						</p>
 						<p className="mt-0.5 font-mono text-[0.56rem] tracking-[0.1em] text-[#0F4C45]/40">
 							{diy.year}
@@ -324,11 +322,11 @@ function SpotlightCard({
 }
 
 export function FeaturedProjects() {
-	const { t, isZh } = useLocale();
+	const { t } = useLocale();
 	const sectionRef = useRef<HTMLElement>(null);
 	const trackRef = useRef<HTMLDivElement>(null);
 	const spotlightRef = useRef<HTMLDivElement>(null);
-	const catalog = useMemo(() => buildCatalog(isZh, t), [isZh, t]);
+	const catalog = useMemo(() => buildCatalog(t), [t]);
 	const [selectedId, setSelectedId] = useState<string>(
 		() => catalog[0]?.id ?? "rtk",
 	);
@@ -769,7 +767,6 @@ export function FeaturedProjects() {
 									<div className="mt-6">
 										<DiyGrid
 											items={selected.diyItems}
-											isZh={isZh}
 											onOpen={setDiyFocus}
 										/>
 									</div>
@@ -816,10 +813,10 @@ export function FeaturedProjects() {
 						</div>
 						<div className="px-5 py-4">
 							<p className="text-[1.05rem] font-extrabold tracking-tight text-[#162b26]">
-								{isZh ? diyFocus.titleZh : diyFocus.title}
+								{diyFocus.title}
 							</p>
 							<p className="mt-1 text-[0.85rem] text-[#4A5C58]">
-								{isZh ? diyFocus.title : diyFocus.titleZh}
+								{diyFocus.title}
 							</p>
 						</div>
 					</div>
