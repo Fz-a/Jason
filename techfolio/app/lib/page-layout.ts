@@ -4,6 +4,7 @@ export const PAGE_SECTION_IDS = [
 	"about",
 	"agenda",
 	"experience",
+	"projects",
 	"research",
 	"goal",
 	"next",
@@ -73,6 +74,16 @@ export const PAGE_SECTIONS: PageSectionMeta[] = [
 		id: "experience",
 		label: "Projects",
 		hint: "Project wall (detail data)",
+		fields: [
+			{ key: "core.kicker", label: "Kicker", role: "label" },
+			{ key: "core.title", label: "Heading", role: "display" },
+			{ key: "core.blurb", label: "Caption", multiline: true, role: "body" },
+		],
+	},
+	{
+		id: "projects",
+		label: "Projects Rail",
+		hint: "Project wall — same rail as /Introduce",
 		fields: [
 			{ key: "core.kicker", label: "Kicker", role: "label" },
 			{ key: "core.title", label: "Heading", role: "display" },

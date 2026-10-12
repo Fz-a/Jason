@@ -17,7 +17,6 @@ import { GoalSection } from "./GoalSection";
 import { ResearchSection } from "./ResearchSection";
 import { ResearchFitNext } from "./ResearchFitNext";
 import { ContactSection, CONTACT_EMAIL, SOCIAL_LINKS } from "./ContactSection";
-import { StoryProgress, STORY_STAGES } from "./StoryProgress";
 import { useLocale } from "../lib/i18n";
 import {
 	PageSectionFrame,
@@ -37,7 +36,8 @@ const lora = Lora({
 	display: "swap",
 });
 
-const STORY_IDS = STORY_STAGES.map((s) => s.id);
+// Number-key jump targets (1–4) for the deck's story stages.
+const STORY_IDS = ["experience", "research", "goal", "next"] as const;
 
 const STUDIO_TAP_COUNT = 5;
 const STUDIO_TAP_WINDOW_MS = 1400;
@@ -89,15 +89,6 @@ export function PortfolioDeck({
 	useEffect(() => {
 		activeSectionRef.current = activeSection;
 	}, [activeSection]);
-
-	const storyProgressId = STORY_IDS.includes(
-		activeSection as (typeof STORY_IDS)[number],
-	)
-		? activeSection
-		: "";
-
-	// The story rail only makes sense when every stage is on the page.
-	const showStory = STORY_IDS.every((id) => sectionOrder.includes(id));
 
 	// Only the feature deck links out; the compact deck keeps contact in place.
 	const contactHref = contactVariant === "feature" ? "/contact/" : "#contact";
@@ -165,9 +156,13 @@ export function PortfolioDeck({
 				return;
 			}
 
+			// offsetTop is relative to the offsetParent, and every section is
+			// wrapped in a .page-section-frame — so it reads 0 for all of them.
+			// Measure against the document instead.
 			let current = sections[0]?.id ?? "home";
 			for (const section of sections) {
-				if (section.offsetTop <= scrollMarker) current = section.id;
+				const docTop = section.getBoundingClientRect().top + window.scrollY;
+				if (docTop <= scrollMarker) current = section.id;
 			}
 			setActiveSection(current);
 		};
@@ -417,6 +412,8 @@ export function PortfolioDeck({
 			) : (
 				<FeaturedProjectsRail />
 			);
+		case "projects":
+			return <FeaturedProjectsRail sectionId="projects" />;
 			case "research":
 				return <ResearchSection />;
 			case "goal":
@@ -488,13 +485,6 @@ export function PortfolioDeck({
 			>
 				<CornerNav mode={cornerNav} />
 			</div>
-
-			{showStory ? (
-				<StoryProgress
-					activeId={storyProgressId}
-					onNavigate={scrollToSection}
-				/>
-			) : null}
 
 			{sectionOrder.map((id) => (
 				<PageSectionFrame key={id} id={id} layout={pageLayout}>

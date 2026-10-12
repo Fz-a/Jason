@@ -105,6 +105,8 @@ function SectionPreview({ id }: { id: PageSectionId }) {
 			return <AgendaSection onNavigate={() => {}} />;
 		case "experience":
 			return <PreviewExperience />;
+		case "projects":
+			return <PreviewExperience />;
 		case "research":
 			return <ResearchSection />;
 		case "goal":

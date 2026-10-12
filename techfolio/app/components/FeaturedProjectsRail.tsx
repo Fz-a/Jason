@@ -343,7 +343,13 @@ function DiyCollagePreview({ items }: { items: MakeDiyItem[] }) {
 	);
 }
 
-export function FeaturedProjectsRail() {
+export function FeaturedProjectsRail({
+	/** DOM id for this slide. On /Introduce it is the "experience" section;
+	 *  on the homepage it is its own "projects" page after the CLI. */
+	sectionId = "experience",
+}: {
+	sectionId?: string;
+} = {}) {
 	const { t } = useLocale();
 	const sectionRef = useRef<HTMLElement>(null);
 	const [briefs, setBriefs] = useState<BriefStore>(() => BRIEF_OVERRIDES);
@@ -484,7 +490,7 @@ export function FeaturedProjectsRail() {
 	return (
 		<section
 			ref={sectionRef}
-			id="experience"
+			id={sectionId}
 			className="story-slide relative bg-[#F7F1E8]"
 		>
 			<aside
