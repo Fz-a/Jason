@@ -2,50 +2,45 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { isGateUnlocked, tryUnlockGate } from "../lib/gate";
+import { isGateUnlocked } from "../lib/gate";
+import { GatePrompt } from "./GatePrompt";
 
 type CornerNavMode = "menu" | "back";
 
 const MENU_ITEMS = [
 	{ label: "Jupyter", href: "/py/" },
 	{ label: "Introduce", href: "/Introduce/" },
+	{ label: "Low-altitude", href: "/low-altitude/index.html" },
 	{ label: "Studio", href: "/studio/" },
 ] as const;
 
 /**
  * Small circle pinned to the top-right corner. Hovering expands it:
- * - "menu" (homepage): Jupyter / Introduce / Studio, each gated by password
+ * - "menu" (homepage): Jupyter / Introduce / Low-altitude / Studio, each gated by password
  * - "back" (inner pages): a "Back" link in the same spot
  */
 export function CornerNav({ mode }: { mode: CornerNavMode }) {
 	const router = useRouter();
 	const [askPasswordFor, setAskPasswordFor] = useState<string | null>(null);
-	const [input, setInput] = useState("");
-	const [error, setError] = useState(false);
 	// Touch devices have no hover — also open on tap.
 	const [open, setOpen] = useState(false);
+
+	function navigate(href: string) {
+		// Static HTML lives outside the App Router — a full page load is safer.
+		if (href.endsWith(".html")) {
+			window.location.assign(href);
+		} else {
+			router.push(href);
+		}
+	}
 
 	function go(href: string) {
 		if (isGateUnlocked()) {
 			setOpen(false);
-			router.push(href);
+			navigate(href);
 		} else {
 			setOpen(false);
-			setInput("");
-			setError(false);
 			setAskPasswordFor(href);
-		}
-	}
-
-	function submitPassword(e: React.FormEvent) {
-		e.preventDefault();
-		if (tryUnlockGate(input) && askPasswordFor) {
-			const href = askPasswordFor;
-			setAskPasswordFor(null);
-			router.push(href);
-		} else {
-			setError(true);
-			setInput("");
 		}
 	}
 
@@ -128,46 +123,15 @@ export function CornerNav({ mode }: { mode: CornerNavMode }) {
 			</div>
 
 			{/* password modal */}
-			{askPasswordFor ? (
-				<div
-					className="fixed inset-0 z-[60] flex items-center justify-center bg-[#0F2A24]/50 px-4 backdrop-blur-sm"
-					onClick={() => setAskPasswordFor(null)}
-				>
-					<form
-						onSubmit={submitPassword}
-						onClick={(e) => e.stopPropagation()}
-						className="w-full max-w-xs rounded-2xl bg-white p-7 shadow-2xl"
-					>
-						<p className="text-[0.66rem] font-semibold uppercase tracking-[0.28em] text-[#0F4C45]/60">
-							Password required
-						</p>
-						<input
-							type="password"
-							autoFocus
-							value={input}
-							onChange={(e) => {
-								setInput(e.target.value);
-								setError(false);
-							}}
-							placeholder="Enter password"
-							className={`mt-4 w-full rounded-lg border px-3.5 py-2.5 text-sm outline-none transition-colors ${
-								error
-									? "border-red-400 bg-red-50"
-									: "border-[#162b26]/15 focus:border-[#0F4C45]"
-							}`}
-						/>
-						{error ? (
-							<p className="mt-2 text-xs text-red-500">Wrong password, try again</p>
-						) : null}
-						<button
-							type="submit"
-							className="mt-4 w-full rounded-lg bg-[#0F4C45] py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
-						>
-							Enter
-						</button>
-					</form>
-				</div>
-			) : null}
+			<GatePrompt
+				open={askPasswordFor !== null}
+				onClose={() => setAskPasswordFor(null)}
+				onSuccess={() => {
+					const href = askPasswordFor;
+					setAskPasswordFor(null);
+					if (href) navigate(href);
+				}}
+			/>
 		</>
 	);
 }

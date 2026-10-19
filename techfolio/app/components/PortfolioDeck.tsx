@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { HomeScrollPreloader } from "./HomeScrollPreloader";
 import { CornerNav } from "./CornerNav";
+import { GatePrompt } from "./GatePrompt";
 import { HeroNameFlip } from "./HeroNameFlip";
 import { FeaturedProjectsRail } from "./FeaturedProjectsRail";
 import { TerminalSection } from "./terminal/TerminalSection";
@@ -18,6 +19,7 @@ import { ResearchSection } from "./ResearchSection";
 import { ResearchFitNext } from "./ResearchFitNext";
 import { ContactSection, CONTACT_EMAIL, SOCIAL_LINKS } from "./ContactSection";
 import { useLocale } from "../lib/i18n";
+import { isGateUnlocked } from "../lib/gate";
 import {
 	PageSectionFrame,
 	orderedVisible,
@@ -78,6 +80,7 @@ export function PortfolioDeck({
 		(id) => id !== "home" && id !== "contact",
 	);
 	const [activeSection, setActiveSection] = useState("home");
+	const [lowAltGateOpen, setLowAltGateOpen] = useState(false);
 	const scrollCueRef = useRef<HTMLAnchorElement>(null);
 	const cueDotRef = useRef<HTMLSpanElement>(null);
 	const cueTextRef = useRef<HTMLSpanElement>(null);
@@ -363,6 +366,18 @@ export function PortfolioDeck({
 								>
 									{t("hero.contact")}
 								</Link>
+								<Link
+									href="/low-altitude/index.html"
+									onClick={(event) => {
+										if (!isGateUnlocked()) {
+											event.preventDefault();
+											setLowAltGateOpen(true);
+										}
+									}}
+									className="cursor-pointer rounded-full border border-[#0F4C45]/25 px-6 py-2.5 text-sm font-semibold text-[#0F4C45] transition hover:border-[#0F4C45]/50 hover:bg-[#0F4C45]/5"
+								>
+									Competition ↗
+								</Link>
 							</div>
 								</div>
 
@@ -485,6 +500,15 @@ export function PortfolioDeck({
 			>
 				<CornerNav mode={cornerNav} />
 			</div>
+
+			<GatePrompt
+				open={lowAltGateOpen}
+				onClose={() => setLowAltGateOpen(false)}
+				onSuccess={() => {
+					setLowAltGateOpen(false);
+					window.location.assign("/low-altitude/index.html");
+				}}
+			/>
 
 			{sectionOrder.map((id) => (
 				<PageSectionFrame key={id} id={id} layout={pageLayout}>
