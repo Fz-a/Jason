@@ -314,6 +314,20 @@
   .verdict{margin-top:auto;padding:8px 10px;background:rgba(221,231,222,.5);border-left:2px solid var(--forest);font-size:10.5px;line-height:1.5;color:var(--deep)}
   .verdict b{color:var(--forest);margin-right:5px}
 
+  /* ---------- 07 published projects ---------- */
+  .p7grid{flex:1;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;min-height:0;position:relative;z-index:1}
+  .p7col{padding:14px 16px;border-radius:14px;overflow:hidden}
+  .p7col .nhead{margin-bottom:8px;padding-bottom:7px;gap:7px}
+  .p7col .nhead b{font-size:8.6px;letter-spacing:.06em;padding:1px 5px;border:1px solid rgba(15,76,69,.25);border-radius:4px}
+  .p7col .nhead h2{font-size:12.5px}
+  .p7col .nhead em{font-size:9px}
+  .plist7{flex:1;display:flex;flex-direction:column;justify-content:flex-start;min-height:0}
+  .plist7 li{display:flex;gap:6px;padding:5px 0;border-top:1px solid var(--line-soft);font-size:10.2px;line-height:1.38;color:var(--body);word-break:break-word}
+  .plist7 li:first-child{border-top:0;padding-top:0}
+  .plist7 li span{flex:none;width:15px;font-size:8.4px;letter-spacing:.04em;color:var(--forest);padding-top:2px}
+  .p7note{margin-top:10px;font-size:9.2px;line-height:1.55;color:var(--muted)}
+  .p7note b{color:var(--forest);margin-right:5px}
+
   /* ---------- snap & responsive ---------- */
   @media (min-width:1024px){
     html{scroll-snap-type:y mandatory}
@@ -341,6 +355,9 @@
     .pain2{gap:11px}
     .mrow{padding:7px 0}
     .cmp td{padding:6px 8px 6px 0}
+    .p7col{padding:11px 13px}
+    .plist7 li{font-size:9.4px;padding:3px 0}
+    .p7note{font-size:8.6px;margin-top:7px}
   }
   @media (max-width:1023px){
     html{scroll-snap-type:y proximity}
@@ -351,6 +368,7 @@
     .grid4{grid-template-columns:1fr;grid-template-rows:none;gap:12px}
     .grid4 .card{min-height:0}
     .techbody{grid-template-columns:1fr;gap:14px}
+    .p7grid{grid-template-columns:1fr 1fr}
     .scene,.pain,.comp,.solution,.data,.tech,.compare,.team,.matrix-card,.rules-card,.plan-card{grid-column:1/-1}
     .card{min-height:0}
     .phead{flex-direction:column;align-items:flex-start;gap:8px}
@@ -389,6 +407,7 @@
     .scene2{grid-template-columns:1fr;gap:12px}
     .nhead h2{font-size:14px}
     .techbody{grid-template-columns:1fr}
+    .p7grid{grid-template-columns:1fr}
     table.cmp{font-size:9.8px}
   }
   @media (prefers-reduced-motion:reduce){
@@ -412,6 +431,7 @@
       <a href="#p4" data-nav="p4"><b>04</b><span>养老补给</span></a>
       <a href="#p5" data-nav="p5"><b>05</b><span>医疗接驳</span></a>
       <a href="#p6" data-nav="p6"><b>06</b><span>比赛</span></a>
+      <a href="#p7" data-nav="p7"><b>07</b><span>项目</span></a>
     </nav>
     <a class="home" href="/">首页 ↗</a>
     <div class="bar" aria-hidden="true"><i id="progress"></i></div>
@@ -850,6 +870,97 @@
         <div class="gate-item"><b>卡点</b><span>校赛推荐名额 · 空域合规 · 报名截止时间</span></div>
       </section>
     </div>
+  </div>
+</section>
+
+<!-- 07 -->
+<section class="page" id="p7" data-num="07">
+  <div class="wrap">
+    <div class="phead">
+      <div>
+        <p class="kicker"><b>07</b><i></i>公开信息 · 已参赛项目</p>
+        <h1>真实参赛项目清单<span class="status">55 项</span></h1>
+      </div>
+      <p class="thesis">先看别人怎么做，再决定自己做什么。</p>
+    </div>
+    <div class="p7grid">
+      <section class="card p7col">
+        <div class="nhead"><b>A</b><h2>安全 · 监管 · 通信</h2><em>15 项</em></div>
+        <ol class="plist7">
+          <li><span>01</span>天翼星盾·绽放全运：基于5G-A多源融合的低空安防解决方案</li>
+          <li><span>02</span>鹏空智驭——北斗+5G+卫星融合低空试验场数字空域服务体系</li>
+          <li><span>03</span>5G-A通感筑防：全域感知织天网，低空守护保要地</li>
+          <li><span>04</span>5G-A助力构建南山区低空多模态协同感知体系</li>
+          <li><span>05</span>深圳市龙岗区“一网统飞”创新无人机应用模式，探索超大城市治理新路径</li>
+          <li><span>06</span>5G-A通感算智融合赋能成都低空监管——兴隆湖与二三环城市立体感知标杆</li>
+          <li><span>07</span>5G空天鹰眼全域低空智治一体化平台</li>
+          <li><span>08</span>驭空而行——萧山5G低空政务无人机精细化治理创新实践</li>
+          <li><span>09</span>“浙海智飞”陆海空天一体化监管服务平台</li>
+          <li><span>10</span>政云融通全域低空空域，5G数智领航飞行管控</li>
+          <li><span>11</span>5G赋能常熟低空一张网共享服务平台</li>
+          <li><span>12</span>构建AI+量子安全底座，打造龙江低空监管融合示范项目群</li>
+          <li><span>13</span>低空产业5G-A全域数字运营平台</li>
+          <li><span>14</span>低空智航，共筑医网——5G+无人机赋能基层医共体资源共享</li>
+          <li><span>15</span>空域智枢：5G-A空地融合低空全域管控与无人机协同调度新生态</li>
+        </ol>
+      </section>
+      <section class="card p7col">
+        <div class="nhead"><b>B</b><h2>巡检 · 治理 · 运维</h2><em>15 项</em></div>
+        <ol class="plist7">
+          <li><span>16</span>5G-A领航低空巡检筑牢电网安全防线</li>
+          <li><span>17</span>“云翼智巡·慧眼识江”——5G+AI双擎驱动，赋能内河海事监管</li>
+          <li><span>18</span>热网空巡——5G筑基础，6G拓长空，空天地融合网络赋能无人机长输热网协同巡检项目</li>
+          <li><span>19</span>基于5G-A通感一体与AI智能决策的城市基础设施“一网统飞”低空巡检平台</li>
+          <li><span>20</span>5G-AI+多模态融合监测一体化技术赋能分布式光伏智慧巡检</li>
+          <li><span>21</span>全球鹰5G查违系统项目</li>
+          <li><span>22</span>凌空瞰楼，数中生智，5G筑底开启房安智治新局</li>
+          <li><span>23</span>5G-A通感一体——大别云翼：老区全域自然灾害低空应急救援体系</li>
+          <li><span>24</span>5G+AI智慧物流助力小漠港物流系统提质增效</li>
+          <li><span>25</span>5G空地一体重构智慧水务新范式—济南水务低空巡检应用示范项目</li>
+          <li><span>26</span>驭数飞行，5G-A赋能无人机警务融合实战体系</li>
+          <li><span>27</span>5G-A通感融合驱动车控一体变革—低空试验基地创新实践</li>
+          <li><span>28</span>5G-A低空新基建与智慧空域管理</li>
+          <li><span>29</span>5G+AI赋能城市治理：合肥市低空政务“一网统飞”应用</li>
+          <li><span>30</span>科技兴警，空域哨兵：5G网联无人机赋能智慧执法新模式</li>
+        </ol>
+      </section>
+      <section class="card p7col">
+        <div class="nhead"><b>C</b><h2>物流 · 应急 · 农业</h2><em>15 项</em></div>
+        <ol class="plist7">
+          <li><span>31</span>5G-A助力“打造河南首条城乡一体、支末融合寄递物流示范航路开通”</li>
+          <li><span>32</span>5G-A通感融合赋能琶洲低空无人机编队表演融媒体平台</li>
+          <li><span>33</span>5G低空全域感知——空海融合海上风电与海洋牧场智慧应用</li>
+          <li><span>34</span>上蔡县5G+无人机AI综合治理项目</li>
+          <li><span>35</span>5G-A点亮“硚口之翼”——无人机物流与应急双擎驱动低空经济新范式</li>
+          <li><span>36</span>低空翱翔·智护秦岭，5G赋能小秦岭国家级自然保护区立体化智慧管护</li>
+          <li><span>37</span>5G+AI低空政务飞行服务平台</li>
+          <li><span>38</span>基于5G-A天翼星云平台的县域医共体绿色低空医疗配送体系</li>
+          <li><span>39</span>5G“空天地人”一体化岭南特色水果AI精准种植创新应用</li>
+          <li><span>40</span>5G-A通感一体赋能石狮全域低空飞行调度与安全保障</li>
+          <li><span>41</span>5G新质领航·空天地联，航空应急救援新范式</li>
+          <li><span>42</span>5G低空赋能，翼启华侨城智慧文旅新征程</li>
+          <li><span>43</span>5G-A通感一体——空中5G应急基站：低空无人机自组网全域通信保障创新应用</li>
+          <li><span>44</span>5G-A通感一体——低空智巡：5G-A+AI空地协同校园智能运维平台</li>
+          <li><span>45</span>5G+智慧林场巡护与生态监测建设项目</li>
+        </ol>
+      </section>
+      <section class="card p7col">
+        <div class="nhead"><b>D</b><h2>优秀奖 · 其他赛事</h2><em>10 项</em></div>
+        <ol class="plist7">
+          <li><span>46</span>国能黄骅港务5G+低空智慧港口项目</li>
+          <li><span>47</span>冰沟河景区项目</li>
+          <li><span>48</span>苏北运河宿迁段低空无人机智能巡检试点应用</li>
+          <li><span>49</span>“智巡工地・5G赋能”：低空智能工地巡检体系建设项目</li>
+          <li><span>50</span>荆门智慧城市大脑无人机工作站项目</li>
+          <li><span>51</span>壱通无人机队——AI 全自主油田巡检</li>
+          <li><span>52</span>探索者飞行俱乐部——智慧农业精准立体施药</li>
+          <li><span>53</span>北京翼航启翔队——灾害应急无人机智能投送</li>
+          <li><span>54</span>控天 eVTOL 飞行控制创新系统</li>
+          <li><span>55</span>群鹰智瞳——低成本集群无人机目标智能自主感知系统</li>
+        </ol>
+      </section>
+    </div>
+    <p class="p7note"><b>来源</b>第九届“绽放杯”5G应用征集大赛低空经济专题赛获奖名单（2026.09，01–50）· 2026 数字中国创新大赛低空经济赛道（51–53）· 第二届低空产业创新大赛（54）· 中国国际大学生创新大赛 2025（55）。名称为公开公告原文，具体技术细节以项目方披露为准。</p>
   </div>
 </section>
 
